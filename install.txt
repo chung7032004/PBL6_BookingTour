@@ -1,0 +1,27 @@
+Cài Dependency
+# Navigation core
+npm install @react-navigation/native
+
+# Bottom Tabs
+npm install @react-navigation/bottom-tabs
+
+# Native Stack (nếu cần màn hình dạng stack)
+npm install @react-navigation/native-stack
+
+# Các gói phụ trợ bắt buộc
+npm install react-native-screens react-native-safe-area-context
+
+# Gesture + animation
+npm install react-native-gesture-handler react-native-reanimated
+
+# Reanimated cần thêm worklets
+npm install react-native-worklets
+
+⚙️ babel.config.js
+
+Phải có react-native-reanimated/plugin ở cuối plugins:
+
+module.exports = {
+  presets: ['module:metro-react-native-babel-preset'],
+  plugins: ['react-native-reanimated/plugin'],
+};
