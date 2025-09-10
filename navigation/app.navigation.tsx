@@ -3,6 +3,7 @@ import BookingScreen from '../components/BookingScreen';
 import ProfileScreen from '../components/ProfileScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeStack from './app.home';
+import { Image } from 'react-native';
 
 const AppNavigation = () => {
   const Tab = createBottomTabNavigator();
@@ -13,11 +14,48 @@ const AppNavigation = () => {
         tabBarActiveTintColor: '#007bff',
         tabBarInactiveTintColor: 'gray',
         tabBarLabelStyle: { fontSize: 14 },
+        tabBarHideOnKeyboard: true,
       }}
     >
-      <Tab.Screen name={'home1'} component={HomeStack} />
-      <Tab.Screen name="booking" component={BookingScreen} />
-      <Tab.Screen name="profile" component={ProfileScreen} />
+      <Tab.Screen
+        name={'home1'}
+        component={HomeStack}
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ size }) => (
+            <Image
+              source={require('../images/home.png')}
+              style={{ width: size, height: size, resizeMode: 'contain' }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="booking"
+        component={BookingScreen}
+        options={{
+          title: 'Booking',
+          tabBarIcon: ({ size }) => (
+            <Image
+              source={require('../images/calendar.png')}
+              style={{ width: size, height: size, resizeMode: 'contain' }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="profile"
+        component={ProfileScreen}
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ size }) => (
+            <Image
+              source={require('../images/account.png')}
+              style={{ width: size, height: size, resizeMode: 'contain' }}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
