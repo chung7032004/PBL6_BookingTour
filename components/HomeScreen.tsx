@@ -10,6 +10,8 @@ const HomeScreen = () => {
         title="Go tour detail"
         onPress={() => navigation.navigate('tourDetail')}
       />
+      <Button title="Login" onPress={() => navigation.navigate('login')} />
+      <Button title="Sign Up" onPress={() => navigation.navigate('signup')} />
     </View>
   );
 };
