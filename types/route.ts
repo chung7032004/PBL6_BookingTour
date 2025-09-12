@@ -5,4 +5,5 @@ type RootStackParamList = {
   tourDetail: undefined;
   login: undefined;
   signup: undefined;
+  forgotPassword: undefined;
 };
