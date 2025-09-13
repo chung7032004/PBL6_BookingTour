@@ -4,6 +4,7 @@ import ProfileScreen from '../components/ProfileScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeStack from './app.home';
 import { Image } from 'react-native';
+import ProfileStack from './app.profile';
 
 const AppNavigation = () => {
   const Tab = createBottomTabNavigator();
@@ -44,8 +45,8 @@ const AppNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="profile"
-        component={ProfileScreen}
+        name="profile1"
+        component={ProfileStack}
         options={{
           title: 'Profile',
           tabBarIcon: ({ size }) => (
