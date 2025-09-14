@@ -1,13 +1,12 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PostsScreen from './PostsScreen';
 import CommentsScreen from './CommentsScreen';
-
-const Tab = createMaterialTopTabNavigator();
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
 
   return (
     <View style={styles.container}>
@@ -36,33 +35,43 @@ const ProfileDetailScreen = () => {
         <Text style={styles.userInfo}>0 bài viết</Text>
       </View>
 
-      {/* Tab navigation */}
-      <View style={{ flex: 1 }}>
-        <Tab.Navigator
-          screenOptions={{
-            tabBarShowLabel: true,
-            tabBarActiveTintColor: '#007bff',
-            tabBarInactiveTintColor: '#666',
-            tabBarIndicatorStyle: { backgroundColor: '#007bff' },
-            tabBarLabelStyle: {
-              fontSize: 14,
-              fontWeight: '600',
-              textTransform: 'none',
-            },
-            tabBarStyle: { backgroundColor: '#fff' }, // đảm bảo có nền trắng
-          }}
+      {/* Custom Tabs */}
+      <View style={styles.tabRow}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'posts' && styles.activeTab]}
+          onPress={() => setActiveTab('posts')}
         >
-          <Tab.Screen
-            name="port"
-            component={PostsScreen}
-            options={{ title: 'Bài viết' }}
-          />
-          <Tab.Screen
-            name="comment"
-            component={CommentsScreen}
-            options={{ title: 'Nhận xét' }}
-          />
-        </Tab.Navigator>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'posts' && styles.activeTabText,
+            ]}
+          >
+            Bài viết
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === 'comments' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('comments')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'comments' && styles.activeTabText,
+            ]}
+          >
+            Nhận xét
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Nội dung theo tab */}
+      <View style={{ flex: 1 }}>
+        {activeTab === 'posts' ? <PostsScreen /> : <CommentsScreen />}
       </View>
     </View>
   );
@@ -95,6 +104,27 @@ const styles = StyleSheet.create({
   editIcon: { width: 18, height: 18, tintColor: '#007bff', marginRight: 6 },
   editText: { fontSize: 14, color: '#007bff', fontWeight: '500' },
   userInfo: { fontSize: 14, color: '#666' },
+
+  tabRow: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  tabText: { fontSize: 16, color: '#666', fontWeight: '500' },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#007bff',
+  },
+  activeTabText: {
+    color: '#007bff',
+    fontWeight: '700',
+  },
 });
 
 export default ProfileDetailScreen;
