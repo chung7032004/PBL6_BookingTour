@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import images from '../../images';
 
 const ForgotPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -29,10 +30,7 @@ const ForgotPasswordScreen = () => {
           style={styles.backToLoginButton}
           onPress={() => navigation.navigate('login')}
         >
-          <Image
-            style={styles.image}
-            source={require('../images/arrow_back.png')}
-          />
+          <Image style={styles.image} source={images.arrowBack} />
           <Text style={styles.textBackToLogin}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.confirmButton} onPress={() => {}}>

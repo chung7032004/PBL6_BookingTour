@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ProfileScreen from '../components/ProfileScreen';
-import ProfileDetailScreen from '../components/ProflieDetailScreen';
-import ProfileEditScreen from '../components/ProfileEditScreen';
+import ProfileScreen from '../Profile/ProfileScreen';
+import ProfileDetailScreen from '../Profile/ProfileDetailScreen';
+import ProfileEditScreen from '../Profile/ProfileEditScreen';
 
 export default function ProfileStack() {
   const Stack = createNativeStackNavigator();

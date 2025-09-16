@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PostsScreen from './PostsScreen';
 import CommentsScreen from './CommentsScreen';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import images from '../../images';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -13,10 +14,7 @@ const ProfileDetailScreen = () => {
       {/* Header profile */}
       <View style={styles.profileSection}>
         <TouchableOpacity>
-          <Image
-            style={styles.avatarImage}
-            source={require('../images/account.jpg')}
-          />
+          <Image style={styles.avatarImage} source={images.account} />
         </TouchableOpacity>
 
         <Text style={styles.userName}>Tên của bạn</Text>
@@ -25,10 +23,7 @@ const ProfileDetailScreen = () => {
           style={styles.editButton}
           onPress={() => navigation.navigate('profileEdit')}
         >
-          <Image
-            style={styles.editIcon}
-            source={require('../images/edit.png')}
-          />
+          <Image style={styles.editIcon} source={images.edit} />
           <Text style={styles.editText}>Chỉnh sửa hồ sơ</Text>
         </TouchableOpacity>
 

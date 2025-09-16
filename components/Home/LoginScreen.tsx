@@ -1,59 +1,54 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import {
-  Alert,
   Button,
-  Image,
-  StyleSheet,
-  Text,
   TextInput,
-  TouchableOpacity,
   View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
+import images from '../../images';
 
-const SignUpScreen = () => {
+const LoginScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const handleSignUp = () => {
+
+  const handleLogin = () => {
     if (email.length === 0) {
-      setError('Email is required');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Không được để trống email');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError('Mật khẩu phải dài ít nhất 6 ký tự');
       return;
     }
-    // Handle sign-up logic here
+    // Handle login logic here
   };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Đăng nhập</Text>
 
       <Text style={styles.text}>Email</Text>
       <TextInput
         value={email}
         onChangeText={setEmail}
         style={styles.input}
-        placeholder="Email"
+        placeholder="Email của bạn"
         placeholderTextColor="#888"
         keyboardType="email-address"
       />
 
-      <Text style={styles.text}>Password</Text>
+      <Text style={styles.text}>Mật khẩu</Text>
       <View style={styles.passwordContainer}>
         <TextInput
           style={[styles.input, { flex: 1, borderWidth: 0, marginVertical: 0 }]}
-          placeholder="Password"
+          placeholder="Mật khẩu"
           placeholderTextColor="#888"
           secureTextEntry={!passwordVisible}
           value={password}
@@ -64,62 +59,44 @@ const SignUpScreen = () => {
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
           <Image
-            source={
-              passwordVisible
-                ? require('../images/visibility_off.png')
-                : require('../images/visibility.png')
-            }
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.text}>Confirm Password</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={[styles.input, { flex: 1, borderWidth: 0, marginVertical: 0 }]}
-          placeholder="Confirm Password"
-          placeholderTextColor="#888"
-          secureTextEntry={!confirmPasswordVisible}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          keyboardType={confirmPasswordVisible ? 'visible-password' : 'default'}
-          autoCapitalize="none"
-          textContentType="password"
-        />
-        <TouchableOpacity
-          onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-        >
-          <Image
-            source={
-              confirmPasswordVisible
-                ? require('../images/visibility_off.png')
-                : require('../images/visibility.png')
-            }
+            source={passwordVisible ? images.visibilityOff : images.visibility}
             style={styles.image}
           />
         </TouchableOpacity>
       </View>
       {error.length > 0 && <Text style={styles.error}>* {error} *</Text>}
       <View style={styles.button}>
-        <Button title="Sign Up" onPress={() => handleSignUp()} />
+        <Button title="Đăng nhập" onPress={() => handleLogin()} />
       </View>
 
-      <View style={styles.loginRow}>
-        <Text>Already have an account?</Text>
-        <View style={styles.loginButton}>
-          <Button title="Login" onPress={() => navigation.navigate('login')} />
+      <View style={styles.forgotRow}>
+        <Text style={styles.text}>Quên mật khẩu?</Text>
+        <View style={styles.forgotButton}>
+          <Button
+            title="Đặt lại mật khẩu"
+            onPress={() => navigation.navigate('forgotPassword')}
+          />
+        </View>
+      </View>
+
+      <View style={styles.signupRow}>
+        <Text style={styles.text}>Không có tài khoản?</Text>
+        <View style={styles.signupButton}>
+          <Button
+            title="Đăng kí"
+            onPress={() => navigation.navigate('signup')}
+          />
         </View>
       </View>
 
       <View style={styles.socialSection}>
-        <Text style={{ textAlign: 'center' }}>Or sign up with</Text>
+        <Text style={{ textAlign: 'center' }}>Hoặc đăng nhập với</Text>
         <View style={styles.socialButtons}>
           <Button title="Google" onPress={() => {}} />
           <Button title="Facebook" onPress={() => {}} />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -128,7 +105,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 28,
@@ -159,17 +135,25 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     paddingRight: 10,
   },
-  image: { width: 18, height: 18, tintColor: '#555' },
   button: {
     marginVertical: 12,
   },
-  loginRow: {
+  forgotRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
   },
-  loginButton: {
+  forgotButton: {
+    marginLeft: 8,
+  },
+  signupRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  signupButton: {
     marginLeft: 8,
   },
   socialSection: {
@@ -179,6 +163,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     gap: 8,
   },
+  image: { width: 18, height: 18, tintColor: '#555' },
   error: {
     fontSize: 14,
     color: 'red',
@@ -187,4 +172,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default LoginScreen;

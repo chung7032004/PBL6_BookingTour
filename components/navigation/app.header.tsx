@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import images from '../../images';
 
 const AppHeader = () => {
   const [searchText, setSearchText] = useState('');
@@ -20,24 +21,21 @@ const AppHeader = () => {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Image source={require('../images/search.png')} />
+        <Image source={images.search} />
         <TextInput
           style={styles.input}
           value={searchText}
-          placeholder="Search"
+          placeholder="Tìm kiếm..."
           placeholderTextColor="#888"
           onChangeText={text => setSearchText(text)}
         />
         {searchText.length > 0 && (
           <TouchableOpacity onPress={handleClearSearch}>
-            <Image
-              style={styles.icon_clear}
-              source={require('../images/close.png')}
-            />
+            <Image style={styles.icon_clear} source={images.close} />
           </TouchableOpacity>
         )}
       </View>
-      <Button title="Search" onPress={() => handleSearch(searchText)} />
+      <Button title="Tìm kiếm" onPress={() => handleSearch(searchText)} />
     </View>
   );
 };

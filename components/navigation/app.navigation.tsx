@@ -1,10 +1,9 @@
-import HomeScreen from '../components/HomeScreen';
-import BookingScreen from '../components/BookingScreen';
-import ProfileScreen from '../components/ProfileScreen';
+import BookingScreen from '../Booking/BookingScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeStack from './app.home';
 import { Image } from 'react-native';
 import ProfileStack from './app.profile';
+import images from '../../images';
 
 const AppNavigation = () => {
   const Tab = createBottomTabNavigator();
@@ -22,10 +21,10 @@ const AppNavigation = () => {
         name={'home1'}
         component={HomeStack}
         options={{
-          title: 'Home',
+          title: 'Trang chủ',
           tabBarIcon: ({ size }) => (
             <Image
-              source={require('../images/home.png')}
+              source={images.home}
               style={{ width: size, height: size, resizeMode: 'contain' }}
             />
           ),
@@ -38,7 +37,7 @@ const AppNavigation = () => {
           title: 'Booking',
           tabBarIcon: ({ size }) => (
             <Image
-              source={require('../images/calendar.png')}
+              source={images.calendar}
               style={{ width: size, height: size, resizeMode: 'contain' }}
             />
           ),
@@ -48,10 +47,10 @@ const AppNavigation = () => {
         name="profile1"
         component={ProfileStack}
         options={{
-          title: 'Profile',
+          title: 'Tài khoản',
           tabBarIcon: ({ size }) => (
             <Image
-              source={require('../images/account.png')}
+              source={images.profile}
               style={{ width: size, height: size, resizeMode: 'contain' }}
             />
           ),
