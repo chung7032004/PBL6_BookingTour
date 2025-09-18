@@ -12,4 +12,8 @@ type RootStackParamList = {
 
   port: undefined;
   comment: undefined;
+
+  search: undefined;
+
+  wishList: undefined;
 };

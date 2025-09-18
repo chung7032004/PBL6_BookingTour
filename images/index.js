@@ -18,6 +18,22 @@ const images = {
   ticket: require('./ticket.png'),
   visibility: require('./visibility.png'),
   visibilityOff: require('./visibility_off.png'),
+  favorite: require('./favorite.png'),
+  favorite_fill: require('./favorite_fill.png'),
+  notifications: require('./notifications.png'),
+  star: require('./star.png'),
+
+  //Danh mục trải nghiệm
+  nature: require('./nature.png'),
+  food: require('./food.png'),
+  workshop: require('./workshop.png'),
+  culture: require('./culture.png'),
+
+  // banner
+  banner1: require('./banner1.jpg'),
+  banner2: require('./banner2.webp'),
+  banner3: require('./banner3.jpg'),
+  banner4: require('./banner4.webp'),
 };
 
 export default images;
