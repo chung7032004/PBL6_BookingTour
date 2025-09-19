@@ -9,31 +9,11 @@ import {
   Dimensions,
 } from 'react-native';
 import images from '../../images';
+import TourCard from './TourCard';
 
 const { width } = Dimensions.get('window');
 
-const TourCard = ({ image, title, rating, showFavorite = false }: any) => (
-  <TouchableOpacity style={styles.card}>
-    <Image source={image} style={styles.cardImage} />
-    <View style={styles.cardContent}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <View style={styles.cardRow}>
-        <Text style={{ color: '#fff' }}>{rating}</Text>
-        <Image source={images.star} style={[styles.iconStar, styles.icon]} />
-        {showFavorite && (
-          <Image
-            source={images.favorite_fill}
-            style={[styles.icon, styles.iconFavorite]}
-          />
-        )}
-      </View>
-    </View>
-  </TouchableOpacity>
-);
-
 const HomeScreen = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
-
   return (
     <ScrollView style={styles.container}>
       {/* Banner nổi bật */}
@@ -46,7 +26,7 @@ const HomeScreen = () => {
       </ScrollView>
 
       {/* Danh mục trải nghiệm */}
-      <Text style={styles.sectionTitle}>Danh mục trải nghiệm</Text>
+      <Text style={styles.sectionTitle}>Trải nghiệm</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -62,7 +42,7 @@ const HomeScreen = () => {
         </View>
         <View style={styles.category}>
           <Image source={images.nature} style={styles.categoryIcon} />
-          <Text>Thiên nhiên</Text>
+          <Text>Thiên nhiên </Text>
         </View>
         <View style={styles.category}>
           <Image source={images.workshop} style={styles.categoryIcon} />
@@ -71,7 +51,7 @@ const HomeScreen = () => {
       </ScrollView>
 
       {/* Trải nghiệm gợi ý */}
-      <Text style={styles.sectionTitle}>Trải nghiệm gợi ý cho bạn</Text>
+      <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
       <TourCard
         image={images.banner1}
         title="Tour Đà Nẵng"
@@ -86,11 +66,11 @@ const HomeScreen = () => {
       />
 
       {/* Top đánh giá cao */}
-      <Text style={styles.sectionTitle}>Top đánh giá cao</Text>
+      <Text style={styles.sectionTitle}>Đánh giá cao</Text>
       <TourCard image={images.banner3} title="Tour Hạ Long" rating="5.0" />
 
       {/* Gần bạn */}
-      <Text style={styles.sectionTitle}>Gần bạn</Text>
+      <Text style={styles.sectionTitle}>Hot</Text>
       <TourCard image={images.banner4} title="Tour Hội An" rating="4.9" />
     </ScrollView>
   );
@@ -123,54 +103,10 @@ const styles = StyleSheet.create({
     padding: 7,
   },
   categoryIcon: {
-    width: 60,
-    height: 60,
+    width: 55,
+    height: 55,
     marginBottom: 5,
     borderRadius: 30,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    marginVertical: 10,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5, // cho Android
-  },
-  cardImage: {
-    width: '100%',
-    height: 180,
-  },
-  cardContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    padding: 10,
-  },
-  cardTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  icon: {
-    width: 20,
-    height: 20,
-    marginLeft: 5,
-  },
-  iconStar: {
-    tintColor: '#FFD700',
-  },
-  iconFavorite: {
-    tintColor: '#FF0000',
   },
 });
 
