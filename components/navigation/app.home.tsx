@@ -21,7 +21,7 @@ export default function HomeStack() {
       <Stack.Screen
         name="tourDetail"
         component={TourDetailScreen}
-        options={{ title: 'Chi tiết tour' }}
+        options={{ title: 'Chi tiết tour', headerTitle: () => <AppHeader /> }}
       />
       <Stack.Screen
         name="login"

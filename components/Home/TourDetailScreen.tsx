@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dimensions,
   Image,
   ScrollView,
@@ -9,10 +10,36 @@ import {
 } from 'react-native';
 // import MapView, { Marker } from 'react-native-maps';
 import images from '../../images';
+import { useState } from 'react';
+import ExpandableText from './ExpandableText';
+import SelectDateModal from './SelectDate.modal';
 
 const { width } = Dimensions.get('window');
 
+const random = Math.floor(Math.random() * 5) + 1;
+let randomArr: number[] = [];
+for (let i = 0; i < random; i++) {
+  randomArr.push(i);
+}
+
 const TourDetailScreen = () => {
+  const handleFavorite = () => {
+    Alert.alert('Thêm vào yêu thích thành công');
+  };
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const tourImages = [
+    images.banner4,
+    images.banner4,
+    images.banner4,
+    images.banner4,
+  ];
+  const handleScroll = (event: any) => {
+    const slide = Math.round(event.nativeEvent.contentOffset.x / width);
+    setActiveIndex(slide);
+  };
+
+  const [showModal, setShowModal] = useState(false);
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -22,35 +49,61 @@ const TourDetailScreen = () => {
           { flexDirection: 'row', justifyContent: 'space-between' },
         ]}
       >
-        <Text style={styles.title}>Tour</Text>
-        <TouchableOpacity style={styles.favorite}>
+        <Text style={styles.title}>Tour........</Text>
+        <TouchableOpacity
+          style={styles.favorite}
+          onPress={() => handleFavorite()}
+        >
           <Image source={images.favorite_fill} style={styles.favoriteImage} />
           <Text style={styles.favoriteText}>Yêu thích</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Hình ảnh & mô tả */}
+      {/* Hình ảnh */}
       <View style={styles.section}>
         <ScrollView
           horizontal
+          pagingEnabled
           showsHorizontalScrollIndicator={false}
-          style={styles.categoriesContainer}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
         >
-          <Image source={images.banner4} style={styles.imageTour} />
-          <Image source={images.banner4} style={styles.imageTour} />
-          <Image source={images.banner4} style={styles.imageTour} />
-          <Image source={images.banner4} style={styles.imageTour} />
+          {tourImages.map((img, index) => (
+            <Image key={index} source={img} style={styles.imageTour} />
+          ))}
         </ScrollView>
-        <Text style={styles.descriptionTour}>
-          Chìa khóa riêng của bạn để đến Hội An: mở khóa sự kỳ diệu của nó...
-        </Text>
+
+        {/* dot indicator */}
+        <View style={styles.dotContainer}>
+          {tourImages.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                activeIndex === index ? styles.activeDot : null,
+              ]}
+            />
+          ))}
+        </View>
+        <ExpandableText
+          text="Chìa khóa riêng của bạn để đến Hội An: mở khóa sự kỳ diệu của nó với sự hỗ trợ tận tâm của chúng tôi, đảm bảo rằng mỗi khoảnh khắc đều đáng nhớ và tràn ngập sự quyến rũ."
+          limit={80}
+        />
         <View style={styles.price}>
           <Text style={styles.priceText}>
             Giá từ: <Text style={{ color: '#e63946' }}>1.000.000 VND</Text>
             /khách
           </Text>
-          <TouchableOpacity style={styles.touchButton}>
+          <TouchableOpacity
+            style={styles.touchButton}
+            onPress={() => setShowModal(true)}
+          >
             <Text style={styles.touchText}>Chọn ngày</Text>
+            <SelectDateModal
+              visible={showModal}
+              onClose={() => setShowModal(false)}
+              title="Chọn thời gian"
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -59,7 +112,7 @@ const TourDetailScreen = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Những việc bạn sẽ làm</Text>
 
-        <View style={styles.containerActive}>
+        <TouchableOpacity style={styles.containerActive}>
           <Image source={images.banner4} style={styles.imageActive} />
           <View style={{ marginLeft: 10 }}>
             <Text style={styles.titleActive}>Làng chài cổ</Text>
@@ -68,9 +121,9 @@ const TourDetailScreen = () => {
               sống thực tại địa phương
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.containerActive}>
+        <TouchableOpacity style={styles.containerActive}>
           <Image source={images.banner4} style={styles.imageActive} />
           <View style={{ marginLeft: 10 }}>
             <Text style={styles.titleActive}>Làng chài cổ</Text>
@@ -79,18 +132,7 @@ const TourDetailScreen = () => {
               sống thực tại địa phương
             </Text>
           </View>
-        </View>
-
-        <View style={styles.containerActive}>
-          <Image source={images.banner4} style={styles.imageActive} />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.titleActive}>Làng chài cổ</Text>
-            <Text style={styles.subtitleActive}>
-              Không khí mặn, bàn tay bận rộn, đánh bắt tươi được giao dịch, cuộc
-              sống thực tại địa phương
-            </Text>
-          </View>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Địa điểm hẹn gặp */}
@@ -142,7 +184,12 @@ const TourDetailScreen = () => {
           <Text style={{ fontSize: 18, fontWeight: 'bold' }}>5.0</Text>
           <Image
             source={images.star}
-            style={{ width: 20, height: 20, marginLeft: 5 }}
+            style={{
+              width: 20,
+              height: 20,
+              marginLeft: 5,
+              tintColor: '#FFD700',
+            }}
           />
           <Text style={{ marginLeft: 5, color: '#666' }}>(1001 đánh giá)</Text>
         </View>
@@ -167,7 +214,19 @@ const TourDetailScreen = () => {
               marginTop: 5,
             }}
           >
-            <Text>Số sao</Text>
+            <View style={{ flexDirection: 'row' }}>
+              {randomArr.map(index => (
+                <Image
+                  key={index}
+                  source={images.star}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: '#FFD700',
+                  }}
+                />
+              ))}
+            </View>
             <Text style={{ color: '#999' }}>2 ngày trước</Text>
           </View>
           <Text style={{ marginTop: 5, color: '#444' }}>
@@ -194,7 +253,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 3,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
@@ -224,10 +283,28 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   imageTour: {
-    width: width * 0.9,
-    height: 300,
+    width: width - 40, // bớt padding 2 bên
+    height: 280,
     borderRadius: 15,
     marginRight: 10,
+    resizeMode: 'cover',
+  },
+  dotContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ccc',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#ff4d4f',
+    width: 10,
+    height: 10,
   },
   descriptionTour: {
     fontSize: 13,

@@ -22,6 +22,10 @@ const images = {
   favorite_fill: require('./favorite_fill.png'),
   notifications: require('./notifications.png'),
   star: require('./star.png'),
+  date: require('./date.png'),
+
+  check_box_outline_blank: require('./check_box_outline_blank.png'),
+  check_box: require('./check_box.png'),
 
   //Danh mục trải nghiệm
   nature: require('./nature.png'),
