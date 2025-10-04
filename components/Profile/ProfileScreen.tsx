@@ -23,7 +23,7 @@ const ProfileScreen = () => {
           <Text style={styles.userInfo}>0 Bài viết</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('profileEdit')}>
-          <Image style={styles.editIcon} source={images.edit.png} />
+          <Image style={styles.editIcon} source={images.edit} />
         </TouchableOpacity>
       </View>
 

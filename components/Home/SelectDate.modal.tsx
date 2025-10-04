@@ -3,6 +3,7 @@ import {
   Button,
   Image,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import {
 import images from '../../images';
 import { Quantity } from './quantity';
 import EditGuests from './EditGuests.modal';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 interface SelectDateModalProps {
   visible: boolean;
@@ -61,6 +63,24 @@ const SelectDateModal = (props: SelectDateModalProps) => {
   });
   const [showEditGuests, setShowEditGuests] = useState(false);
 
+  const [date, setDate] = useState(new Date());
+
+  const handleChangeDate = (event: any, selectedDate?: Date) => {
+    if (event.type === 'set' && selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const openDatePicker = () => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange: handleChangeDate,
+      mode: 'date',
+      is24Hour: true,
+      minimumDate: new Date(), // chỉ chọn >= hôm nay
+    });
+  };
+
   const slots: Slot[] = [
     { time: '18:00 - 22:00', price: 1000000, quantity: 10 },
     { time: '19:00 - 23:00', price: 1200000, quantity: 8 },
@@ -106,15 +126,21 @@ const SelectDateModal = (props: SelectDateModalProps) => {
 
           {/* Chọn ngày */}
           <View style={styles.chooseDate}>
-            <Text style={styles.subTitle}>Tháng 9 năm 2025</Text>
-            <TouchableOpacity>
+            <Text style={styles.subTitle}>{`Ngày ${date.getDate()} tháng ${
+              date.getMonth() + 1
+            } năm ${date.getFullYear()}`}</Text>
+            <TouchableOpacity onPress={openDatePicker}>
               <Image source={images.date} style={styles.icon} />
             </TouchableOpacity>
           </View>
 
           {/* Danh sách giờ */}
           <ScrollView style={{ marginTop: 10 }}>
-            <Text style={styles.sectionLabel}>Hôm nay, ngày 28 tháng 9</Text>
+            <Text style={styles.sectionLabel}>
+              {`Ngày ${date.getDate()} tháng ${
+                date.getMonth() + 1
+              } năm ${date.getFullYear()}`}
+            </Text>
             {slots.map((slot, index) => (
               <SelectDateCard
                 key={index}

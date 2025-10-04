@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import {
+  Alert,
   Image,
+  ImageSourcePropType,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,31 +12,70 @@ import {
 } from 'react-native';
 import images from '../../images';
 import DescriptionModal from './description.modal';
+import EditNameModal from './EditName.modal';
+import EditAvatarModal from './EditAvatar.modal';
+import EditGenderModal from './EditGender.modal';
+import BirthdayPicker from './BirthdayPicker';
 
 const ProfileEditScreen = () => {
   const [infoState, setInfoState] = useState(true);
   const [phoneState, setPhoneState] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalDesc, setShowModalDesc] = useState(false);
   const [description, setDescription] = useState('Chúng tôi biết về bạn');
+
+  const [showModalEditAvatar, setShowModalEditAvatar] = useState(false);
+  const [avatar, setAvatar] = useState<ImageSourcePropType>(images.account);
+
+  const [showModalEditName, setShowModalEditName] = useState(false);
+  const [name, setName] = useState('Tên của bạn');
+
+  const [showModalEditGender, setShowModalEditGender] = useState(false);
+  const [gender, SetGender] = useState('male');
+
+  const [birthday, setBirthday] = useState<Date>(new Date(2000, 0, 1));
+
+  const handleSaveInfo = () => {
+    setInfoState(true);
+    Alert.alert('Lưu thành công');
+  };
+
+  const handleSavePhone = () => {
+    setPhoneState(true);
+    Alert.alert('Lưu số điện thoại thành công');
+  };
 
   return (
     <ScrollView style={styles.container}>
       {/* Header Profile */}
       <View style={styles.profileSection}>
-        <Image style={styles.avatarImage} source={images.account} />
-        <Text style={styles.userName}>Tên của bạn</Text>
+        {/* Avatar */}
+        <View style={styles.avatarWrapper}>
+          <Image style={styles.avatarImage} source={avatar} />
+          <TouchableOpacity
+            style={styles.editAvatarBtn}
+            onPress={() => setShowModalEditAvatar(true)}
+          >
+            <Image source={images.edit} style={styles.editIconSmall} />
+          </TouchableOpacity>
+        </View>
+
+        {/* User name */}
+        <View style={styles.userNameRow}>
+          <Text style={styles.userName}>{name}</Text>
+          <TouchableOpacity
+            style={styles.editNameBtn}
+            onPress={() => setShowModalEditName(true)}
+          >
+            <Image source={images.edit} style={styles.editIcon} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Description */}
         <TouchableOpacity
           style={styles.input}
-          onPress={() => setShowModal(true)}
+          onPress={() => setShowModalDesc(true)}
         >
           <Text style={{ color: '#aaa' }}>{description}</Text>
-          <DescriptionModal
-            visible={showModal}
-            onClose={() => setShowModal(false)}
-            onSave={text => setDescription(text)}
-            title="Chỉnh sửa tiểu sử"
-            initialValue={description}
-          />
         </TouchableOpacity>
       </View>
 
@@ -64,11 +105,29 @@ const ProfileEditScreen = () => {
         <View style={styles.row}>
           <View style={styles.flexItem}>
             <Text style={styles.subtitle}>Ngày sinh</Text>
-            <Text style={styles.valueText}>01/01/2000</Text>
+            <BirthdayPicker
+              value={birthday}
+              onChange={(date, state) => {
+                setBirthday(date);
+                setInfoState(state);
+              }}
+            />
           </View>
           <View style={styles.flexItem}>
             <Text style={styles.subtitle}>Giới tính</Text>
-            <Text style={styles.valueText}>Nam</Text>
+            <TouchableOpacity
+              style={styles.genderTouch}
+              onPress={() => {
+                setShowModalEditGender(true);
+                setInfoState(false);
+              }}
+            >
+              <Text style={styles.genderText}>
+                {' '}
+                {gender === 'male' ? 'Nam' : 'Nữ'}
+              </Text>
+              <Image source={images.down} style={styles.genderIcon} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -83,7 +142,7 @@ const ProfileEditScreen = () => {
         </View>
 
         {!infoState && (
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveInfo}>
             <Text style={styles.saveButtonText}>Lưu</Text>
           </TouchableOpacity>
         )}
@@ -111,11 +170,38 @@ const ProfileEditScreen = () => {
         />
 
         {!phoneState && (
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSavePhone}>
             <Text style={styles.saveButtonText}>Lưu</Text>
           </TouchableOpacity>
         )}
       </View>
+      <EditAvatarModal
+        title={'Chọn ảnh đại diện'}
+        visible={showModalEditAvatar}
+        onClose={() => setShowModalEditAvatar(false)}
+        onSave={uri => setAvatar({ uri })}
+      />
+      <EditNameModal
+        visible={showModalEditName}
+        onClose={() => setShowModalEditName(false)}
+        onSave={text => setName(text)}
+        title="Chỉnh sửa tên người dùng"
+        initialValue={name}
+      />
+      <DescriptionModal
+        visible={showModalDesc}
+        onClose={() => setShowModalDesc(false)}
+        onSave={text => setDescription(text)}
+        title="Chỉnh sửa tiểu sử"
+        initialValue={description}
+      />
+      <EditGenderModal
+        visible={showModalEditGender}
+        onClose={() => setShowModalEditGender(false)}
+        onSave={value => SetGender(value)}
+        title="Chọn giới tính"
+        initialValue={gender}
+      />
     </ScrollView>
   );
 };
@@ -132,18 +218,46 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
+  avatarWrapper: {
+    position: 'relative',
+    marginBottom: 12,
+  },
   avatarImage: {
-    height: 90,
-    width: 90,
-    borderRadius: 45,
-    marginBottom: 10,
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+  },
+  editAvatarBtn: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  editIconSmall: { width: 16, height: 16, tintColor: '#007bff' },
+
+  userNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   userName: {
     fontSize: 20,
     fontWeight: '600',
     color: '#000',
-    marginBottom: 8,
+    marginRight: 8,
   },
+  editNameBtn: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+    padding: 6,
+  },
+  editIcon: { width: 18, height: 18, tintColor: '#007bff' },
 
   // Card style
   card: {
@@ -177,11 +291,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#666',
-    marginTop: 6,
-  },
-  valueText: {
-    fontSize: 15,
-    color: '#333',
     marginTop: 6,
   },
 
@@ -218,6 +327,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  genderTouch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginTop: 6,
+    backgroundColor: '#fafafa',
+  },
+  genderText: {
+    fontSize: 15,
+    color: '#333',
+  },
+  genderIcon: {
+    width: 18,
+    height: 18,
+    tintColor: '#666',
   },
 });
 

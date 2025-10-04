@@ -12,6 +12,7 @@ const images = {
   login: require('./login.png'),
   logout: require('./logout.png'),
   next: require('./next.png'),
+  down: require('./down.png'),
   refund: require('./refund.png'),
   search: require('./search.png'),
   setting: require('./setting.png'),
@@ -26,6 +27,9 @@ const images = {
 
   check_box_outline_blank: require('./check_box_outline_blank.png'),
   check_box: require('./check_box.png'),
+
+  radio_button_checked: require('./radio_button_checked.png'),
+  radio_button_unchecked: require('./radio_button_unchecked.png'),
 
   //Danh mục trải nghiệm
   nature: require('./nature.png'),
