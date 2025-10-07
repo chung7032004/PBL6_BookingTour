@@ -5,6 +5,8 @@ import AppHeader from './app.header';
 import LoginScreen from '../Home/LoginScreen';
 import SignUpScreen from '../Home/SignUpScreen';
 import ForgotPasswordScreen from '../Home/ForgetPasswordScreen';
+import SearchScreen from '../Search/SearchScreen';
+import SearchHeader from '../Search/Search.header';
 
 const Stack = createNativeStackNavigator();
 

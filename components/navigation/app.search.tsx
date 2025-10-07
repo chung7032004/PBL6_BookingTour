@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SearchScreen from '../Search/SearchScreen';
-import AppHeader from './app.header';
+import SearchHeader from '../Search/Search.header';
 
 const SearchStack = () => {
   const Stack = createNativeStackNavigator();
@@ -9,7 +9,7 @@ const SearchStack = () => {
       <Stack.Screen
         name="search"
         component={SearchScreen}
-        options={{ headerTitle: () => <AppHeader /> }}
+        options={{ headerTitle: () => <SearchHeader /> }}
       />
     </Stack.Navigator>
   );

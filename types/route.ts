@@ -16,6 +16,7 @@ type RootStackParamList = {
   comment: undefined;
 
   search: undefined;
+  searchTab: undefined;
 
   wishList: undefined;
 };

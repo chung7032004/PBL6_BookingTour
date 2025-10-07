@@ -1,44 +1,28 @@
-import { useState } from 'react';
-import {
-  Alert,
-  Button,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import images from '../../images';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 const AppHeader = () => {
-  const [searchText, setSearchText] = useState('');
-  const handleSearch = (searchText: string) => {
-    Alert.alert('Search', `You searched for: ${searchText}`);
-  };
-  const handleClearSearch = () => {
-    setSearchText('');
-  };
+  const navigation: NavigationProp<any> = useNavigation();
+
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <TouchableOpacity
+        style={styles.searchContainer}
+        // 👉 Chuyển sang tab "searchTab" thay vì mở màn mới
+        onPress={() => navigation.navigate('searchTab')}
+      >
         <Image source={images.search} />
-        <TextInput
-          style={styles.input}
-          value={searchText}
-          placeholder="Tìm kiếm..."
-          placeholderTextColor="#888"
-          onChangeText={text => setSearchText(text)}
-        />
-        {searchText.length > 0 && (
-          <TouchableOpacity onPress={handleClearSearch}>
-            <Image style={styles.icon_clear} source={images.close} />
-          </TouchableOpacity>
-        )}
-      </View>
-      <Button title="Tìm kiếm" onPress={() => handleSearch(searchText)} />
+        <Text style={styles.input}>Tìm kiếm...</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <Image source={images.notifications} />
+      </TouchableOpacity>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -60,23 +44,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 14,
-    color: '#000',
+    color: '#888',
     paddingVertical: 0,
   },
-  icon: {
-    width: 18,
-    height: 18,
-    tintColor: 'gray',
-    marginRight: 6,
-  },
-  icon_clear: {
-    width: 17,
-    height: 17,
-    tintColor: '#fff',
-    backgroundColor: '#999',
-    borderRadius: 10,
-    padding: 3,
-    marginLeft: 6,
-  },
 });
+
 export default AppHeader;

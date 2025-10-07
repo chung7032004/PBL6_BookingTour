@@ -1,10 +1,9 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import React from 'react';
 import {
   Image,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   Dimensions,
 } from 'react-native';
@@ -13,79 +12,176 @@ import TourCard from './TourCard';
 
 const { width } = Dimensions.get('window');
 
+const highlightData = [
+  images.banner1,
+  images.banner2,
+  images.banner3,
+  images.banner4,
+];
+
+const categoryData = [
+  { id: 1, icon: images.food, name: 'Ẩm thực' },
+  { id: 2, icon: images.culture, name: 'Văn hóa' },
+  { id: 3, icon: images.nature, name: 'Thiên nhiên' },
+  { id: 4, icon: images.workshop, name: 'Workshop' },
+];
+
+const suggestData = [
+  {
+    id: 1,
+    image: images.banner1,
+    title: 'Street Food Motorbike Tour',
+    rating: 4.98,
+    price: '₫730,000',
+    popular: true,
+  },
+  {
+    id: 2,
+    image: images.banner2,
+    title: 'Hue City Tour',
+    rating: 4.91,
+    price: '₫650,000',
+  },
+  {
+    id: 3,
+    image: images.banner3,
+    title: 'Ha Long Bay Cruise',
+    rating: 5.0,
+    price: '₫1,000,000',
+  },
+];
+
+const topRatedData = [
+  {
+    id: 4,
+    image: images.banner4,
+    title: 'Tour Hạ Long',
+    rating: 5.0,
+    price: '₫950,000',
+  },
+  {
+    id: 5,
+    image: images.banner1,
+    title: 'Tour Phú Quốc',
+    rating: 4.9,
+    price: '₫880,000',
+  },
+];
+
+const hotData = [
+  {
+    id: 6,
+    image: images.banner2,
+    title: 'Tour Hội An',
+    rating: 4.9,
+    price: '₫870,000',
+  },
+  {
+    id: 7,
+    image: images.banner3,
+    title: 'Tour Sài Gòn đêm',
+    rating: 4.95,
+    price: '₫750,000',
+  },
+];
+
+// ======================
+// 📱 COMPONENT CHÍNH
+// ======================
 const HomeScreen = () => {
   return (
-    <ScrollView style={styles.container}>
-      {/* Banner nổi bật */}
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Nổi bật */}
       <Text style={styles.sectionTitle}>Nổi bật</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <Image source={images.banner1} style={styles.banner} />
-        <Image source={images.banner2} style={styles.banner} />
-        <Image source={images.banner3} style={styles.banner} />
-        <Image source={images.banner4} style={styles.banner} />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.bannerContainer}
+      >
+        {highlightData.map((img, index) => (
+          <Image key={index} source={img} style={styles.banner} />
+        ))}
       </ScrollView>
 
-      {/* Danh mục trải nghiệm */}
+      {/* Trải nghiệm */}
       <Text style={styles.sectionTitle}>Trải nghiệm</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoriesContainer}
+        contentContainerStyle={styles.categoriesContainer}
       >
-        <View style={styles.category}>
-          <Image source={images.food} style={styles.categoryIcon} />
-          <Text>Ẩm thực</Text>
-        </View>
-        <View style={styles.category}>
-          <Image source={images.culture} style={styles.categoryIcon} />
-          <Text>Văn hóa</Text>
-        </View>
-        <View style={styles.category}>
-          <Image source={images.nature} style={styles.categoryIcon} />
-          <Text>Thiên nhiên </Text>
-        </View>
-        <View style={styles.category}>
-          <Image source={images.workshop} style={styles.categoryIcon} />
-          <Text>Workshop</Text>
-        </View>
+        {categoryData.map(item => (
+          <View key={item.id} style={styles.category}>
+            <Image source={item.icon} style={styles.categoryIcon} />
+            <Text style={styles.categoryName}>{item.name}</Text>
+          </View>
+        ))}
       </ScrollView>
 
-      {/* Trải nghiệm gợi ý */}
+      {/* Gợi ý cho bạn */}
       <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
-      <TourCard
-        image={images.banner1}
-        title="Tour Đà Nẵng"
-        rating="5.0"
-        showFavorite
-      />
-      <TourCard
-        image={images.banner2}
-        title="Tour Huế"
-        rating="4.8"
-        showFavorite
-      />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cardRow}
+      >
+        {suggestData.map(tour => (
+          <TourCard key={tour.id} {...tour} />
+        ))}
+      </ScrollView>
 
-      {/* Top đánh giá cao */}
+      {/*  Đánh giá cao */}
       <Text style={styles.sectionTitle}>Đánh giá cao</Text>
-      <TourCard image={images.banner3} title="Tour Hạ Long" rating="5.0" />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cardRow}
+      >
+        {topRatedData.map(tour => (
+          <TourCard key={tour.id} {...tour} />
+        ))}
+      </ScrollView>
 
-      {/* Gần bạn */}
+      {/* Hot */}
       <Text style={styles.sectionTitle}>Hot</Text>
-      <TourCard image={images.banner4} title="Tour Hội An" rating="4.9" />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cardRow}
+      >
+        {hotData.map(tour => (
+          <TourCard key={tour.id} {...tour} />
+        ))}
+      </ScrollView>
     </ScrollView>
   );
 };
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 10,
+    backgroundColor: '#f7f7f7',
+    paddingHorizontal: 10,
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 10,
+    marginTop: 20,
+    marginBottom: 10,
+    color: '#000',
+  },
+  bannerContainer: {
+    paddingRight: 10,
+    paddingBottom: 10,
   },
   banner: {
     width: width * 0.8,
@@ -94,20 +190,26 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   categoriesContainer: {
-    flexDirection: 'row',
-    marginBottom: 15,
+    paddingRight: 10,
+    paddingBottom: 15,
   },
   category: {
-    flex: 1,
     alignItems: 'center',
-    padding: 7,
+    justifyContent: 'center',
+    marginRight: 15,
   },
   categoryIcon: {
-    width: 55,
-    height: 55,
+    width: 60,
+    height: 60,
     marginBottom: 5,
     borderRadius: 30,
   },
+  categoryName: {
+    fontSize: 13,
+    color: '#333',
+  },
+  cardRow: {
+    paddingRight: 10,
+    paddingBottom: 25,
+  },
 });
-
-export default HomeScreen;
