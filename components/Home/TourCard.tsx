@@ -9,7 +9,7 @@ const TourCard = ({
   price,
   rating,
   popular,
-  showFavorite = true,
+  showFavorite = false,
 }: any) => {
   const navigation: NavigationProp<any> = useNavigation();
 

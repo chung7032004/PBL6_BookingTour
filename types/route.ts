@@ -1,6 +1,7 @@
 type RootStackParamList = {
   home: undefined;
   tourDetail: undefined;
+  provider: undefined;
 
   booking: undefined;
 

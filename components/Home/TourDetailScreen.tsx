@@ -12,10 +12,12 @@ import {
 import images from '../../images';
 import ExpandableText from './ExpandableText';
 import SelectDateModal from './SelectDate.modal';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
 const TourDetailScreen = () => {
+  const navigation: NavigationProp<any> = useNavigation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
@@ -121,7 +123,10 @@ const TourDetailScreen = () => {
       {/* Thông tin Host */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Thông tin Host</Text>
-        <TouchableOpacity style={styles.hostContainer}>
+        <TouchableOpacity
+          style={styles.hostContainer}
+          onPress={() => navigation.navigate('provider')}
+        >
           <Image source={images.banner4} style={styles.hostAvatar} />
           <View style={{ flex: 1, flexShrink: 1 }}>
             <Text style={styles.hostName}>Nguyễn Minh An</Text>
@@ -132,7 +137,7 @@ const TourDetailScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 🔹 Đánh giá */}
+      {/*  Đánh giá */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Đánh giá</Text>
 
@@ -156,7 +161,6 @@ const TourDetailScreen = () => {
             </View>
             <Text style={styles.reviewTime}>2 ngày trước</Text>
           </View>
-
           <Text style={styles.reviewText}>
             Trải nghiệm tuyệt vời, hướng dẫn viên thân thiện, cảnh đẹp và đồ ăn
             ngon. Rất đáng để thử!

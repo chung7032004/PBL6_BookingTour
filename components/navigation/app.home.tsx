@@ -5,8 +5,7 @@ import AppHeader from './app.header';
 import LoginScreen from '../Home/LoginScreen';
 import SignUpScreen from '../Home/SignUpScreen';
 import ForgotPasswordScreen from '../Home/ForgetPasswordScreen';
-import SearchScreen from '../Search/SearchScreen';
-import SearchHeader from '../Search/Search.header';
+import ProviderScreen from '../Home/ProviderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +23,11 @@ export default function HomeStack() {
         name="tourDetail"
         component={TourDetailScreen}
         options={{ title: 'Chi tiết tour', headerTitle: () => <AppHeader /> }}
+      />
+      <Stack.Screen
+        name="provider"
+        component={ProviderScreen}
+        options={{ title: 'Thông tin host', headerTitle: () => <AppHeader /> }}
       />
       <Stack.Screen
         name="login"

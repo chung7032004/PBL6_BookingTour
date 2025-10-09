@@ -85,9 +85,6 @@ const hotData = [
   },
 ];
 
-// ======================
-// 📱 COMPONENT CHÍNH
-// ======================
 const HomeScreen = () => {
   return (
     <ScrollView
@@ -96,6 +93,7 @@ const HomeScreen = () => {
       contentContainerStyle={styles.scrollContent}
     >
       {/* Nổi bật */}
+      {/*       
       <Text style={styles.sectionTitle}>Nổi bật</Text>
       <ScrollView
         horizontal
@@ -107,7 +105,7 @@ const HomeScreen = () => {
         ))}
       </ScrollView>
 
-      {/* Trải nghiệm */}
+ 
       <Text style={styles.sectionTitle}>Trải nghiệm</Text>
       <ScrollView
         horizontal
@@ -120,7 +118,7 @@ const HomeScreen = () => {
             <Text style={styles.categoryName}>{item.name}</Text>
           </View>
         ))}
-      </ScrollView>
+      </ScrollView> */}
 
       {/* Gợi ý cho bạn */}
       <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>

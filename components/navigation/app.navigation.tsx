@@ -6,6 +6,7 @@ import ProfileStack from './app.profile';
 import images from '../../images';
 import SearchStack from './app.search';
 import WishListScreen from '../WishList/WishListScreen';
+import BookingStack from './app.booking';
 
 const AppNavigation = () => {
   const Tab = createBottomTabNavigator();
@@ -58,7 +59,7 @@ const AppNavigation = () => {
       />
       <Tab.Screen
         name="bookingTab"
-        component={BookingScreen}
+        component={BookingStack}
         options={{
           title: 'Booking',
           tabBarIcon: ({ size, color }) => (
