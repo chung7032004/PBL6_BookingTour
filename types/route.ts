@@ -20,4 +20,7 @@ type RootStackParamList = {
   searchTab: undefined;
 
   wishList: undefined;
+  personalScheduleScreen: undefined;
+  wishListScreen: undefined;
+  wishListDetail: undefined;
 };

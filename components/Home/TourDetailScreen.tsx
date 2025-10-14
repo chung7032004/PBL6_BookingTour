@@ -13,13 +13,17 @@ import images from '../../images';
 import ExpandableText from './ExpandableText';
 import SelectDateModal from './SelectDate.modal';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import ActiveModal from './Active.modal';
+import ActiveCard from './ActiveCard';
+import CustomButton from '../component/CustomButton';
 
 const { width } = Dimensions.get('window');
 
 const TourDetailScreen = () => {
   const navigation: NavigationProp<any> = useNavigation();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showModal, setShowModal] = useState(false);
+  const [showSelectModal, setShowSelectModal] = useState(false);
+  const [showActiveModal, setShowActiveModal] = useState(false);
 
   const tourImages = [
     images.banner1,
@@ -89,35 +93,31 @@ const TourDetailScreen = () => {
           </Text>
           <TouchableOpacity
             style={styles.bookButton}
-            onPress={() => setShowModal(true)}
+            onPress={() => setShowSelectModal(true)}
           >
             <Text style={styles.bookButtonText}>Chọn ngày</Text>
           </TouchableOpacity>
         </View>
-
-        <SelectDateModal
-          visible={showModal}
-          onClose={() => setShowModal(false)}
-          title="Chọn thời gian"
-        />
       </View>
 
       {/* Hoạt động nổi bật */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
-
-        {[1, 2].map(i => (
-          <TouchableOpacity key={i} style={styles.activityCard}>
-            <Image source={images.banner3} style={styles.activityImage} />
-            <View style={{ flex: 1, marginLeft: 10 }}>
-              <Text style={styles.activityTitle}>Làng chài cổ</Text>
-              <Text style={styles.activityDesc}>
-                Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của
-                người dân địa phương.
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity onPress={() => setShowActiveModal(true)}>
+          {[1, 2].map(i => (
+            <ActiveCard
+              key={i}
+              title="Làng chày cổ"
+              description="Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của người dân địa phương"
+              image={images.banner3}
+            />
+          ))}
+        </TouchableOpacity>
+        <CustomButton
+          title="Hiển thị tất cả hoạt động"
+          onPress={() => setShowActiveModal(true)}
+          style={styles.buttonActive}
+        />
       </View>
 
       {/* Thông tin Host */}
@@ -171,6 +171,17 @@ const TourDetailScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <SelectDateModal
+        visible={showSelectModal}
+        onClose={() => setShowSelectModal(false)}
+        title="Chọn thời gian"
+      />
+      <ActiveModal
+        visible={showActiveModal}
+        onClose={() => {
+          setShowActiveModal(false);
+        }}
+      />
     </ScrollView>
   );
 };
@@ -278,30 +289,6 @@ const styles = StyleSheet.create({
     color: '#222',
   },
 
-  activityCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fafafa',
-    padding: 8,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  activityImage: {
-    width: 65,
-    height: 65,
-    borderRadius: 8,
-  },
-  activityTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
-  },
-  activityDesc: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 3,
-  },
-
   hostContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -380,5 +367,8 @@ const styles = StyleSheet.create({
     color: '#007bff',
     marginTop: 4,
     fontWeight: '500',
+  },
+  buttonActive: {
+    backgroundColor: '#ccc',
   },
 });

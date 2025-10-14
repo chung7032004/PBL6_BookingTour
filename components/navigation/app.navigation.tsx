@@ -5,8 +5,9 @@ import { Image } from 'react-native';
 import ProfileStack from './app.profile';
 import images from '../../images';
 import SearchStack from './app.search';
-import WishListScreen from '../WishList/WishListScreen';
+import WishListScreen from '../WishList/WishList';
 import BookingStack from './app.booking';
+import WishListStack from './app.wishlist';
 
 const AppNavigation = () => {
   const Tab = createBottomTabNavigator();
@@ -77,7 +78,7 @@ const AppNavigation = () => {
       />
       <Tab.Screen
         name="wishListTab"
-        component={WishListScreen}
+        component={WishListStack}
         options={{
           title: 'Yêu thích',
           tabBarIcon: ({ size, color }) => (

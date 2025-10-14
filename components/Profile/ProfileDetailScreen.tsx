@@ -4,10 +4,16 @@ import PostsScreen from './PostsScreen';
 import CommentsScreen from './CommentsScreen';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import images from '../../images';
+import CustomTabs from '../component/CustomTabs';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
+
+  const tabs = [
+    { key: 'posts', label: 'Bài viết' },
+    { key: 'comments', label: 'Đánh giá' },
+  ];
 
   return (
     <View style={styles.container}>
@@ -31,40 +37,12 @@ const ProfileDetailScreen = () => {
       </View>
 
       {/* Custom Tabs */}
-      <View style={styles.tabRow}>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'posts' && styles.activeTab]}
-          onPress={() => setActiveTab('posts')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'posts' && styles.activeTabText,
-            ]}
-          >
-            Bài viết
-          </Text>
-        </TouchableOpacity>
+      <CustomTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onChangeTab={key => setActiveTab(key as 'posts' | 'comments')}
+      />
 
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'comments' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('comments')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'comments' && styles.activeTabText,
-            ]}
-          >
-            Nhận xét
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Nội dung theo tab */}
       <View style={{ flex: 1 }}>
         {activeTab === 'posts' ? <PostsScreen /> : <CommentsScreen />}
       </View>
@@ -99,27 +77,6 @@ const styles = StyleSheet.create({
   editIcon: { width: 18, height: 18, tintColor: '#007bff', marginRight: 6 },
   editText: { fontSize: 14, color: '#007bff', fontWeight: '500' },
   userInfo: { fontSize: 14, color: '#666' },
-
-  tabRow: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  tabText: { fontSize: 16, color: '#666', fontWeight: '500' },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#007bff',
-  },
-  activeTabText: {
-    color: '#007bff',
-    fontWeight: '700',
-  },
 });
 
 export default ProfileDetailScreen;

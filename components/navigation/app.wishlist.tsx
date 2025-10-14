@@ -1,7 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SearchScreen from '../Search/SearchScreen';
+
 import AppHeader from './app.header';
-import WishListScreen from '../WishList/WishListScreen';
+
+import WishList from '../WishList/WishList';
+import WishListDetailScreen from '../WishList/WishListDetailScreen';
 
 const WishListStack = () => {
   const Stack = createNativeStackNavigator();
@@ -9,7 +11,12 @@ const WishListStack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="wishList"
-        component={WishListScreen}
+        component={WishList}
+        options={{ headerTitle: () => <AppHeader /> }}
+      />
+      <Stack.Screen
+        name="wishListDetail"
+        component={WishListDetailScreen}
         options={{ headerTitle: () => <AppHeader /> }}
       />
     </Stack.Navigator>

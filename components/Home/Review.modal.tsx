@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dimensions,
   Modal,
@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import ReviewCard from './ReviewCard';
+import CustomButton from '../component/CustomButton';
 
 interface ReviewModalProps {
   quantityReview: number;
@@ -24,6 +25,12 @@ const ReviewModal = ({
   onClose,
   reviews,
 }: ReviewModalProps) => {
+  const [visibleCount, setVisibleCount] = useState(4);
+  const displayedReviews = reviews.slice(0, visibleCount);
+  const handleLoadMore = () => {
+    setVisibleCount(prev => Math.min(prev + 4, reviews.length)); // tăng thêm 4, nhưng không vượt quá tổng
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -33,7 +40,7 @@ const ReviewModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Header cố định */}
+          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>{quantityReview} đánh giá</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
@@ -46,11 +53,20 @@ const ReviewModal = ({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.reviewList}
           >
-            {reviews.map(item => (
+            {displayedReviews.map(item => (
               <View key={item.id} style={styles.reviewItem}>
-                <ReviewCard width={width - 35} {...item} />
+                <ReviewCard width={width - 20} {...item} />
               </View>
             ))}
+
+            {/* Nút "Hiển thị thêm" chỉ hiện nếu còn review chưa hiển thị */}
+            {visibleCount < reviews.length && (
+              <CustomButton
+                title="Hiển thị thêm đánh giá"
+                onPress={handleLoadMore}
+                style={styles.button}
+              />
+            )}
           </ScrollView>
         </View>
       </View>
@@ -59,14 +75,11 @@ const ReviewModal = ({
 };
 
 const styles = StyleSheet.create({
-  /** Nền mờ */
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
-
-  /** Hộp modal */
   modalContainer: {
     height: '85%',
     backgroundColor: '#fff',
@@ -79,8 +92,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 10,
   },
-
-  /** Header có bóng nhẹ */
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -111,14 +122,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#666',
   },
-
-  /** Danh sách review */
   reviewList: {
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
   reviewItem: {
     marginBottom: 14,
+  },
+  button: {
+    marginVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#ccc',
   },
 });
 
