@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface ReviewCardProps {
   name: string;
@@ -35,7 +35,13 @@ const ReviewCard = ({
       {/* Rating */}
       <View style={styles.starRow}>
         {stars.map(i => (
-          <Image key={i} source={images.star} style={styles.star} />
+          <Icon
+            key={i}
+            name="star"
+            size={16}
+            color="#FFD700"
+            style={styles.starIcon}
+          />
         ))}
       </View>
 
@@ -79,10 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 4,
   },
-  star: {
-    width: 16,
-    height: 16,
-    tintColor: '#FFD700',
+  starIcon: {
     marginRight: 2,
   },
   content: {

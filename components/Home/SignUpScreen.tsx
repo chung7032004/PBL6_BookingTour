@@ -2,7 +2,6 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import {
   Button,
-  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -10,7 +9,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -20,6 +19,7 @@ const SignUpScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [error, setError] = useState('');
+
   const handleSignUp = () => {
     if (email.length === 0) {
       setError('Không được để trống email');
@@ -64,9 +64,10 @@ const SignUpScreen = () => {
           textContentType="password"
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Image
-            source={passwordVisible ? images.visibilityOff : images.visibility}
-            style={styles.image}
+          <Icon
+            name={passwordVisible ? 'visibility-off' : 'visibility'}
+            size={20}
+            color="#555"
           />
         </TouchableOpacity>
       </View>
@@ -87,15 +88,16 @@ const SignUpScreen = () => {
         <TouchableOpacity
           onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
         >
-          <Image
-            source={
-              confirmPasswordVisible ? images.visibilityOff : images.visibility
-            }
-            style={styles.image}
+          <Icon
+            name={confirmPasswordVisible ? 'visibility-off' : 'visibility'}
+            size={20}
+            color="#555"
           />
         </TouchableOpacity>
       </View>
+
       {error.length > 0 && <Text style={styles.error}>* {error} *</Text>}
+
       <View style={styles.button}>
         <Button title="Đăng kí" onPress={() => handleSignUp()} />
       </View>
@@ -156,7 +158,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     paddingRight: 10,
   },
-  image: { width: 18, height: 18, tintColor: '#555' },
   button: {
     marginVertical: 12,
   },

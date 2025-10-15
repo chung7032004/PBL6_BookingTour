@@ -11,6 +11,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface BirthdayPickerProps {
   value: Date;
@@ -31,7 +32,7 @@ const BirthdayPicker: React.FC<BirthdayPickerProps> = ({ value, onChange }) => {
     <View>
       <TouchableOpacity style={styles.touch} onPress={() => setShow(true)}>
         <Text style={styles.text}>{value.toLocaleDateString('vi-VN')}</Text>
-        <Image source={images.date} style={styles.image} />
+        <Icon name="date-range" size={20} color="#666" />
       </TouchableOpacity>
 
       {show && (
@@ -61,6 +62,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   text: { fontSize: 15, color: '#333' },
-  image: { width: 18, height: 18, tintColor: '#666' },
 });
 export default BirthdayPicker;

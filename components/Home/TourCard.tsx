@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import images from '../../images';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TourCard = ({
   image,
@@ -30,7 +31,12 @@ const TourCard = ({
         )}
         {/* Icon yêu thích */}
         {showFavorite && (
-          <Image source={images.favorite} style={styles.favoriteIcon} />
+          <Icon
+            name="favorite-border"
+            size={22}
+            color="#ff4d4d"
+            style={styles.favoriteIcon}
+          />
         )}
       </View>
 
@@ -41,14 +47,16 @@ const TourCard = ({
         </Text>
 
         <Text style={styles.price}>
-          From{' '}
-          <Text style={{ color: '#000', fontWeight: 'bold' }}>{price}</Text> /
-          guest
+          Chỉ từ{' '}
+          <Text style={{ color: '#000', fontWeight: 'bold' }}>
+            {price.toLocaleString('vi-VN')}₫
+          </Text>{' '}
+          / khách
         </Text>
 
         <View style={styles.ratingRow}>
-          <Image source={images.star} style={styles.starIcon} />
           <Text style={styles.ratingText}>{rating}</Text>
+          <Icon name="star" size={18} color="#FFD700" style={styles.starIcon} />
         </View>
       </View>
     </TouchableOpacity>
@@ -94,9 +102,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    width: 22,
-    height: 22,
-    tintColor: '#ff4d4d',
   },
   infoContainer: {
     padding: 10,
@@ -117,10 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   starIcon: {
-    width: 16,
-    height: 16,
-    tintColor: '#FFD700',
-    marginRight: 4,
+    marginLeft: 4,
   },
   ratingText: {
     fontSize: 13,

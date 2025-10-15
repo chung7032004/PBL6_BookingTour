@@ -4,6 +4,7 @@ import AppHeader from './app.header';
 
 import WishList from '../WishList/WishList';
 import WishListDetailScreen from '../WishList/WishListDetailScreen';
+import TourDetailScreen from '../Home/TourDetailScreen';
 
 const WishListStack = () => {
   const Stack = createNativeStackNavigator();
@@ -18,6 +19,11 @@ const WishListStack = () => {
         name="wishListDetail"
         component={WishListDetailScreen}
         options={{ headerTitle: () => <AppHeader /> }}
+      />
+      <Stack.Screen
+        name="tourDetail"
+        component={TourDetailScreen}
+        options={{ title: 'Chi tiết tour', headerTitle: () => <AppHeader /> }}
       />
     </Stack.Navigator>
   );

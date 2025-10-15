@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
 } from 'react-native';
 import images from '../../images';
 import CustomButton from '../component/CustomButton';
+import NotepadModal from './Note.modal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
@@ -16,7 +18,7 @@ const CARD_WIDTH = width - 32;
 interface TourCardProps {
   title: string;
   subtitle: string;
-  price: string;
+  price: number;
   rating: string;
   reviews: string;
   image: any;
@@ -34,6 +36,8 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
   label,
   onPress,
 }) => {
+  const [showModalNote, setShowModalNote] = useState(false);
+  const [note, setNote] = useState('');
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       {/* Hình ảnh */}
@@ -49,7 +53,12 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
 
         {/* Nút tim yêu thích */}
         <TouchableOpacity style={styles.heartButton}>
-          <Image source={images.favorite} style={styles.heartIcon} />
+          <Icon
+            name="favorite-border"
+            size={24}
+            color="#ff4d4d"
+            style={styles.favoriteIcon}
+          />
         </TouchableOpacity>
       </View>
 
@@ -61,11 +70,28 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
         <Text style={styles.subtitle} numberOfLines={1}>
           {subtitle}
         </Text>
-        <Text style={styles.price}>
-          {price} <Text style={styles.dot}>·</Text> ⭐ {rating} ({reviews})
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.price}>
+            Chỉ từ {price.toLocaleString('vi-VN')}₫ /khách{' '}
+            <Text style={styles.dot}>·</Text>
+          </Text>
+          <Text style={styles.price}> {rating} </Text>
+          <Icon name="star" size={16} color="#FFD700" style={styles.starIcon} />
+          <Text style={styles.price}> ({reviews})</Text>
+        </View>
       </View>
-      <CustomButton title="Thêm ghi chú" style={{ backgroundColor: '#ccc' }} />
+      <CustomButton
+        title="Thêm ghi chú"
+        style={{ backgroundColor: '#ccc' }}
+        onPress={() => setShowModalNote(true)}
+      />
+      <NotepadModal
+        visible={showModalNote}
+        onClose={() => setShowModalNote(false)}
+        onSave={text => setNote(text)}
+        title="Thêm ghi chú"
+        initialValue={note}
+      />
     </TouchableOpacity>
   );
 };
@@ -112,10 +138,10 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
   },
-  heartIcon: {
-    width: 20,
-    height: 20,
-    tintColor: '#ff4d4d',
+  favoriteIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   infoContainer: {
     padding: 12,
@@ -134,9 +160,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#555',
     marginTop: 4,
+    alignItems: 'center',
+    alignContent: 'center',
   },
   dot: {
     fontWeight: 'bold',
+  },
+  starIcon: {
+    marginLeft: 1,
   },
 });
 

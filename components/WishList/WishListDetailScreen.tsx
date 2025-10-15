@@ -13,6 +13,7 @@ import WishListDetailCard from './WishListDetailCard';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import EditGuests from '../Home/EditGuests.modal';
 import { Quantity } from '../Home/quantity';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const WishListDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -29,7 +30,7 @@ const WishListDetailScreen = () => {
         <Text style={styles.headerText}>Trải nghiệm 2025</Text>
         <TouchableOpacity style={styles.iconButton}>
           <Image source={images.account} style={styles.iconSmall} />
-          <Image source={images_tour.add} style={styles.iconAdd} />
+          <Icon name="add" size={16} color="#007bff" style={styles.iconAdd} />
         </TouchableOpacity>
       </View>
 
@@ -51,7 +52,17 @@ const WishListDetailScreen = () => {
       <WishListDetailCard
         title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
         subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price="Từ ₫650.000 /khách"
+        price={650000}
+        rating="4.96"
+        reviews="799 đánh giá"
+        label="Phổ biến"
+        image={images.banner1}
+        onPress={() => navigation.navigate('tourDetail')}
+      />
+      <WishListDetailCard
+        title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
+        subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
+        price={650000}
         rating="4.96"
         reviews="799 đánh giá"
         label="Phổ biến"
@@ -61,17 +72,7 @@ const WishListDetailScreen = () => {
       <WishListDetailCard
         title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
         subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price="Từ ₫650.000 /khách"
-        rating="4.96"
-        reviews="799 đánh giá"
-        label="Phổ biến"
-        image={images.banner1}
-        onPress={() => console.log('Đi tới chi tiết tour')}
-      />
-      <WishListDetailCard
-        title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
-        subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price="Từ ₫650.000 /khách"
+        price={650000}
         rating="4.96"
         reviews="799 đánh giá"
         label="Phổ biến"
@@ -151,12 +152,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   iconAdd: {
-    width: 16,
-    height: 16,
     position: 'absolute',
     bottom: 3,
     right: 3,
-    tintColor: '#007bff',
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 2,

@@ -1,17 +1,16 @@
-import BookingScreen from '../Booking/BookingScreen';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import HomeStack from './app.home';
-import { Image } from 'react-native';
-import ProfileStack from './app.profile';
-import images from '../../images';
 import SearchStack from './app.search';
-import WishListScreen from '../WishList/WishList';
 import BookingStack from './app.booking';
 import WishListStack from './app.wishlist';
+import ProfileStack from './app.profile';
+
+const Tab = createBottomTabNavigator();
 
 const AppNavigation = () => {
-  const Tab = createBottomTabNavigator();
-
   return (
     <Tab.Navigator
       screenOptions={{
@@ -23,20 +22,12 @@ const AppNavigation = () => {
       }}
     >
       <Tab.Screen
-        name={'homeTab'}
+        name="homeTab"
         component={HomeStack}
         options={{
           title: 'Trang chủ',
           tabBarIcon: ({ size, color }) => (
-            <Image
-              source={images.home}
-              style={{
-                width: size,
-                height: size,
-                resizeMode: 'contain',
-                tintColor: color,
-              }}
-            />
+            <MaterialIcons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -46,15 +37,7 @@ const AppNavigation = () => {
         options={{
           title: 'Tìm kiếm',
           tabBarIcon: ({ size, color }) => (
-            <Image
-              source={images.search}
-              style={{
-                width: size,
-                height: size,
-                resizeMode: 'contain',
-                tintColor: color,
-              }}
-            />
+            <MaterialIcons name="search" size={size} color={color} />
           ),
         }}
       />
@@ -64,15 +47,7 @@ const AppNavigation = () => {
         options={{
           title: 'Booking',
           tabBarIcon: ({ size, color }) => (
-            <Image
-              source={images.calendar}
-              style={{
-                width: size,
-                height: size,
-                resizeMode: 'contain',
-                tintColor: color,
-              }}
-            />
+            <MaterialIcons name="calendar-month" size={size} color={color} />
           ),
         }}
       />
@@ -82,15 +57,7 @@ const AppNavigation = () => {
         options={{
           title: 'Yêu thích',
           tabBarIcon: ({ size, color }) => (
-            <Image
-              source={images.favorite}
-              style={{
-                width: size,
-                height: size,
-                resizeMode: 'contain',
-                tintColor: color,
-              }}
-            />
+            <MaterialIcons name="favorite-outline" size={size} color={color} />
           ),
         }}
       />
@@ -100,15 +67,7 @@ const AppNavigation = () => {
         options={{
           title: 'Tài khoản',
           tabBarIcon: ({ size, color }) => (
-            <Image
-              source={images.profile}
-              style={{
-                width: size,
-                height: size,
-                resizeMode: 'contain',
-                tintColor: color,
-              }}
-            />
+            <MaterialIcons name="person" size={size} color={color} />
           ),
         }}
       />

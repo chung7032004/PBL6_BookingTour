@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ProfileScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -23,7 +24,7 @@ const ProfileScreen = () => {
           <Text style={styles.userInfo}>0 Bài viết</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('profileEdit')}>
-          <Image style={styles.editIcon} source={images.edit} />
+          <Icon name="edit" size={24} color="#007bff" />
         </TouchableOpacity>
       </View>
 
@@ -38,58 +39,103 @@ const ProfileScreen = () => {
       {/* Menu items */}
       <View style={styles.menuSection}>
         <TouchableOpacity style={styles.touch}>
-          <Image style={styles.icon} source={images.creditCard} />
+          <Icon
+            name="credit-card"
+            size={24}
+            color="#000000ff"
+            style={styles.icon}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Thanh toán</Text>
             <Text style={styles.subtitle}>
               Thêm hoặc quản lý các thẻ đã lưu
             </Text>
           </View>
-          <Image style={styles.nextIcon} source={images.next} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.touch}>
-          <Image style={styles.icon} source={images.refund} />
+          <Icon
+            name="attach-money"
+            size={24}
+            color="#000000ff"
+            style={styles.icon}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Hoàn tiền</Text>
             <Text style={styles.subtitle}>
               Theo dõi hoàn tiền và quản lý chi tiết ngân hàng
             </Text>
           </View>
-          <Image style={styles.nextIcon} source={images.next} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.touch}>
-          <Image style={styles.icon} source={images.helpCenter} />
+          <Icon
+            name="help-outline"
+            size={24}
+            color="#000000ff"
+            style={styles.icon}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Trung tâm hỗ trợ</Text>
             <Text style={styles.subtitle}>
               Nơi giải đáp mọi thắc mắc của bạn
             </Text>
           </View>
-          <Image style={styles.nextIcon} source={images.next} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.touch}>
-          <Image style={styles.icon} source={images.contactPhone} />
+          <Icon name="call" size={24} color="#000000ff" style={styles.icon} />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Liên hệ chúng tôi</Text>
             <Text style={styles.subtitle}>
               Yêu cầu hỗ trợ từ dịch vụ Chăm sóc khách hàng
             </Text>
           </View>
-          <Image style={styles.nextIcon} source={images.next} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.touch}>
-          <Image style={styles.icon} source={images.setting} />
+          <Icon
+            name="settings"
+            size={24}
+            color="#000000ff"
+            style={styles.icon}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Cài đặt</Text>
             <Text style={styles.subtitle}>
               Xem và tùy chỉnh cài đặt cho tài khoản
             </Text>
           </View>
-          <Image style={styles.nextIcon} source={images.next} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -125,11 +171,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-  editIcon: {
-    width: 22,
-    height: 22,
-    tintColor: '#007bff',
-  },
   viewProfileButton: {
     backgroundColor: '#007bff',
     paddingVertical: 10,
@@ -156,8 +197,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   icon: {
-    width: 28,
-    height: 28,
     marginRight: 15,
   },
   textContainer: {
@@ -174,9 +213,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   nextIcon: {
-    width: 20,
-    height: 20,
-    tintColor: '#999',
     marginLeft: 5,
   },
 });

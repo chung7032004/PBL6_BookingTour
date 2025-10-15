@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Dimensions } from 'react-native';
 import images from '../../images';
 import TourCard from './TourCard';
 
@@ -32,22 +25,23 @@ const suggestData = [
     image: images.banner1,
     title: 'Street Food Motorbike Tour',
     rating: 4.98,
-    price: '₫730,000',
+    price: 730000,
     popular: true,
+    showFavorite: true,
   },
   {
     id: 2,
     image: images.banner2,
     title: 'Hue City Tour',
     rating: 4.91,
-    price: '₫650,000',
+    price: 650000,
   },
   {
     id: 3,
     image: images.banner3,
     title: 'Ha Long Bay Cruise',
     rating: 5.0,
-    price: '₫1,000,000',
+    price: 1000000,
   },
 ];
 
@@ -57,14 +51,14 @@ const topRatedData = [
     image: images.banner4,
     title: 'Tour Hạ Long',
     rating: 5.0,
-    price: '₫950,000',
+    price: 950000,
   },
   {
     id: 5,
     image: images.banner1,
     title: 'Tour Phú Quốc',
     rating: 4.9,
-    price: '₫880,000',
+    price: 880000,
   },
 ];
 
@@ -74,14 +68,14 @@ const hotData = [
     image: images.banner2,
     title: 'Tour Hội An',
     rating: 4.9,
-    price: '₫870,000',
+    price: 870000,
   },
   {
     id: 7,
     image: images.banner3,
     title: 'Tour Sài Gòn đêm',
     rating: 4.95,
-    price: '₫750,000',
+    price: 750000,
   },
 ];
 
@@ -121,6 +115,7 @@ const HomeScreen = () => {
       </ScrollView> */}
 
       {/* Gợi ý cho bạn */}
+
       <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
       <ScrollView
         horizontal

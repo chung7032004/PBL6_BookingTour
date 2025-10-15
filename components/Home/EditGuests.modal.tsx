@@ -1,12 +1,5 @@
-import {
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from 'react-native';
-import images_tour from '../../images/image_tour';
+import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useState } from 'react';
 import CustomButton from '../component/CustomButton';
 import { Quantity } from './quantity';
@@ -36,7 +29,6 @@ const EditGuests = (props: EditGuestsProps) => {
   const [guardianConfirmed, setGuardianConfirmed] = useState(false);
   const [error, setError] = useState(false);
 
-  // Khi nhấn lưu
   const handleSave = () => {
     const quantity: Quantity = { adult, children, total };
     if (children >= 1 && guardianConfirmed) {
@@ -46,14 +38,12 @@ const EditGuests = (props: EditGuestsProps) => {
     } else if (children >= 1 && !guardianConfirmed) {
       setError(true);
     } else {
-      // Trường hợp không có trẻ em thì không cần xác nhận
       onSave(quantity);
       setError(false);
       onClose();
     }
   };
 
-  // Reset khi đóng modal
   const handleClose = () => {
     setGuardianConfirmed(false);
     setError(false);
@@ -73,7 +63,7 @@ const EditGuests = (props: EditGuestsProps) => {
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity onPress={handleClose}>
-              <Text style={styles.closeBtn}>✕</Text>
+              <MaterialIcons name="close" size={24} color="#999" />
             </TouchableOpacity>
           </View>
 
@@ -87,11 +77,11 @@ const EditGuests = (props: EditGuestsProps) => {
               <TouchableOpacity
                 onPress={() => setAdult(Math.max(1, adult - 1))}
               >
-                <Image source={images_tour.remove} style={styles.icon} />
+                <MaterialIcons name="remove" size={26} color="#007AFF" />
               </TouchableOpacity>
               <Text style={styles.number}>{adult}</Text>
               <TouchableOpacity onPress={() => setAdult(adult + 1)}>
-                <Image source={images_tour.add} style={styles.icon} />
+                <MaterialIcons name="add" size={26} color="#007AFF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -106,11 +96,11 @@ const EditGuests = (props: EditGuestsProps) => {
               <TouchableOpacity
                 onPress={() => setChildren(Math.max(0, children - 1))}
               >
-                <Image source={images_tour.remove} style={styles.icon} />
+                <MaterialIcons name="remove" size={26} color="#007AFF" />
               </TouchableOpacity>
               <Text style={styles.number}>{children}</Text>
               <TouchableOpacity onPress={() => setChildren(children + 1)}>
-                <Image source={images_tour.add} style={styles.icon} />
+                <MaterialIcons name="add" size={26} color="#007AFF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -130,7 +120,7 @@ const EditGuests = (props: EditGuestsProps) => {
                   checked={guardianConfirmed}
                   onChange={() => {
                     setGuardianConfirmed(!guardianConfirmed);
-                    if (!guardianConfirmed) setError(false); // tick thì ẩn lỗi
+                    if (!guardianConfirmed) setError(false);
                   }}
                 />
                 {error && (
@@ -178,10 +168,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  closeBtn: {
-    fontSize: 20,
-    color: '#999',
-  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -202,10 +188,6 @@ const styles = StyleSheet.create({
   counter: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  icon: {
-    width: 24,
-    height: 24,
   },
   number: {
     marginHorizontal: 12,

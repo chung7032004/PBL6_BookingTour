@@ -1,17 +1,16 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import {
-  Button,
-  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ForgotPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Reset Password</Text>
@@ -19,21 +18,31 @@ const ForgotPasswordScreen = () => {
         Please enter your email address to receive a link to create a new
         password via email
       </Text>
+
       <TextInput
         style={styles.input}
         placeholder="Email"
         placeholderTextColor="#888"
         keyboardType="email-address"
       />
+
       <View style={styles.button}>
+        {/* Nút quay lại */}
         <TouchableOpacity
           style={styles.backToLoginButton}
           onPress={() => navigation.navigate('login')}
         >
-          <Image style={styles.image} source={images.arrowBack} />
+          <Icon
+            name="arrow-back"
+            size={20}
+            color="#333"
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.textBackToLogin}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.confirmButton} onPress={() => {}}>
+
+        {/* Nút xác nhận */}
+        <TouchableOpacity style={styles.confirmButton}>
           <Text style={styles.confirmText}>Confirm</Text>
         </TouchableOpacity>
       </View>
@@ -44,7 +53,6 @@ const ForgotPasswordScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //justifyContent: 'center',
     backgroundColor: '#f5f5f5',
     padding: 20,
   },
@@ -54,6 +62,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     marginTop: 30,
+  },
+  text: {
+    fontSize: 16,
   },
   input: {
     borderWidth: 1,
@@ -77,13 +88,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    shadowColor: '#000',
-  },
-  image: {
-    height: 20,
-    width: 20,
-    marginRight: 8,
-    tintColor: '#333',
   },
   textBackToLogin: {
     fontSize: 16,
@@ -101,8 +105,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  text: {
-    fontSize: 16,
-  },
 });
+
 export default ForgotPasswordScreen;

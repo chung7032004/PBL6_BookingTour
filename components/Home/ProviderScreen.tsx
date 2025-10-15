@@ -5,6 +5,7 @@ import TourCard from './TourCard';
 import ReviewCard from './ReviewCard';
 import CustomButton from '../component/CustomButton';
 import ReviewModal from './Review.modal';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ProviderScreen = () => {
   const suggestData = [
@@ -66,7 +67,12 @@ const ProviderScreen = () => {
           <View style={styles.infoItem}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.infoValue}>4.66</Text>
-              <Image source={images.star} style={styles.starIcon} />
+              <Icon
+                name="star"
+                size={20}
+                color="#FFD700"
+                style={styles.starIcon}
+              />
             </View>
             <Text style={styles.infoLabel}>Xếp hạng</Text>
           </View>
@@ -173,9 +179,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   starIcon: {
-    width: 18,
-    height: 18,
-    tintColor: '#FFD700',
     marginLeft: 4,
   },
   introText: {

@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import images from '../../images';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const AppHeader = () => {
   const navigation: NavigationProp<any> = useNavigation();
@@ -12,12 +12,12 @@ const AppHeader = () => {
         // 👉 Chuyển sang tab "searchTab" thay vì mở màn mới
         onPress={() => navigation.navigate('searchTab')}
       >
-        <Image source={images.search} />
+        <Icon name="search" size={24} />
         <Text style={styles.input}>Tìm kiếm...</Text>
       </TouchableOpacity>
 
       <TouchableOpacity>
-        <Image source={images.notifications} />
+        <Icon name="notifications" size={24} />
       </TouchableOpacity>
     </View>
   );

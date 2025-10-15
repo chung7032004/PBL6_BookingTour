@@ -6,11 +6,10 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // ✅ thêm dòng này
 
 const LoginScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -30,6 +29,7 @@ const LoginScreen = () => {
     }
     // Handle login logic here
   };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Đăng nhập</Text>
@@ -57,14 +57,18 @@ const LoginScreen = () => {
           autoCapitalize="none"
           textContentType="password"
         />
+
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Image
-            source={passwordVisible ? images.visibilityOff : images.visibility}
-            style={styles.image}
+          <Icon
+            name={passwordVisible ? 'visibility-off' : 'visibility'}
+            size={20}
+            color="#555"
           />
         </TouchableOpacity>
       </View>
+
       {error.length > 0 && <Text style={styles.error}>* {error} *</Text>}
+
       <View style={styles.button}>
         <Button title="Đăng nhập" onPress={() => handleLogin()} />
       </View>
@@ -163,7 +167,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     gap: 8,
   },
-  image: { width: 18, height: 18, tintColor: '#555' },
   error: {
     fontSize: 14,
     color: 'red',

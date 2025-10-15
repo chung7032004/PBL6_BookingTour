@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import {
-  Button,
   Image,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import images from '../../images';
 import { Quantity } from './quantity';
 import EditGuests from './EditGuests.modal';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface SelectDateModalProps {
   visible: boolean;
@@ -113,7 +111,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
               </Text>
             </View>
             <TouchableOpacity onPress={() => setShowEditGuests(true)}>
-              <Image source={images.edit} style={styles.icon} />
+              <Icon name="edit" size={24} color="#007bff" />
             </TouchableOpacity>
             <EditGuests
               visible={showEditGuests}
@@ -130,7 +128,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
               date.getMonth() + 1
             } năm ${date.getFullYear()}`}</Text>
             <TouchableOpacity onPress={openDatePicker}>
-              <Image source={images.date} style={styles.icon} />
+              <Icon name="date-range" size={24} color="#007bff" />
             </TouchableOpacity>
           </View>
 
@@ -282,10 +280,5 @@ const styles = StyleSheet.create({
   payButtonText: {
     color: '#fff',
     fontWeight: '600',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    tintColor: '#007AFF',
   },
 });

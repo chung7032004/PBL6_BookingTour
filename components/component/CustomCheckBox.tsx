@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Image, StyleSheet, View } from 'react-native';
-import images from '../../images';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface CustomCheckboxProps {
   checked: boolean;
@@ -15,9 +15,10 @@ const CustomCheckbox = ({ checked, onChange }: CustomCheckboxProps) => {
       style={styles.wrapper}
     >
       <View style={styles.container}>
-        <Image
-          source={checked ? images.check_box : images.check_box_outline_blank}
-          style={styles.icon}
+        <MaterialIcons
+          name={checked ? 'check-box' : 'check-box-outline-blank'}
+          size={26}
+          color={checked ? '#007AFF' : '#8E8E93'}
         />
       </View>
     </TouchableOpacity>
@@ -35,10 +36,5 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  icon: {
-    width: 26,
-    height: 26,
-    tintColor: '#007AFF',
   },
 });

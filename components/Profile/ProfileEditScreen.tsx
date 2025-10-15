@@ -16,6 +16,7 @@ import EditNameModal from './EditName.modal';
 import EditAvatarModal from './EditAvatar.modal';
 import EditGenderModal from './EditGender.modal';
 import BirthdayPicker from './BirthdayPicker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ProfileEditScreen = () => {
   const [infoState, setInfoState] = useState(true);
@@ -55,7 +56,7 @@ const ProfileEditScreen = () => {
             style={styles.editAvatarBtn}
             onPress={() => setShowModalEditAvatar(true)}
           >
-            <Image source={images.edit} style={styles.editIconSmall} />
+            <Icon name="edit" size={14} color="#007bff" />
           </TouchableOpacity>
         </View>
 
@@ -66,7 +67,7 @@ const ProfileEditScreen = () => {
             style={styles.editNameBtn}
             onPress={() => setShowModalEditName(true)}
           >
-            <Image source={images.edit} style={styles.editIcon} />
+            <Icon name="edit" size={20} color="#007bff" />
           </TouchableOpacity>
         </View>
 
@@ -126,7 +127,7 @@ const ProfileEditScreen = () => {
                 {' '}
                 {gender === 'male' ? 'Nam' : 'Nữ'}
               </Text>
-              <Image source={images.down} style={styles.genderIcon} />
+              <Icon name="keyboard-arrow-down" size={20} color="#666" />
             </TouchableOpacity>
           </View>
         </View>
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-  editIconSmall: { width: 16, height: 16, tintColor: '#007bff' },
 
   userNameRow: {
     flexDirection: 'row',
@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 6,
   },
-  editIcon: { width: 18, height: 18, tintColor: '#007bff' },
 
   // Card style
   card: {
@@ -343,11 +342,6 @@ const styles = StyleSheet.create({
   genderText: {
     fontSize: 15,
     color: '#333',
-  },
-  genderIcon: {
-    width: 18,
-    height: 18,
-    tintColor: '#666',
   },
 });
 

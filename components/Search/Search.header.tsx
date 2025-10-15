@@ -1,27 +1,32 @@
 import { useState } from 'react';
 import {
   Alert,
-  Image,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import images from '../../images';
 import CustomButton from '../component/CustomButton';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const SearchHeader = () => {
   const [searchText, setSearchText] = useState('');
+
   const handleSearch = (searchText: string) => {
     Alert.alert('Search', `You searched for: ${searchText}`);
   };
+
   const handleClearSearch = () => {
     setSearchText('');
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Image source={images.search} />
+        {/* Icon tìm kiếm */}
+        <Icon name="search" size={22} color="#555" style={styles.icon} />
+
+        {/* Ô nhập liệu */}
         <TextInput
           style={styles.input}
           value={searchText}
@@ -29,16 +34,26 @@ const SearchHeader = () => {
           placeholderTextColor="#888"
           onChangeText={text => setSearchText(text)}
         />
+
+        {/* Nút xóa */}
         {searchText.length > 0 && (
           <TouchableOpacity onPress={handleClearSearch}>
-            <Image style={styles.icon_clear} source={images.close} />
+            <Icon
+              name="close"
+              size={16}
+              color="#fff"
+              style={styles.icon_clear}
+            />
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Nút tìm kiếm */}
       <CustomButton title="Tìm kiếm" onPress={() => handleSearch(searchText)} />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -64,19 +79,15 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   icon: {
-    width: 18,
-    height: 18,
-    tintColor: 'gray',
     marginRight: 6,
   },
   icon_clear: {
-    width: 17,
-    height: 17,
-    tintColor: '#fff',
     backgroundColor: '#999',
-    borderRadius: 10,
-    padding: 3,
-    marginLeft: 6,
+    borderRadius: 20,
+    padding: 2,
+    marginLeft: 2,
+    overflow: 'hidden',
   },
 });
+
 export default SearchHeader;

@@ -5,6 +5,7 @@ import CommentsScreen from './CommentsScreen';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import images from '../../images';
 import CustomTabs from '../component/CustomTabs';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -29,7 +30,7 @@ const ProfileDetailScreen = () => {
           style={styles.editButton}
           onPress={() => navigation.navigate('profileEdit')}
         >
-          <Image style={styles.editIcon} source={images.edit} />
+          <Icon name="edit" size={20} color="#007bff" style={styles.editIcon} />
           <Text style={styles.editText}>Chỉnh sửa hồ sơ</Text>
         </TouchableOpacity>
 
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 10,
   },
-  editIcon: { width: 18, height: 18, tintColor: '#007bff', marginRight: 6 },
+  editIcon: { marginRight: 6 },
   editText: { fontSize: 14, color: '#007bff', fontWeight: '500' },
   userInfo: { fontSize: 14, color: '#666' },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Image, Text, StyleSheet, View } from 'react-native';
-import images from '../../images';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface CustomRadioButtonProps {
   label: string;
@@ -8,20 +8,27 @@ interface CustomRadioButtonProps {
   onPress: () => void;
 }
 
-const CustomRadioButton = (props: CustomRadioButtonProps) => {
-  const { label, selected, onPress } = props;
-  const icons = {
-    checked: images.radio_button_checked,
-    unchecked: images.radio_button_unchecked,
-  };
-
+const CustomRadioButton = ({
+  label,
+  selected,
+  onPress,
+}: CustomRadioButtonProps) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      <Image
-        source={selected ? icons.checked : icons.unchecked}
-        style={styles.icon}
-      />
-      <Text style={styles.label}>{label}</Text>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <View style={styles.iconWrapper}>
+        <MaterialIcons
+          name={selected ? 'radio-button-checked' : 'radio-button-unchecked'}
+          size={24}
+          color={selected ? '#007AFF' : '#8E8E93'}
+        />
+      </View>
+      <Text style={[styles.label, selected && styles.labelSelected]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -32,13 +39,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
-  icon: {
-    width: 24,
-    height: 24,
+  iconWrapper: {
     marginRight: 8,
   },
   label: {
     fontSize: 16,
+    color: '#333',
+  },
+  labelSelected: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
 });
 

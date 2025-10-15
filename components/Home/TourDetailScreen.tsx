@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import images from '../../images';
 import ExpandableText from './ExpandableText';
 import SelectDateModal from './SelectDate.modal';
@@ -50,7 +51,12 @@ const TourDetailScreen = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Tour Khám Phá Hội An</Text>
         <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
-          <Image source={images.favorite_fill} style={styles.favoriteImage} />
+          <Icon
+            name="favorite"
+            size={20}
+            color="#ff4d4d"
+            style={styles.favoriteIcon}
+          />
           <Text style={styles.favoriteText}>Yêu thích</Text>
         </TouchableOpacity>
       </View>
@@ -143,7 +149,7 @@ const TourDetailScreen = () => {
 
         <View style={styles.ratingSummary}>
           <Text style={styles.ratingValue}>5.0</Text>
-          <Image source={images.star} style={styles.starIcon} />
+          <Icon name="star" size={20} color="#FFD700" style={styles.starIcon} />
           <Text style={styles.ratingCount}>(1.001 đánh giá)</Text>
         </View>
 
@@ -156,7 +162,7 @@ const TourDetailScreen = () => {
           <View style={styles.reviewMeta}>
             <View style={{ flexDirection: 'row' }}>
               {randomArr.map(i => (
-                <Image key={i} source={images.star} style={styles.starSmall} />
+                <Icon key={i} name="star" size={18} color="#FFD700" />
               ))}
             </View>
             <Text style={styles.reviewTime}>2 ngày trước</Text>
@@ -209,10 +215,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  favoriteImage: {
-    width: 20,
-    height: 20,
-    tintColor: '#ff4d4f',
+  favoriteIcon: {
     marginRight: 4,
   },
   favoriteText: {
@@ -319,9 +322,6 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   starIcon: {
-    width: 20,
-    height: 20,
-    tintColor: '#FFD700',
     marginHorizontal: 5,
   },
   ratingCount: {
@@ -349,11 +349,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 5,
-  },
-  starSmall: {
-    width: 18,
-    height: 18,
-    tintColor: '#FFD700',
   },
   reviewTime: {
     color: '#999',
