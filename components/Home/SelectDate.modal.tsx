@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import {
   Image,
   Modal,
@@ -12,11 +12,18 @@ import { Quantity } from './quantity';
 import EditGuests from './EditGuests.modal';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { NavigationProp } from '@react-navigation/native';
+import { formatVNDate } from '../component/FormatDate';
 
 interface SelectDateModalProps {
   visible: boolean;
   title: string;
   onClose: () => void;
+  navigation: NavigationProp<any>;
+  tourInfo: {
+    name: string;
+    image: any;
+  };
 }
 
 interface Slot {
@@ -85,6 +92,24 @@ const SelectDateModal = (props: SelectDateModalProps) => {
     { time: '20:00 - 23:59', price: 1500000, quantity: 5 },
   ];
 
+  const handlePayment = () => {
+    {
+      if (selectedSlot) {
+        const total = selectedSlot.price * quantity.total;
+        props.navigation.navigate('paymentScreen', {
+          tourName: props.tourInfo.name,
+          image: props.tourInfo.image,
+          date: date.toISOString(),
+          time: selectedSlot.time,
+          pricePerGuest: selectedSlot.price,
+          quantity: quantity,
+          total: total,
+        });
+        props.onClose();
+      }
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -113,20 +138,13 @@ const SelectDateModal = (props: SelectDateModalProps) => {
             <TouchableOpacity onPress={() => setShowEditGuests(true)}>
               <Icon name="edit" size={24} color="#007bff" />
             </TouchableOpacity>
-            <EditGuests
-              visible={showEditGuests}
-              onClose={() => setShowEditGuests(false)}
-              initialValue={quantity}
-              onSave={newQuantity => setQuantity(newQuantity)}
-              title="Chỉnh sửa số khách"
-            />
           </View>
 
           {/* Chọn ngày */}
           <View style={styles.chooseDate}>
-            <Text style={styles.subTitle}>{`Ngày ${date.getDate()} tháng ${
-              date.getMonth() + 1
-            } năm ${date.getFullYear()}`}</Text>
+            <Text style={styles.subTitle}>
+              {formatVNDate(date.toDateString())}
+            </Text>
             <TouchableOpacity onPress={openDatePicker}>
               <Icon name="date-range" size={24} color="#007bff" />
             </TouchableOpacity>
@@ -135,9 +153,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
           {/* Danh sách giờ */}
           <ScrollView style={{ marginTop: 10 }}>
             <Text style={styles.sectionLabel}>
-              {`Ngày ${date.getDate()} tháng ${
-                date.getMonth() + 1
-              } năm ${date.getFullYear()}`}
+              {formatVNDate(date.toDateString())}
             </Text>
             {slots.map((slot, index) => (
               <SelectDateCard
@@ -162,7 +178,10 @@ const SelectDateModal = (props: SelectDateModalProps) => {
                     {(selectedSlot.price * quantity.total).toLocaleString()} đ
                     cho {quantity.total} khách
                   </Text>
-                  <TouchableOpacity style={styles.payButton}>
+                  <TouchableOpacity
+                    style={styles.payButton}
+                    onPress={() => handlePayment()}
+                  >
                     <Text style={styles.payButtonText}>Thanh toán</Text>
                   </TouchableOpacity>
                 </>
@@ -171,6 +190,13 @@ const SelectDateModal = (props: SelectDateModalProps) => {
           )}
         </View>
       </View>
+      <EditGuests
+        visible={showEditGuests}
+        onClose={() => setShowEditGuests(false)}
+        initialValue={quantity}
+        onSave={newQuantity => setQuantity(newQuantity)}
+        title="Chỉnh sửa số khách"
+      />
     </Modal>
   );
 };

@@ -3,7 +3,24 @@ type RootStackParamList = {
   tourDetail: undefined;
   provider: undefined;
 
+  paymentScreen: {
+    tourName: string;
+    image: any;
+    date: string;
+    time: string;
+    pricePerGuest: number;
+    quantity: {
+      adult: number;
+      children: number;
+      total: number;
+    };
+    total: number;
+  };
+
   booking: undefined;
+  bookingList: undefined;
+  bookingDetail: undefined;
+  reviewScreen: undefined;
 
   login: undefined;
   signup: undefined;

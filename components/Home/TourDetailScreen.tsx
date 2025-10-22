@@ -181,7 +181,13 @@ const TourDetailScreen = () => {
         visible={showSelectModal}
         onClose={() => setShowSelectModal(false)}
         title="Chọn thời gian"
+        navigation={navigation}
+        tourInfo={{
+          name: 'Tour Khám Phá Hội An',
+          image: images.banner1,
+        }}
       />
+
       <ActiveModal
         visible={showActiveModal}
         onClose={() => {

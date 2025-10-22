@@ -21,23 +21,33 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.userName}>Tên của bạn </Text>
-          <Text style={styles.userInfo}>0 Bài viết</Text>
+          <Text style={styles.userInfo}>0 Đánh giá</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('profileEdit')}>
           <Icon name="edit" size={24} color="#007bff" />
         </TouchableOpacity>
       </View>
 
-      {/* View profile button */}
-      <TouchableOpacity
-        style={styles.viewProfileButton}
-        onPress={() => navigation.navigate('profileDetail')}
-      >
-        <Text style={styles.viewProfileText}>Xem trang cá nhân</Text>
-      </TouchableOpacity>
-
       {/* Menu items */}
       <View style={styles.menuSection}>
+        <TouchableOpacity
+          style={styles.touch}
+          onPress={() => navigation.navigate('profileDetail')}
+        >
+          <Icon name="person" size={24} color="#000000ff" style={styles.icon} />
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Xem hồ sơ</Text>
+            <Text style={styles.subtitle}>
+              Xem và chỉnh sửa thông tin cá nhân của bạn
+            </Text>
+          </View>
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#666"
+            style={styles.nextIcon}
+          />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.touch}>
           <Icon
             name="credit-card"
@@ -137,6 +147,12 @@ const ProfileScreen = () => {
             style={styles.nextIcon}
           />
         </TouchableOpacity>
+        <TouchableOpacity style={styles.touch}>
+          <Icon name="logout" size={24} color="#000000ff" style={styles.icon} />
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Đăng xuất</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -171,19 +187,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-  viewProfileButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-    alignSelf: 'center',
-    marginVertical: 20,
-  },
-  viewProfileText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+
   menuSection: {
     backgroundColor: '#fff',
     marginTop: 10,

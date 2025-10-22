@@ -6,12 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 import BookingCard from './BookingCard';
-import images from '../../images'; // file ảnh của bạn
+import images from '../../images';
 
-const BookingScreen = () => {
+const BookingListScreen = () => {
+  const navigation = useNavigation<any>();
   const [filter, setFilter] = useState('Tất cả');
 
+  // === Dữ liệu demo ===
+  // const bookings: any[] = []; // danh sách rỗng để hiển thị "Không có booking nào"
   const bookings = [
     {
       id: 1,
@@ -40,19 +45,35 @@ const BookingScreen = () => {
       total: 3500000,
       status: 'Đã hủy',
     },
+    {
+      id: 4,
+      nameTour: 'Tour khám phá Đà Lạt',
+      image: images.banner3,
+      date: new Date(2025, 8, 15),
+      quantity: { adult: 2, children: 2, total: 4 },
+      total: 3500000,
+      status: 'Hoàn thành',
+    },
   ];
 
+  const filters = [
+    'Tất cả',
+    'Đã xác nhận',
+    'Đang xử lý',
+    'Đã hủy',
+    'Hoàn thành',
+  ];
   const filteredBookings =
     filter === 'Tất cả' ? bookings : bookings.filter(b => b.status === filter);
 
-  const filters = ['Tất cả', 'Đã xác nhận', 'Đang xử lý', 'Đã hủy'];
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Danh sách đặt tour</Text>
-
       {/* Thanh lọc trạng thái */}
-      <View style={styles.filterContainer}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterContainer}
+      >
         {filters.map(f => (
           <TouchableOpacity
             key={f}
@@ -69,54 +90,71 @@ const BookingScreen = () => {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
+      {/* Danh sách booking */}
       <ScrollView showsVerticalScrollIndicator={false}>
-        {filteredBookings.map(b => (
-          <BookingCard
-            key={b.id}
-            nameTour={b.nameTour}
-            image={b.image}
-            date={b.date}
-            quantity={b.quantity}
-            total={b.total}
-            status={b.status}
-          />
-        ))}
-
-        {filteredBookings.length === 0 && (
-          <Text style={styles.emptyText}>Không có booking nào.</Text>
+        {filteredBookings.length > 0 ? (
+          filteredBookings.map(b => (
+            <TouchableOpacity
+              key={b.id}
+              activeOpacity={0.85}
+              onPress={() =>
+                navigation.navigate('bookingDetail', {
+                  booking: {
+                    ...b,
+                    date: b.date.toISOString(),
+                  },
+                })
+              }
+            >
+              <BookingCard
+                nameTour={b.nameTour}
+                image={b.image}
+                date={b.date}
+                quantity={b.quantity}
+                total={b.total}
+                status={b.status}
+              />
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="hourglass-empty" size={50} color="#aaa" />
+            <Text style={styles.emptyText}>Không có booking nào.</Text>
+          </View>
         )}
       </ScrollView>
     </View>
   );
 };
 
-export default BookingScreen;
+export default BookingListScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FAFAFA',
     paddingTop: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222',
     paddingHorizontal: 16,
     marginBottom: 10,
   },
   filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexGrow: 0,
+    paddingHorizontal: 10,
     marginBottom: 10,
   },
   filterButton: {
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 20,
     backgroundColor: '#E0E0E0',
+    marginHorizontal: 5,
   },
   activeFilter: {
     backgroundColor: '#00BFA5',
@@ -128,10 +166,14 @@ const styles = StyleSheet.create({
   activeFilterText: {
     color: '#fff',
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
   emptyText: {
-    textAlign: 'center',
-    color: '#888',
-    marginTop: 30,
+    marginTop: 10,
     fontSize: 16,
+    color: '#888',
   },
 });

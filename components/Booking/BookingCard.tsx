@@ -20,6 +20,8 @@ const BookingCard = (props: BookingCardProps) => {
         return '#FFA000';
       case 'đã hủy':
         return '#F44336';
+      case 'hoàn thành':
+        return '#00BCD4';
       default:
         return '#757575';
     }

@@ -8,7 +8,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import images from '../../images';
-import images_tour from '../../images/image_tour';
 import WishListDetailCard from './WishListDetailCard';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import EditGuests from '../Home/EditGuests.modal';
@@ -57,6 +56,7 @@ const WishListDetailScreen = () => {
         reviews="799 đánh giá"
         label="Phổ biến"
         image={images.banner1}
+        currentUserId="user_2"
         onPress={() => navigation.navigate('tourDetail')}
       />
       <WishListDetailCard
@@ -67,7 +67,8 @@ const WishListDetailScreen = () => {
         reviews="799 đánh giá"
         label="Phổ biến"
         image={images.banner1}
-        onPress={() => console.log('Đi tới chi tiết tour')}
+        currentUserId="user_2"
+        onPress={() => navigation.navigate('tourDetail')}
       />
       <WishListDetailCard
         title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
@@ -77,7 +78,8 @@ const WishListDetailScreen = () => {
         reviews="799 đánh giá"
         label="Phổ biến"
         image={images.banner1}
-        onPress={() => console.log('Đi tới chi tiết tour')}
+        currentUserId="user_2"
+        onPress={() => navigation.navigate('tourDetail')}
       />
       <EditGuests
         visible={showEditGuests}

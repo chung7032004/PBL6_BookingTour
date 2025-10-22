@@ -8,12 +8,17 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import images from '../../images';
 import CustomButton from '../component/CustomButton';
 import NotepadModal from './Note.modal';
+import NoteDisplayModal from './NoteDisplay.modal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
+
+interface NoteItem {
+  userId: string;
+  text: string;
+}
 
 interface TourCardProps {
   title: string;
@@ -24,6 +29,7 @@ interface TourCardProps {
   image: any;
   label?: string;
   onPress?: () => void;
+  currentUserId: string;
 }
 
 const WishListDetailCard: React.FC<TourCardProps> = ({
@@ -35,30 +41,46 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
   image,
   label,
   onPress,
+  currentUserId,
 }) => {
   const [showModalNote, setShowModalNote] = useState(false);
-  const [note, setNote] = useState('');
+  const [showModalNoteDisplay, setShowModalNoteDisplay] = useState(false);
+
+  // 🔹 Fake ghi chú để test
+  const [notes, setNotes] = useState<NoteItem[]>([
+    { userId: 'user_1', text: 'Mang theo áo mưa và nước suối.' },
+    { userId: 'user_2', text: 'Kiểm tra lại lịch trình ngày 2.' },
+    { userId: 'user_3', text: 'Đặt thêm bữa trưa cho đoàn 5 người.' },
+  ]);
+
+  const currentUserNote = notes.find(n => n.userId === currentUserId);
+  const noteCount = notes.length;
+
+  const handleSaveNote = (text: string) => {
+    if (text.trim() === '') {
+      setNotes(prev => prev.filter(n => n.userId !== currentUserId));
+    } else if (currentUserNote) {
+      setNotes(prev =>
+        prev.map(n => (n.userId === currentUserId ? { ...n, text } : n)),
+      );
+    } else {
+      setNotes(prev => [...prev, { userId: currentUserId, text }]);
+    }
+    setShowModalNote(false);
+  };
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      {/* Hình ảnh */}
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+      {/* Ảnh */}
       <View style={styles.imageContainer}>
         <Image source={image} style={styles.image} />
-
-        {/* Nhãn "Phổ biến" */}
         {label && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{label}</Text>
           </View>
         )}
-
-        {/* Nút tim yêu thích */}
         <TouchableOpacity style={styles.heartButton}>
-          <Icon
-            name="favorite-border"
-            size={24}
-            color="#ff4d4d"
-            style={styles.favoriteIcon}
-          />
+          <Icon name="favorite-border" size={24} color="#ff4d4d" />
         </TouchableOpacity>
       </View>
 
@@ -70,27 +92,69 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
         <Text style={styles.subtitle} numberOfLines={1}>
           {subtitle}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+        <View style={styles.ratingRow}>
           <Text style={styles.price}>
             Chỉ từ {price.toLocaleString('vi-VN')}₫ /khách{' '}
-            <Text style={styles.dot}>·</Text>
           </Text>
+          <Text style={styles.dot}>·</Text>
           <Text style={styles.price}> {rating} </Text>
-          <Icon name="star" size={16} color="#FFD700" style={styles.starIcon} />
+          <Icon name="star" size={16} color="#FFD700" />
           <Text style={styles.price}> ({reviews})</Text>
         </View>
+
+        {/* Ghi chú */}
+
+        {noteCount === 0 ? (
+          <View style={styles.noteSection}>
+            <TouchableOpacity
+              style={styles.noteButton}
+              onPress={() => setShowModalNote(true)}
+            >
+              <Icon name="add" size={18} color="#2c2c2c" />
+              <Text style={styles.noteButtonText}> Thêm ghi chú</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.noteSection}>
+            <TouchableOpacity
+              style={styles.noteButton}
+              onPress={() => setShowModalNoteDisplay(true)}
+            >
+              <Icon
+                name="sticky-note-2"
+                size={18}
+                color="#2c2c2c"
+                style={{ marginRight: 6 }}
+              />
+              <Text style={styles.noteButtonText}>{noteCount} ghi chú</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setShowModalNote(true)}
+            >
+              <Icon
+                name={currentUserNote ? 'edit' : 'add'}
+                size={18}
+                color="#007BFF"
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-      <CustomButton
-        title="Thêm ghi chú"
-        style={{ backgroundColor: '#ccc' }}
-        onPress={() => setShowModalNote(true)}
-      />
+
+      {/* Modal ghi chú */}
       <NotepadModal
         visible={showModalNote}
         onClose={() => setShowModalNote(false)}
-        onSave={text => setNote(text)}
-        title="Thêm ghi chú"
-        initialValue={note}
+        onSave={handleSaveNote}
+        title="Ghi chú"
+        initialValue={currentUserNote ? currentUserNote.text : ''}
+      />
+      <NoteDisplayModal
+        visible={showModalNoteDisplay}
+        notes={notes}
+        onClose={() => setShowModalNoteDisplay(false)}
       />
     </TouchableOpacity>
   );
@@ -109,16 +173,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  imageContainer: {
-    position: 'relative',
-    width: '100%',
-    aspectRatio: 1.4,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
+  imageContainer: { position: 'relative', width: '100%', aspectRatio: 1.4 },
+  image: { width: '100%', height: '100%', resizeMode: 'cover' },
   badge: {
     position: 'absolute',
     top: 10,
@@ -128,46 +184,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-  },
-  heartButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
-  favoriteIcon: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
-  infoContainer: {
-    padding: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-  },
-  subtitle: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 4,
-  },
-  price: {
-    fontSize: 13,
-    color: '#555',
-    marginTop: 4,
+  badgeText: { fontSize: 12, fontWeight: '600', color: '#333' },
+  heartButton: { position: 'absolute', top: 10, right: 10 },
+  infoContainer: { padding: 12 },
+  title: { fontSize: 16, fontWeight: '600', color: '#000' },
+  subtitle: { fontSize: 13, color: '#666', marginTop: 4 },
+  price: { fontSize: 13, color: '#555' },
+  dot: { marginHorizontal: 3, fontWeight: 'bold', color: '#777' },
+  ratingRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    alignContent: 'center',
+    marginTop: 6,
   },
-  dot: {
-    fontWeight: 'bold',
+
+  /** Ghi chú */
+  noteSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
   },
-  starIcon: {
-    marginLeft: 1,
+  noteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f3f3',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  noteButtonText: {
+    fontSize: 13,
+    color: '#222',
+    fontWeight: '500',
+  },
+  editButton: {
+    backgroundColor: '#e6f0ff',
+    padding: 8,
+    borderRadius: 10,
   },
 });
 
