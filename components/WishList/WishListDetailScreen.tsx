@@ -10,7 +10,7 @@ import {
 import images from '../../images';
 import WishListDetailCard from './WishListDetailCard';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import EditGuests from '../Home/EditGuests.modal';
+import EditGuests from '../Home/modals/EditGuests.modal';
 import { Quantity } from '../Home/quantity';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 

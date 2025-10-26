@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import {
   Image,
   ScrollView,
@@ -11,16 +11,27 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../component/CustomButton';
 import { formatVNDate, formatVNTimeRange } from '../component/FormatDate';
-import EditGuests from './EditGuests.modal';
+import EditGuests from './modals/EditGuests.modal';
 import { Quantity } from './quantity';
-import DiscountCodeModal from './DiscountCode.modal';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import PaymentMethodModal, {
+  PaymentMethod,
+} from './modals/PaymentMethod.modal';
+import EditPhoneModal from './modals/EditPhone.modal';
+import DiscountCodeModal from './modals/DiscountCode.modal';
 
 type PaymentRouteProp = RouteProp<RootStackParamList, 'paymentScreen'>;
 
 const PaymentScreen = () => {
   const route = useRoute<PaymentRouteProp>();
+  const navigation = useNavigation<any>();
   const { tourName, image, date, time, pricePerGuest, quantity, total } =
     route.params;
+
+  const tabBarHeight = useBottomTabBarHeight();
+
+  const [phone, setPhone] = useState<string>(''); // giá trị mặc định
+  const [showEditPhoneModal, setShowEditPhoneModal] = useState(false);
 
   const [showEditGuests, setShowEditGuests] = useState(false);
   const [quantityGuest, setQuantityGuest] = useState<Quantity>(quantity);
@@ -28,12 +39,25 @@ const PaymentScreen = () => {
     setQuantityGuest(quantity);
   }, [quantity]);
 
-  const [discount, setDiscount] = useState<number | null>(100000);
+  const [discount, setDiscount] = useState<number>(100000);
   const [showDiscountCodeModal, setShowDiscountCodeModal] = useState(false);
   const [discountCode, setDiscountCode] = useState<string | null>(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>('cash');
+
+  const handlePayment = () => {
+    navigation.navigate('paymentSuccessScreen', {
+      total: total - discount,
+      method: method,
+    });
+  };
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: tabBarHeight }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Main Card */}
       <View style={styles.card}>
         {/* Tour Info */}
@@ -47,7 +71,25 @@ const PaymentScreen = () => {
             </View>
           </View>
         </View>
+        <View style={styles.separator} />
 
+        {/* Phone Section */}
+        <View style={styles.rowBetween}>
+          <View>
+            <Text style={styles.sectionLabel}>Số điện thoại</Text>
+            <Text style={styles.sectionSub}>
+              {phone ? phone : 'Chưa có số điện thoại'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.smallButton}
+            onPress={() => setShowEditPhoneModal(true)}
+          >
+            <Text style={styles.smallButtonText}>
+              {phone ? 'Thay đổi' : 'Thêm'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.separator} />
 
         {/* Date Section */}
@@ -58,14 +100,13 @@ const PaymentScreen = () => {
             {time ?? formatVNTimeRange(date)}
           </Text>
         </View>
-
         <View style={styles.separator} />
 
         {/* Guests */}
         <View style={styles.rowBetween}>
           <View>
             <Text style={styles.sectionLabel}>Khách</Text>
-            <Text style={styles.sectionValue}>
+            <Text style={styles.sectionSub}>
               {quantityGuest.adult} người lớn
               {quantityGuest.children
                 ? `, ${quantityGuest.children} trẻ em`
@@ -79,56 +120,14 @@ const PaymentScreen = () => {
             <Text style={styles.smallButtonText}>Thay đổi</Text>
           </TouchableOpacity>
         </View>
-
         <View style={styles.separator} />
 
-        {/* Price Details */}
-        <View style={{ marginBottom: 6 }}>
-          <Text style={[styles.sectionLabel, { marginBottom: 8 }]}>
-            Chi tiết giá
-          </Text>
-
-          <View style={styles.rowBetween}>
-            <Text style={styles.detailText}>
-              {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.adult} người
-              lớn
-            </Text>
-            <Text style={styles.priceText}>
-              {(quantity.adult * pricePerGuest).toLocaleString('vi-VN')}₫
-            </Text>
-          </View>
-
-          {quantity.children ? (
-            <View style={styles.rowBetween}>
-              <Text style={styles.detailText}>
-                {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.children}{' '}
-                trẻ em
-              </Text>
-              <Text style={styles.priceText}>
-                {(quantity.children * pricePerGuest).toLocaleString('vi-VN')}₫
-              </Text>
-            </View>
-          ) : null}
-
-          {discount !== null && (
-            <View style={styles.rowBetween}>
-              <Text style={[styles.detailText, { color: '#ff4d4d' }]}>
-                Giảm giá
-              </Text>
-              <Text style={[styles.priceText, { color: '#ff4d4d' }]}>
-                {discount.toLocaleString('vi-VN')}₫
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.separator} />
-
+        {/* Discount Code */}
         <View style={styles.rowBetween}>
           <View>
             <Text style={styles.sectionLabel}>Mã giảm giá</Text>
-            {discount && (
-              <Text style={styles.sectionValue}>
+            {discount >= 0 && (
+              <Text style={styles.sectionSub}>
                 -{discount.toLocaleString('vi-VN')}₫
               </Text>
             )}
@@ -142,11 +141,73 @@ const PaymentScreen = () => {
         </View>
         <View style={styles.separator} />
 
+        {/* Price Details */}
+        <View style={{ marginBottom: 6 }}>
+          <Text style={[styles.sectionLabel, { marginBottom: 8 }]}>
+            Chi tiết giá
+          </Text>
+          <View style={styles.rowBetween}>
+            <Text style={styles.detailText}>
+              {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.adult} người
+              lớn
+            </Text>
+            <Text style={styles.priceText}>
+              {(quantity.adult * pricePerGuest).toLocaleString('vi-VN')}₫
+            </Text>
+          </View>
+          {quantity.children ? (
+            <View style={styles.rowBetween}>
+              <Text style={styles.detailText}>
+                {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.children}{' '}
+                trẻ em
+              </Text>
+              <Text style={styles.priceText}>
+                {(quantity.children * pricePerGuest).toLocaleString('vi-VN')}₫
+              </Text>
+            </View>
+          ) : null}
+          {discount >= 0 && (
+            <View style={styles.rowBetween}>
+              <Text style={[styles.detailText, { color: '#ff4d4d' }]}>
+                Giảm giá
+              </Text>
+              <Text style={[styles.priceText, { color: '#ff4d4d' }]}>
+                -{discount.toLocaleString('vi-VN')}₫
+              </Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.separator} />
+
+        {/* Payment Method */}
+        <View style={styles.rowBetween}>
+          <View>
+            <Text style={styles.sectionLabel}>Phương thức thanh toán</Text>
+            <View style={styles.creditCard}>
+              <MaterialIcons name="credit-card" size={16} color="#666" />
+              <Text style={[styles.sectionSub, { marginLeft: 2 }]}>
+                {method === 'cash'
+                  ? 'Thanh toán trực tiếp'
+                  : method === 'momo'
+                  ? 'Thanh toán bằng Momo'
+                  : 'Thanh toán qua ZaloPay'}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.smallButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.smallButtonText}>Thay đổi</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.separator} />
+
         {/* Total */}
         <View style={styles.rowBetween}>
           <Text style={styles.totalLabel}>Tổng thanh toán</Text>
           <Text style={styles.totalValue}>
-            {total.toLocaleString('vi-VN')}₫
+            {(total - discount).toLocaleString('vi-VN')}₫
           </Text>
         </View>
 
@@ -154,7 +215,11 @@ const PaymentScreen = () => {
       </View>
 
       {/* Continue Button */}
-      <CustomButton title="Xác nhận và thanh toán" style={styles.payBtn} />
+      <CustomButton
+        title="Xác nhận và thanh toán"
+        style={styles.payBtn}
+        onPress={handlePayment}
+      />
       <EditGuests
         visible={showEditGuests}
         onClose={() => setShowEditGuests(false)}
@@ -167,6 +232,18 @@ const PaymentScreen = () => {
         onClose={() => setShowDiscountCodeModal(false)}
         initialValue={discountCode ?? ''}
         onSave={newCode => setDiscountCode(newCode)}
+      />
+      <PaymentMethodModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSave={selectedMethod => setMethod(selectedMethod)}
+        initialMethod={method}
+      />
+      <EditPhoneModal
+        visible={showEditPhoneModal}
+        onClose={() => setShowEditPhoneModal(false)}
+        onSave={newPhone => setPhone(newPhone)}
+        initialValue={phone}
       />
     </ScrollView>
   );
@@ -186,7 +263,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
-    marginBottom: 24,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -226,13 +303,13 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sectionLabel: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 15,
+    color: '#222',
     marginBottom: 2,
+    fontWeight: '500',
   },
   sectionValue: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: 14,
     color: '#222',
   },
   sectionSub: {
@@ -281,5 +358,12 @@ const styles = StyleSheet.create({
   },
   payBtn: {
     backgroundColor: '#007AFF',
+    paddingVertical: 14,
+  },
+  creditCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    flex: 1,
   },
 });

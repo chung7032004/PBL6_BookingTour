@@ -1,30 +1,36 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CustomTextInput from '../component/CustomTextInput';
+import CustomTextInput from '../../component/CustomTextInput';
 import { useState, useEffect } from 'react';
-import CustomButton from '../component/CustomButton';
-
+import CustomButton from '../../component/CustomButton';
 interface EditNameProps {
   visible: boolean;
   onClose: () => void;
   onSave: (text: string) => void;
+  title?: string;
   initialValue?: string;
 }
 
-const DiscountCodeModal = (props: EditNameProps) => {
-  const { visible, onClose, onSave, initialValue = '' } = props;
+const EditNameModal = (props: EditNameProps) => {
+  const {
+    visible,
+    onClose,
+    onSave,
+    title = 'Chỉnh sửa tên người dùng',
+    initialValue = '',
+  } = props;
 
-  const [code, setCode] = useState(initialValue);
+  const [name, setName] = useState(initialValue);
 
   // Cập nhật state khi mở modal
   useEffect(() => {
     if (visible) {
-      setCode(initialValue);
+      setName(initialValue);
     }
   }, [visible, initialValue]);
 
   const handleSave = () => {
-    if (code !== initialValue) {
-      onSave(code);
+    if (name !== initialValue) {
+      onSave(name);
       onClose();
     }
   };
@@ -44,19 +50,20 @@ const DiscountCodeModal = (props: EditNameProps) => {
           </TouchableOpacity>
 
           {/* Title */}
-          <Text style={styles.title}>Phiếu giảm giá</Text>
+          <Text style={styles.title}>{title}</Text>
 
           {/* Input */}
           <CustomTextInput
-            title="Mã giảm giá"
-            value={code}
-            onChangeText={setCode}
+            title="Nhập tên của bạn"
+            value={name}
+            onChangeText={setName}
           />
 
+          {/* Save button (luôn hiện, nhưng disable nếu không thay đổi) */}
           <CustomButton
-            title="Thêm mã"
+            title="Lưu"
             onPress={handleSave}
-            disabled={code === initialValue}
+            disabled={name === initialValue}
           />
         </View>
       </View>
@@ -99,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DiscountCodeModal;
+export default EditNameModal;

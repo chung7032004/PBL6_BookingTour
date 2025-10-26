@@ -1,9 +1,9 @@
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useState } from 'react';
-import CustomButton from '../component/CustomButton';
-import { Quantity } from './quantity';
-import CustomCheckbox from '../component/CustomCheckBox';
+import CustomButton from '../../component/CustomButton';
+import { Quantity } from '../quantity';
+import CustomCheckbox from '../../component/CustomCheckBox';
 
 interface EditGuestsProps {
   title: string;

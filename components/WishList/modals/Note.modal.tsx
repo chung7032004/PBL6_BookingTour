@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import CustomButton from '../component/CustomButton';
+import CustomButton from '../../component/CustomButton';
 
 interface NotepadModalProps {
   visible: boolean;

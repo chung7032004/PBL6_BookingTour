@@ -1,37 +1,31 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CustomTextInput from '../component/CustomTextInput';
+import CustomTextInput from '../../component/CustomTextInput';
 import { useState, useEffect } from 'react';
-import CustomButton from '../component/CustomButton';
+import CustomButton from '../../component/CustomButton';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 interface EditNameProps {
   visible: boolean;
   onClose: () => void;
   onSave: (text: string) => void;
-  title?: string;
   initialValue?: string;
 }
 
-const EditNameModal = (props: EditNameProps) => {
-  const {
-    visible,
-    onClose,
-    onSave,
-    title = 'Chỉnh sửa tên người dùng',
-    initialValue = '',
-  } = props;
+const DiscountCodeModal = (props: EditNameProps) => {
+  const { visible, onClose, onSave, initialValue = '' } = props;
 
-  const [name, setName] = useState(initialValue);
+  const [code, setCode] = useState(initialValue);
 
   // Cập nhật state khi mở modal
   useEffect(() => {
     if (visible) {
-      setName(initialValue);
+      setCode(initialValue);
     }
   }, [visible, initialValue]);
 
   const handleSave = () => {
-    if (name !== initialValue) {
-      onSave(name);
+    if (code !== initialValue) {
+      onSave(code);
       onClose();
     }
   };
@@ -51,20 +45,29 @@ const EditNameModal = (props: EditNameProps) => {
           </TouchableOpacity>
 
           {/* Title */}
-          <Text style={styles.title}>{title}</Text>
-
+          <Text style={styles.title}>Phiếu giảm giá</Text>
+          <Text style={styles.desc}>
+            Nhập mã giảm giá của bạn ở đây. Mã hợp lệ sẽ được áp dụng khi thanh
+            toán
+          </Text>
           {/* Input */}
           <CustomTextInput
-            title="Nhập tên của bạn"
-            value={name}
-            onChangeText={setName}
+            title="Mã giảm giá"
+            value={code}
+            onChangeText={setCode}
           />
 
-          {/* Save button (luôn hiện, nhưng disable nếu không thay đổi) */}
+          {code === initialValue && code !== '' && (
+            <View style={styles.errorContainer}>
+              <MaterialIcons name="error-outline" size={16} color="red" />
+              <Text style={styles.error}>Kiểm tra kĩ mã giảm giá của bạn</Text>
+            </View>
+          )}
+
           <CustomButton
-            title="Lưu"
+            title="Thêm mã"
             onPress={handleSave}
-            disabled={name === initialValue}
+            disabled={code === initialValue}
           />
         </View>
       </View>
@@ -103,8 +106,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#222',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
+  },
+  desc: { marginBottom: 4, color: '#555', fontSize: 15, fontWeight: '400' },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  error: {
+    color: 'red',
+    marginLeft: 4,
+    fontSize: 13,
   },
 });
 
-export default EditNameModal;
+export default DiscountCodeModal;

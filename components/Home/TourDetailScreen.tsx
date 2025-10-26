@@ -12,9 +12,9 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import images from '../../images';
 import ExpandableText from './ExpandableText';
-import SelectDateModal from './SelectDate.modal';
+import SelectDateModal from './modals/SelectDate.modal';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import ActiveModal from './Active.modal';
+import ActiveModal from './modals/Active.modal';
 import ActiveCard from './ActiveCard';
 import CustomButton from '../component/CustomButton';
 

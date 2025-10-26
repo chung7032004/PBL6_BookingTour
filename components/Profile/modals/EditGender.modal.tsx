@@ -1,7 +1,7 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import RadioGroup from '../component/CustomRadioGroup';
+import RadioGroup from '../../component/CustomRadioGroup';
 import { useEffect, useState } from 'react';
-import CustomButton from '../component/CustomButton';
+import CustomButton from '../../component/CustomButton';
 
 interface EditGenderProps {
   title: string;

@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ReviewCard from './ReviewCard';
-import CustomButton from '../component/CustomButton';
+import ReviewCard from '../ReviewCard';
+import CustomButton from '../../component/CustomButton';
 
 interface ReviewModalProps {
   quantityReview: number;

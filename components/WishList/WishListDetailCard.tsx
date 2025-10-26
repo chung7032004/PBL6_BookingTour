@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import CustomButton from '../component/CustomButton';
-import NotepadModal from './Note.modal';
-import NoteDisplayModal from './NoteDisplay.modal';
+
+import NoteDisplayModal from './modals/NoteDisplay.modal';
+import NoteModal from './modals/Note.modal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
@@ -144,7 +144,7 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
       </View>
 
       {/* Modal ghi chú */}
-      <NotepadModal
+      <NoteModal
         visible={showModalNote}
         onClose={() => setShowModalNote(false)}
         onSave={handleSaveNote}

@@ -1,5 +1,5 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CustomButton from '../component/CustomButton';
+import CustomButton from '../../component/CustomButton';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 interface EditAvatarProps {

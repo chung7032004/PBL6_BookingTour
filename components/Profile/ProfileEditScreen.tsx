@@ -11,10 +11,10 @@ import {
   View,
 } from 'react-native';
 import images from '../../images';
-import DescriptionModal from './description.modal';
-import EditNameModal from './EditName.modal';
-import EditAvatarModal from './EditAvatar.modal';
-import EditGenderModal from './EditGender.modal';
+import DescriptionModal from './modals/description.modal';
+import EditNameModal from './modals/EditName.modal';
+import EditAvatarModal from './modals/EditAvatar.modal';
+import EditGenderModal from './modals/EditGender.modal';
 import BirthdayPicker from './BirthdayPicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 

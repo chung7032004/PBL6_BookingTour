@@ -7,6 +7,7 @@ import SignUpScreen from '../Home/SignUpScreen';
 import ForgotPasswordScreen from '../Home/ForgetPasswordScreen';
 import ProviderScreen from '../Home/ProviderScreen';
 import PaymentScreen from '../Home/PaymentScreen';
+import PaymentSuccessScreen from '../Home/PaymentSuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,11 @@ export default function HomeStack() {
         name="paymentScreen"
         component={PaymentScreen}
         options={{ title: 'Xác nhận và thanh toán' }}
+      />
+      <Stack.Screen
+        name="paymentSuccessScreen"
+        component={PaymentSuccessScreen}
+        options={{ title: 'Thanh toán thành công' }}
       />
       <Stack.Screen
         name="login"

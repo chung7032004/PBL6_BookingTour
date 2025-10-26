@@ -2,7 +2,6 @@ type RootStackParamList = {
   home: undefined;
   tourDetail: undefined;
   provider: undefined;
-
   paymentScreen: {
     tourName: string;
     image: any;
@@ -15,6 +14,10 @@ type RootStackParamList = {
       total: number;
     };
     total: number;
+  };
+  paymentSuccessScreen: {
+    total: number;
+    method: string;
   };
 
   booking: undefined;

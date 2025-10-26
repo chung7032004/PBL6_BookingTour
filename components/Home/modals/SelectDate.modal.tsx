@@ -1,6 +1,5 @@
 import React, { use, useState } from 'react';
 import {
-  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -8,12 +7,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Quantity } from './quantity';
-import EditGuests from './EditGuests.modal';
+import { Quantity } from '../quantity';
+import EditGuests from '../modals/EditGuests.modal';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
-import { formatVNDate } from '../component/FormatDate';
+import { formatVNDate } from '../../component/FormatDate';
 
 interface SelectDateModalProps {
   visible: boolean;

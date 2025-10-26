@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ActiveCard from './ActiveCard';
-import images from '../../images';
+import ActiveCard from '../ActiveCard';
+import images from '../../../images';
 
 interface ActiveModalProps {
   visible: boolean;

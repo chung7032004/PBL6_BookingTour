@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import images from '../../images';
+import images from '../../../images';
 
 interface NoteItem {
   userId: string;

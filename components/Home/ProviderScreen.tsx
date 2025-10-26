@@ -4,7 +4,7 @@ import images from '../../images';
 import TourCard from './TourCard';
 import ReviewCard from './ReviewCard';
 import CustomButton from '../component/CustomButton';
-import ReviewModal from './Review.modal';
+import ReviewModal from './modals/Review.modal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ProviderScreen = () => {
