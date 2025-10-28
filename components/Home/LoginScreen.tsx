@@ -1,4 +1,7 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/route';
+
 import { useState } from 'react';
 import {
   Button,
@@ -9,16 +12,27 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // ✅ thêm dòng này
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { login } from '../api/fakeAuth';
+
+//Ở màn hình LoginScreen chỉ được gọi những route có trong RootStackParamList
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'login'
+>;
+//Đây là thông tin của route login, có thể nhận params (nếu có).
+type LoginScreenRouteProp = RouteProp<RootStackParamList, 'login'>;
 
 const LoginScreen = () => {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const navigation = useNavigation<LoginScreenNavigationProp>(); //điều hướng giữa các màn hình
+  const route = useRoute<LoginScreenRouteProp>(); //thông tin params được truyền vào màn hình hiện tại
+
   const [email, setEmail] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email.length === 0) {
       setError('Không được để trống email');
       return;
@@ -27,9 +41,35 @@ const LoginScreen = () => {
       setError('Mật khẩu phải dài ít nhất 6 ký tự');
       return;
     }
-    // Handle login logic here
-  };
 
+    // Gọi "fake API"
+    const user = await login(email, password);
+    if (user) {
+      const redirect = route.params?.redirect;
+      const redirectParams = route.params?.params;
+      if (redirect) {
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'AppTabs',
+              params: {
+                screen: redirect,
+                params: redirectParams,
+              },
+            },
+          ],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AppTabs' }],
+        });
+      }
+    } else {
+      setError('Email hoặc mật khẩu không đúng!');
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Đăng nhập</Text>

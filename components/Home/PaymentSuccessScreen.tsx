@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import CustomButton from '../component/CustomButton';
+import { RootStackParamList } from '../../types/route';
 
 type PaymentSuccessRouteProp = RouteProp<
   RootStackParamList,

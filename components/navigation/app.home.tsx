@@ -2,9 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../Home/HomeScreen';
 import TourDetailScreen from '../Home/TourDetailScreen';
 import AppHeader from './app.header';
-import LoginScreen from '../Home/LoginScreen';
-import SignUpScreen from '../Home/SignUpScreen';
-import ForgotPasswordScreen from '../Home/ForgetPasswordScreen';
 import ProviderScreen from '../Home/ProviderScreen';
 import PaymentScreen from '../Home/PaymentScreen';
 import PaymentSuccessScreen from '../Home/PaymentSuccessScreen';
@@ -41,7 +38,7 @@ export default function HomeStack() {
         component={PaymentSuccessScreen}
         options={{ title: 'Thanh toán thành công' }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="login"
         component={LoginScreen}
         options={{ title: 'Login', headerShown: false }}
@@ -55,7 +52,7 @@ export default function HomeStack() {
         name="forgotPassword"
         component={ForgotPasswordScreen}
         options={{ title: 'Forgot Password', headerShown: false }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }

@@ -1,4 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+
 import {
   Image,
   ScrollView,
@@ -9,9 +11,33 @@ import {
 } from 'react-native';
 import images from '../../images';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { getCurrentUser, logout } from '../api/fakeAuth';
 
 const ProfileScreen = () => {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const navigation = useNavigation<any>();
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const checkLogin = async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    };
+    checkLogin();
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+  };
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'profileTab',
+      params: { screen: 'profile' },
+    });
+  };
   return (
     <ScrollView style={styles.container}>
       {/* Header Avatar */}
@@ -20,7 +46,8 @@ const ProfileScreen = () => {
           <Image style={styles.avatarImage} source={images.account} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.userName}>Tên của bạn </Text>
+          <Text style={styles.userName}>{user ? user.name : 'Khách'}</Text>
+          <Text style={styles.userInfo}>{user ? user.email : ''}</Text>
           <Text style={styles.userInfo}>0 Đánh giá</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('profileEdit')}>
@@ -30,6 +57,20 @@ const ProfileScreen = () => {
 
       {/* Menu items */}
       <View style={styles.menuSection}>
+        {!user && (
+          <TouchableOpacity style={styles.touch} onPress={handleLogin}>
+            <Icon
+              name="login"
+              size={24}
+              color="#000000ff"
+              style={styles.icon}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>Đăng nhập/ Đăng kí</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={styles.touch}
           onPress={() => navigation.navigate('profileDetail')}
@@ -147,12 +188,19 @@ const ProfileScreen = () => {
             style={styles.nextIcon}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.touch}>
-          <Icon name="logout" size={24} color="#000000ff" style={styles.icon} />
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>Đăng xuất</Text>
-          </View>
-        </TouchableOpacity>
+        {user && (
+          <TouchableOpacity style={styles.touch} onPress={handleLogout}>
+            <Icon
+              name="logout"
+              size={24}
+              color="#000000ff"
+              style={styles.icon}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>Đăng xuất</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );

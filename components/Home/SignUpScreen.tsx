@@ -10,6 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../types/route';
+import { checkEmailExists, signup } from '../api/fakeAuth';
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -19,21 +21,48 @@ const SignUpScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [error, setError] = useState('');
+  const [disable, setDisable] = useState(false);
 
-  const handleSignUp = () => {
+  const handleEmailBlur = async () => {
+    const check = await checkEmailExists(email);
+    if (check) {
+      setError('Email đã tồn tại');
+      setDisable(true);
+    } else {
+      setError('');
+      setDisable(false);
+    }
+  };
+
+  const handleSignUp = async () => {
     if (email.length === 0) {
-      setError('Không được để trống email');
+      setError('Email Không được để trống');
       return;
     }
-    if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp');
+    if (password.length === 0) {
+      setError('Vui lòng nhập mật khẩu');
       return;
     }
     if (password.length < 6) {
       setError('Mật khẩu phải dài ít nhất 6 ký tự');
       return;
     }
-    // Handle sign-up logic here
+    if (confirmPassword.length === 0) {
+      setError('Vui lòng nhập mật khẩu ');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Mật khẩu không khớp');
+      return;
+    }
+
+    const name = 'Người dùng mới';
+    const user = await signup(email, password, name);
+    if (user) {
+      navigation.navigate('login');
+    } else {
+      setError('Đăng kí thất bại , Email đã tồn tại');
+    }
   };
 
   return (
@@ -48,6 +77,7 @@ const SignUpScreen = () => {
         placeholder="Email của bạn"
         placeholderTextColor="#888"
         keyboardType="email-address"
+        onBlur={handleEmailBlur}
       />
 
       <Text style={styles.text}>Mật khẩu</Text>
@@ -99,7 +129,11 @@ const SignUpScreen = () => {
       {error.length > 0 && <Text style={styles.error}>* {error} *</Text>}
 
       <View style={styles.button}>
-        <Button title="Đăng kí" onPress={() => handleSignUp()} />
+        <Button
+          title="Đăng kí"
+          onPress={() => handleSignUp()}
+          disabled={disable}
+        />
       </View>
 
       <View style={styles.loginRow}>

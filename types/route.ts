@@ -1,4 +1,7 @@
-type RootStackParamList = {
+export type RootStackParamList = {
+  AppTabs: undefined;
+
+  homeTab: undefined;
   home: undefined;
   tourDetail: undefined;
   provider: undefined;
@@ -20,15 +23,17 @@ type RootStackParamList = {
     method: string;
   };
 
+  bookingTab: undefined;
   booking: undefined;
   bookingList: undefined;
   bookingDetail: undefined;
   reviewScreen: undefined;
 
-  login: undefined;
+  login: { redirect?: keyof RootStackParamList; params?: any } | undefined;
   signup: undefined;
   forgotPassword: undefined;
 
+  profileTab: undefined;
   profile: undefined;
   profileDetail: undefined;
   profileEdit: undefined;
@@ -39,6 +44,7 @@ type RootStackParamList = {
   search: undefined;
   searchTab: undefined;
 
+  wishListTab: undefined;
   wishList: undefined;
   personalScheduleScreen: undefined;
   wishListScreen: undefined;
