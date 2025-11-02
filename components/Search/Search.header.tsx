@@ -1,41 +1,38 @@
 import { useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import CustomButton from '../component/CustomButton';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../component/CustomButton';
 
-const SearchHeader = () => {
+interface Props {
+  onSearch: (keyword: string) => void;
+}
+
+const SearchHeader = ({ onSearch }: Props) => {
   const [searchText, setSearchText] = useState('');
 
-  const handleSearch = (searchText: string) => {
-    Alert.alert('Search', `You searched for: ${searchText}`);
-  };
+  const handleSearch = () => onSearch(searchText.trim());
 
   const handleClearSearch = () => {
     setSearchText('');
+    onSearch('');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        {/* Icon tìm kiếm */}
         <Icon name="search" size={22} color="#555" style={styles.icon} />
 
-        {/* Ô nhập liệu */}
         <TextInput
           style={styles.input}
           value={searchText}
           placeholder="Tìm kiếm..."
           placeholderTextColor="#888"
-          onChangeText={text => setSearchText(text)}
+          onChangeText={text => {
+            setSearchText(text);
+            if (text === '') onSearch('');
+          }}
         />
 
-        {/* Nút xóa */}
         {searchText.length > 0 && (
           <TouchableOpacity onPress={handleClearSearch}>
             <Icon
@@ -48,19 +45,19 @@ const SearchHeader = () => {
         )}
       </View>
 
-      {/* Nút tìm kiếm */}
-      <CustomButton title="Tìm kiếm" onPress={() => handleSearch(searchText)} />
+      <CustomButton title="Tìm kiếm" onPress={handleSearch} />
     </View>
   );
 };
 
+export default SearchHeader;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
+    padding: 10,
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 10,
     justifyContent: 'space-between',
   },
   searchContainer: {
@@ -89,5 +86,3 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
-
-export default SearchHeader;

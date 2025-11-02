@@ -6,13 +6,14 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import images from '../../images';
 import CustomTabs from '../component/CustomTabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../types/route';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
 
   const tabs = [
-    { key: 'posts', label: 'Bài viết' },
+    { key: 'posts', label: 'Thông tin' },
     { key: 'comments', label: 'Đánh giá' },
   ];
 
@@ -34,7 +35,7 @@ const ProfileDetailScreen = () => {
           <Text style={styles.editText}>Chỉnh sửa hồ sơ</Text>
         </TouchableOpacity>
 
-        <Text style={styles.userInfo}>0 bài viết</Text>
+        <Text style={styles.userInfo}>0 Đánh giá</Text>
       </View>
 
       {/* Custom Tabs */}
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     backgroundColor: '#fff',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   avatarImage: {
     height: 90,

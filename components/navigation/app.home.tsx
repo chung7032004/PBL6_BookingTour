@@ -36,7 +36,7 @@ export default function HomeStack() {
       <Stack.Screen
         name="paymentSuccessScreen"
         component={PaymentSuccessScreen}
-        options={{ title: 'Thanh toán thành công' }}
+        options={{ headerShown: false }}
       />
       {/* <Stack.Screen
         name="login"

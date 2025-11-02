@@ -5,12 +5,26 @@ export interface User {
   name: string;
   password: string;
 }
+export interface UserPublic {
+  email: string;
+  name: string;
+}
 
 // Giả lập dữ liệu user đã "đăng ký"
 let users: User[] = [
   {
-    email: 'test@gmail.com',
+    email: 'test1@gmail.com',
     name: 'Nguyen Van A',
+    password: '123456',
+  },
+  {
+    email: 'test2@gmail.com',
+    name: 'Nguyen Thi B',
+    password: '123456',
+  },
+  {
+    email: 'test3@gmail.com',
+    name: 'Le C',
     password: '123456',
   },
 ];
@@ -19,14 +33,18 @@ let users: User[] = [
 export async function login(
   email: string,
   password: string,
-): Promise<User | null> {
+): Promise<UserPublic | null> {
   try {
     const user = users.find(u => {
       return u.email === email && u.password === password;
     });
     if (user) {
-      await AsyncStorage.setItem('user', JSON.stringify(user)); // lưu
-      return user;
+      const userPublicData = {
+        email: user.email,
+        name: user.name,
+      };
+      await AsyncStorage.setItem('user', JSON.stringify(userPublicData)); // lưu
+      return userPublicData;
     }
     return null;
   } catch (e) {
@@ -36,7 +54,7 @@ export async function login(
 }
 
 //lấy user hiện tại
-export async function getCurrentUser(): Promise<User | null> {
+export async function getCurrentUser(): Promise<UserPublic | null> {
   const data = await AsyncStorage.getItem('user'); // đọc
   return data ? JSON.parse(data) : null;
 }

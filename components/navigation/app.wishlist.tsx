@@ -20,11 +20,6 @@ const WishListStack = () => {
         component={WishListDetailScreen}
         options={{ headerTitle: () => <AppHeader /> }}
       />
-      <Stack.Screen
-        name="tourDetail"
-        component={TourDetailScreen}
-        options={{ title: 'Chi tiết tour', headerTitle: () => <AppHeader /> }}
-      />
     </Stack.Navigator>
   );
 };

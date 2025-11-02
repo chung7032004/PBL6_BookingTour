@@ -4,16 +4,17 @@ import { RootStackParamList } from '../../types/route';
 
 import { useState } from 'react';
 import {
-  Button,
   TextInput,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { login } from '../api/fakeAuth';
+import images from '../../images';
 
 //Ở màn hình LoginScreen chỉ được gọi những route có trong RootStackParamList
 type LoginScreenNavigationProp = NativeStackNavigationProp<
@@ -36,8 +37,10 @@ const LoginScreen = () => {
     if (email.length === 0) {
       setError('Không được để trống email');
       return;
-    }
-    if (password.length < 6) {
+    } else if (password.length === 0) {
+      setError('Mật khẩu không được để trống');
+      return;
+    } else if (password.length < 6) {
       setError('Mật khẩu phải dài ít nhất 6 ký tự');
       return;
     }
@@ -71,73 +74,67 @@ const LoginScreen = () => {
     }
   };
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Đăng nhập</Text>
-
-      <Text style={styles.text}>Email</Text>
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        placeholder="Email của bạn"
-        placeholderTextColor="#888"
-        keyboardType="email-address"
-      />
-
-      <Text style={styles.text}>Mật khẩu</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={[styles.input, { flex: 1, borderWidth: 0, marginVertical: 0 }]}
-          placeholder="Mật khẩu"
-          placeholderTextColor="#888"
-          secureTextEntry={!passwordVisible}
-          value={password}
-          onChangeText={setPassword}
-          keyboardType={passwordVisible ? 'visible-password' : 'default'}
-          autoCapitalize="none"
-          textContentType="password"
-        />
-
-        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Icon
-            name={passwordVisible ? 'visibility-off' : 'visibility'}
-            size={20}
-            color="#555"
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Đăng nhập</Text>
+        </View>
+        {/* Email */}
+        <Text style={styles.text}>Email</Text>
+        <View style={styles.inputWrapper}>
+          <Icon name="email" size={20} color="#555" style={styles.inputIcon} />
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+            placeholder="Email của bạn"
+            placeholderTextColor="#999"
+            keyboardType="email-address"
           />
+        </View>
+        {/* Password */}
+        <Text style={styles.text}>Mật khẩu</Text>
+        <View style={styles.inputWrapper}>
+          <Icon name="lock" size={20} color="#555" style={styles.inputIcon} />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            style={styles.input}
+            placeholder="Nhập mật khẩu"
+            placeholderTextColor="#999"
+            secureTextEntry={!passwordVisible}
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+            style={styles.eyeIcon}
+          >
+            <Icon
+              name={passwordVisible ? 'visibility-off' : 'visibility'}
+              size={20}
+              color="#555"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+
+        <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
+          <Text style={styles.buttonText}>Đăng nhập</Text>
         </TouchableOpacity>
-      </View>
 
-      {error.length > 0 && <Text style={styles.error}>* {error} *</Text>}
-
-      <View style={styles.button}>
-        <Button title="Đăng nhập" onPress={() => handleLogin()} />
-      </View>
-
-      <View style={styles.forgotRow}>
-        <Text style={styles.text}>Quên mật khẩu?</Text>
-        <View style={styles.forgotButton}>
-          <Button
-            title="Đặt lại mật khẩu"
+        <View style={styles.loginRow}>
+          <Text>Quên mật khẩu?</Text>
+          <TouchableOpacity
             onPress={() => navigation.navigate('forgotPassword')}
-          />
+          >
+            <Text style={styles.loginLink}> Đặt lại mật khẩu</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.signupRow}>
-        <Text style={styles.text}>Không có tài khoản?</Text>
-        <View style={styles.signupButton}>
-          <Button
-            title="Đăng kí"
-            onPress={() => navigation.navigate('signup')}
-          />
-        </View>
-      </View>
-
-      <View style={styles.socialSection}>
-        <Text style={{ textAlign: 'center' }}>Hoặc đăng nhập với</Text>
-        <View style={styles.socialButtons}>
-          <Button title="Google" onPress={() => {}} />
-          <Button title="Facebook" onPress={() => {}} />
+        <View style={styles.loginRow}>
+          <Text>Không có tài khoảng</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('signup')}>
+            <Text style={styles.loginLink}> Đăng kí</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
@@ -147,71 +144,85 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 22,
+    justifyContent: 'center',
+    backgroundColor: '#FFEBEC',
+  },
+  titleContainer: {
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fefefe',
+    borderRadius: 12,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
-    fontSize: 28,
+    fontSize: 40,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginVertical: 5,
+    color: '#222',
   },
   text: {
     fontSize: 16,
     marginLeft: 5,
+    marginBottom: 6,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#ddd',
+    borderWidth: 1.2,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#f9f9f9',
+    marginBottom: 12,
+  },
+  inputIcon: {
+    marginRight: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 12,
-    marginVertical: 8,
+    flex: 1,
+    paddingVertical: 12,
     color: '#000',
   },
-  passwordContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 6,
-    marginVertical: 8,
-    paddingRight: 10,
-  },
-  button: {
-    marginVertical: 12,
-  },
-  forgotRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  forgotButton: {
-    marginLeft: 8,
-  },
-  signupRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  signupButton: {
-    marginLeft: 8,
-  },
-  socialSection: {
-    marginTop: 20,
-  },
-  socialButtons: {
-    marginTop: 10,
-    gap: 8,
+  eyeIcon: {
+    padding: 5,
   },
   error: {
-    fontSize: 14,
     color: 'red',
     textAlign: 'center',
+    marginVertical: 8,
     fontStyle: 'italic',
+  },
+  button: {
+    backgroundColor: '#FF5A5F',
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  loginLink: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
 });
 

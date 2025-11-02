@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, Dimensions } from 'react-native';
 import images from '../../images';
 import TourCard from './TourCard';
+import { getHot, getTopRated, getTours, Tour } from '../api/fakeTours';
 
 const { width } = Dimensions.get('window');
 
@@ -19,67 +20,23 @@ const categoryData = [
   { id: 4, icon: images.workshop, name: 'Workshop' },
 ];
 
-const suggestData = [
-  {
-    id: 1,
-    image: images.banner1,
-    title: 'Street Food Motorbike Tour',
-    rating: 4.98,
-    price: 730000,
-    popular: true,
-    showFavorite: true,
-  },
-  {
-    id: 2,
-    image: images.banner2,
-    title: 'Hue City Tour',
-    rating: 4.91,
-    price: 650000,
-  },
-  {
-    id: 3,
-    image: images.banner3,
-    title: 'Ha Long Bay Cruise',
-    rating: 5.0,
-    price: 1000000,
-  },
-];
-
-const topRatedData = [
-  {
-    id: 4,
-    image: images.banner4,
-    title: 'Tour Hạ Long',
-    rating: 5.0,
-    price: 950000,
-  },
-  {
-    id: 5,
-    image: images.banner1,
-    title: 'Tour Phú Quốc',
-    rating: 4.9,
-    price: 880000,
-  },
-];
-
-const hotData = [
-  {
-    id: 6,
-    image: images.banner2,
-    title: 'Tour Hội An',
-    rating: 4.9,
-    price: 870000,
-  },
-  {
-    id: 7,
-    image: images.banner3,
-    title: 'Tour Sài Gòn đêm',
-    rating: 4.95,
-    price: 750000,
-  },
-];
-
 const HomeScreen = () => {
+  const [suggest, setSuggest] = useState<Tour[]>([]);
+  const [topRated, setTopRated] = useState<Tour[]>([]);
+  const [hot, setHot] = useState<Tour[]>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+  const loadData = async () => {
+    const suggestData = await getTours();
+    const topRatedData = await getTopRated();
+    const hotData = await getHot();
+
+    setSuggest(suggestData.slice(0, 10));
+    setTopRated(topRatedData);
+    setHot(hotData);
+  };
   return (
     <ScrollView
       style={styles.container}
@@ -122,7 +79,7 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardRow}
       >
-        {suggestData.map(tour => (
+        {suggest.map(tour => (
           <TourCard key={tour.id} {...tour} />
         ))}
       </ScrollView>
@@ -134,7 +91,7 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardRow}
       >
-        {topRatedData.map(tour => (
+        {topRated.map(tour => (
           <TourCard key={tour.id} {...tour} />
         ))}
       </ScrollView>
@@ -146,7 +103,7 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardRow}
       >
-        {hotData.map(tour => (
+        {hot.map(tour => (
           <TourCard key={tour.id} {...tour} />
         ))}
       </ScrollView>

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -13,19 +14,37 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import images from '../../images';
 import ExpandableText from './ExpandableText';
 import SelectDateModal from './modals/SelectDate.modal';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import ActiveModal from './modals/Active.modal';
 import ActiveCard from './ActiveCard';
 import CustomButton from '../component/CustomButton';
+import { getTourDetail, TourDetail } from '../api/fakeTours';
 
 const { width } = Dimensions.get('window');
 
 const TourDetailScreen = () => {
   const navigation: NavigationProp<any> = useNavigation();
+  const route: any = useRoute();
+  const { id } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [showActiveModal, setShowActiveModal] = useState(false);
 
+  const [tour, setTour] = useState<TourDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, [id]);
+  const loadData = async () => {
+    const data = await getTourDetail(id);
+    setTour(data);
+    setLoading(false);
+  };
   const tourImages = [
     images.banner1,
     images.banner2,
@@ -44,12 +63,19 @@ const TourDetailScreen = () => {
 
   const random = Math.floor(Math.random() * 5) + 1;
   const randomArr = Array.from({ length: random }, (_, i) => i);
-
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ff4d4f" />
+        <Text style={{ marginTop: 8 }}>Đang tải dữ liệu...</Text>
+      </View>
+    );
+  }
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Tour Khám Phá Hội An</Text>
+        <Text style={styles.title}>{tour?.title}</Text>
         <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
           <Icon
             name="favorite"
@@ -88,14 +114,15 @@ const TourDetailScreen = () => {
 
       {/*  Mô tả & giá */}
       <View style={styles.section}>
-        <ExpandableText
-          text="Trải nghiệm văn hóa và ẩm thực Hội An — di sản thế giới nổi tiếng với vẻ đẹp cổ kính, đèn lồng rực rỡ và con người hiếu khách."
-          limit={100}
-        />
+        <ExpandableText text={tour?.description} limit={100} />
 
         <View style={styles.priceRow}>
           <Text style={styles.priceText}>
-            Giá từ: <Text style={styles.priceHighlight}>₫1.000.000</Text> /khách
+            Giá từ:{' '}
+            <Text style={styles.priceHighlight}>
+              ₫{tour?.price.toLocaleString('vi-VN')}
+            </Text>{' '}
+            /khách
           </Text>
           <TouchableOpacity
             style={styles.bookButton}
@@ -148,7 +175,7 @@ const TourDetailScreen = () => {
         <Text style={styles.sectionTitle}>Đánh giá</Text>
 
         <View style={styles.ratingSummary}>
-          <Text style={styles.ratingValue}>5.0</Text>
+          <Text style={styles.ratingValue}>{tour?.rating}</Text>
           <Icon name="star" size={20} color="#FFD700" style={styles.starIcon} />
           <Text style={styles.ratingCount}>(1.001 đánh giá)</Text>
         </View>

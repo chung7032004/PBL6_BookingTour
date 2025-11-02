@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 
 interface ExpandableTextProps {
-  text: string;
+  text?: string | null;
   limit?: number; // giới hạn ký tự
 }
 
@@ -11,21 +11,21 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({
   limit = 100,
 }) => {
   const [expanded, setExpanded] = useState(false);
-
+  const safeText = text ?? '';
   return (
     <View>
       <Text style={styles.descriptionTour}>
         {expanded ? (
           <>
-            {text}{' '}
+            {safeText}{' '}
             <Text style={styles.seeMore} onPress={() => setExpanded(false)}>
               Thu gọn
             </Text>
           </>
         ) : (
           <>
-            {text.slice(0, limit)}
-            {text.length > limit && (
+            {safeText.slice(0, limit)}
+            {safeText.length > limit && (
               <>
                 ...{' '}
                 <Text style={styles.seeMore} onPress={() => setExpanded(true)}>

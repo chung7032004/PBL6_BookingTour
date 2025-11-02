@@ -7,44 +7,57 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../types/route';
 
 const ForgotPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reset Password</Text>
-      <Text style={styles.text}>
-        Please enter your email address to receive a link to create a new
-        password via email
-      </Text>
+      {/* View bao bọc để căn giữa nội dung chính */}
+      <View style={styles.contentWrapper}>
+        <View style={styles.card}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Đặt lại mật khẩu</Text>
+          </View>
+          <Text style={styles.instructionText}>
+            Vui lòng nhập **địa chỉ email** bạn đã đăng ký. Chúng tôi sẽ gửi một
+            liên kết đến hộp thư của bạn để bạn có thể tạo mật khẩu mới.
+          </Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#888"
-        keyboardType="email-address"
-      />
+          <View style={styles.inputWrapper}>
+            <Icon
+              name="email"
+              size={20}
+              color="#666"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email của bạn đã đăng ký"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+            />
+          </View>
 
-      <View style={styles.button}>
-        {/* Nút quay lại */}
-        <TouchableOpacity
-          style={styles.backToLoginButton}
-          onPress={() => navigation.navigate('login')}
-        >
-          <Icon
-            name="arrow-back"
-            size={20}
-            color="#333"
-            style={{ marginRight: 8 }}
-          />
-          <Text style={styles.textBackToLogin}>Login</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.confirmButton}>
+            <Text style={styles.confirmText}>Gửi liên kết xác nhận</Text>
+          </TouchableOpacity>
 
-        {/* Nút xác nhận */}
-        <TouchableOpacity style={styles.confirmButton}>
-          <Text style={styles.confirmText}>Confirm</Text>
-        </TouchableOpacity>
+          {/* Nút quay lại Login - Đặt riêng để căn chỉnh hợp lý hơn */}
+          <TouchableOpacity
+            style={styles.backToLoginButton}
+            onPress={() => navigation.navigate('login')}
+          >
+            <Icon
+              name="arrow-back"
+              size={18}
+              color="#333"
+              style={{ marginRight: 6 }}
+            />
+            <Text style={styles.textBackToLogin}>Quay lại Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -53,57 +66,86 @@ const ForgotPasswordScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFEBEC',
+    justifyContent: 'center',
+  },
+  contentWrapper: {
+    paddingHorizontal: 25,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  card: {
+    backgroundColor: '#fefefe',
+    borderRadius: 12,
     padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  titleContainer: {
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
-    marginTop: 30,
-  },
-  text: {
-    fontSize: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 12,
-    marginVertical: 8,
-    color: '#000',
-  },
-  button: {
-    flexDirection: 'row',
-    marginTop: 20,
-    justifyContent: 'space-between',
-  },
-  backToLoginButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-  },
-  textBackToLogin: {
-    fontSize: 16,
-    fontWeight: '600',
+    marginBottom: 10,
     color: '#333',
   },
+  instructionText: {
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: 30,
+    color: '#666',
+    lineHeight: 22,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    backgroundColor: '#f9f9f9',
+    marginBottom: 15,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#000',
+  },
   confirmButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
+    backgroundColor: '#FF5A5F',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: 'center',
   },
   confirmText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  backToLoginButton: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+    padding: 8,
+  },
+  textBackToLogin: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
   },
 });
 

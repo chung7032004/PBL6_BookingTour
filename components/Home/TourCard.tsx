@@ -1,10 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import images from '../../images';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TourCard = ({
+  id,
   image,
   title,
   price,
@@ -17,7 +17,7 @@ const TourCard = ({
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('tourDetail')}
+      onPress={() => navigation.navigate('tourDetail', { id })}
       activeOpacity={0.8}
     >
       {/* Ảnh tour */}

@@ -1,4 +1,4 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 
 import {
@@ -68,6 +68,12 @@ const ProfileScreen = () => {
             <View style={styles.textContainer}>
               <Text style={styles.title}>Đăng nhập/ Đăng kí</Text>
             </View>
+            <Icon
+              name="chevron-right"
+              size={24}
+              color="#666"
+              style={styles.nextIcon}
+            />
           </TouchableOpacity>
         )}
 
@@ -209,7 +215,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5', // nền xám nhạt
+    backgroundColor: '#f5f5f5',
   },
   profileContainer: {
     flexDirection: 'row',

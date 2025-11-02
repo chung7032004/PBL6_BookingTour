@@ -1,5 +1,6 @@
 const images = {
   account: require('./account.jpg'),
+  background: require('./background.jpg'),
 
   //Danh mục trải nghiệm
   nature: require('./nature.png'),
