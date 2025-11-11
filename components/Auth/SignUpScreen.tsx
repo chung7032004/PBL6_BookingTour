@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
-import { checkEmailExists, signup } from '../api/fakeAuth';
+import { checkEmailExists } from '../api/fakeAuth';
+import LoadingOverlay from '../component/LoadingOverlay';
+import { signup } from '../api/fakeAuth';
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -22,6 +24,7 @@ const SignUpScreen = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [error, setError] = useState('');
   const [disable, setDisable] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleEmailBlur = async () => {
     const check = await checkEmailExists(email);
@@ -46,22 +49,38 @@ const SignUpScreen = () => {
     if (email.length === 0) {
       setError('Email không được để trống');
       return;
-    } else if (fullName.length > 0 && fullName.length < 3) {
-      setError('Họ và tên phải dài ít nhất 3 ký tự');
+    } else if (fullName.length > 0 && fullName.length < 2) {
+      setError('Họ và tên phải dài ít nhất 2 ký tự');
       return;
-    } else if (password.length < 6) {
-      setError('Mật khẩu phải dài ít nhất 6 ký tự');
+    } else if (password.length < 8) {
+      setError('Mật khẩu phải dài ít nhất 8 ký tự');
       return;
     } else if (password !== confirmPassword) {
       setError('Mật khẩu không khớp');
       return;
     }
 
+    // setLoading(true);
+    // setError('');
+    // const result = await signup(email, password, fullName);
+    // setLoading(false);
+
+    // if (result != null) {
+    //   if (result.accountId) {
+    //      navigation.navigate('login', {
+    //   message: 'Đăng ký thành công, vui lòng đăng nhập',
+    // });
+    //   } else {
+    //     setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại!');
+    //   }
+    // }
+
     const name = fullName.length === 0 ? 'Người dùng mới' : fullName;
     const user = await signup(email, password, name);
-
     if (user) {
-      navigation.navigate('login');
+      navigation.navigate('login', {
+        message: 'Đăng ký thành công, vui lòng đăng nhập',
+      });
     } else {
       setError('Đăng ký thất bại, Email đã tồn tại');
     }
@@ -71,7 +90,9 @@ const SignUpScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Tạo tài khoản</Text>
+          <Text style={styles.title} testID="signup-title">
+            Tạo tài khoản
+          </Text>
         </View>
 
         {/* Email */}
@@ -86,6 +107,7 @@ const SignUpScreen = () => {
             placeholderTextColor="#999"
             keyboardType="email-address"
             onBlur={handleEmailBlur}
+            testID="signup-input-email"
           />
         </View>
 
@@ -99,6 +121,7 @@ const SignUpScreen = () => {
             style={styles.input}
             placeholder="Họ và tên của bạn"
             placeholderTextColor="#999"
+            testID="signup-input-name"
           />
         </View>
 
@@ -113,6 +136,7 @@ const SignUpScreen = () => {
             placeholder="Nhập mật khẩu"
             placeholderTextColor="#999"
             secureTextEntry={!passwordVisible}
+            testID="signup-input-password"
           />
           <TouchableOpacity
             onPress={() => setPasswordVisible(!passwordVisible)}
@@ -142,6 +166,7 @@ const SignUpScreen = () => {
             placeholder="Nhập lại mật khẩu"
             placeholderTextColor="#999"
             secureTextEntry={!confirmPasswordVisible}
+            testID="signup-input-confirm-password"
           />
           <TouchableOpacity
             onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
@@ -155,13 +180,18 @@ const SignUpScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+        {error.length > 0 && (
+          <Text style={styles.error} testID="signup-text-error">
+            {error}
+          </Text>
+        )}
 
         {/* Sign up button */}
         <TouchableOpacity
           style={[styles.button, disable && { backgroundColor: '#aaa' }]}
           onPress={handleSignUp}
           disabled={disable}
+          testID="signup-btn-submit"
         >
           <Text style={styles.buttonText}>Đăng ký</Text>
         </TouchableOpacity>
@@ -174,6 +204,7 @@ const SignUpScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <LoadingOverlay visible={loading} message="Đang xử lý..." />
     </ScrollView>
   );
 };
@@ -185,7 +216,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 22,
     justifyContent: 'center',
-    backgroundColor: '#FFEBEC',
+    backgroundColor: '#FFF',
   },
   titleContainer: {
     alignItems: 'center',

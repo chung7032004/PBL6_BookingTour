@@ -32,24 +32,19 @@ const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
 const PostsScreen = () => {
   return (
     <ScrollView style={styles.container}>
-      {/* 1. Card Tên đầy đủ */}
       <Card nameIcon="person-outline" title="Tên đầy đủ" data="Nguyễn Văn A" />
-
-      {/* 2. Card Email */}
       <Card
-        nameIcon="email-outline"
+        nameIcon="email"
         title="Địa chỉ Email"
         data="nguyenvana@example.com"
       />
-
-      {/* 3. Card Số điện thoại */}
       <Card
         nameIcon="phone-iphone"
         title="Số điện thoại"
         data="(+84) 901 234 567"
       />
-
-      {/* 4. Card Địa chỉ (ví dụ: sử dụng icon "home") */}
+      <Card nameIcon="transgender" title="Giới tính" data="Nam" />
+      <Card nameIcon="date-range" title="Ngày sinh" data="01/01/2001" />
       <Card
         nameIcon="home"
         title="Địa chỉ"
@@ -63,7 +58,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    paddingTop: 10,
   },
   cardContainer: {
     flexDirection: 'row',
@@ -71,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 10,
-    marginVertical: 8,
+    marginVertical: 4,
     marginHorizontal: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

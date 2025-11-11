@@ -1,4 +1,5 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,23 +9,59 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
+import { forgotPassword } from '../api/fakeAuth';
+import LoadingOverlay from '../component/LoadingOverlay';
 
 const ForgotPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSendLink = async () => {
+    if (!validateEmail(email)) {
+      setError('Email không hợp lệ');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    const res = await forgotPassword(email);
+    setLoading(false);
+
+    if (!res.success) {
+      setError(res.message);
+      return;
+    }
+    setTimeout(() => {
+      navigation.navigate('verifyCode', {
+        email,
+        message: 'Liên kết xác nhận đã được gửi đến email của bạn',
+      });
+    }, 1000);
+  };
+
   return (
     <View style={styles.container}>
-      {/* View bao bọc để căn giữa nội dung chính */}
       <View style={styles.contentWrapper}>
         <View style={styles.card}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Đặt lại mật khẩu</Text>
           </View>
+
+          {/* Mô tả */}
           <Text style={styles.instructionText}>
-            Vui lòng nhập **địa chỉ email** bạn đã đăng ký. Chúng tôi sẽ gửi một
+            Vui lòng nhập địa chỉ email bạn đã đăng ký. Chúng tôi sẽ gửi một
             liên kết đến hộp thư của bạn để bạn có thể tạo mật khẩu mới.
           </Text>
 
+          {/* Input Email */}
           <View style={styles.inputWrapper}>
             <Icon
               name="email"
@@ -33,19 +70,36 @@ const ForgotPasswordScreen = () => {
               style={styles.inputIcon}
             />
             <TextInput
+              testID="emailInput"
               style={styles.input}
-              placeholder="Email của bạn đã đăng ký"
+              placeholder="Email đã đăng ký"
               placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
               keyboardType="email-address"
             />
           </View>
 
-          <TouchableOpacity style={styles.confirmButton}>
+          {!!error && (
+            <Text
+              style={{ color: 'red', textAlign: 'center' }}
+              testID="errorText"
+            >
+              {error}
+            </Text>
+          )}
+
+          <TouchableOpacity
+            testID="sendLinkButton"
+            style={styles.confirmButton}
+            disabled={loading}
+            onPress={handleSendLink}
+          >
             <Text style={styles.confirmText}>Gửi liên kết xác nhận</Text>
           </TouchableOpacity>
 
-          {/* Nút quay lại Login - Đặt riêng để căn chỉnh hợp lý hơn */}
           <TouchableOpacity
+            testID="backToLoginButton"
             style={styles.backToLoginButton}
             onPress={() => navigation.navigate('login')}
           >
@@ -59,9 +113,12 @@ const ForgotPasswordScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <LoadingOverlay visible={loading} message={'Đang xử lý ...'} />
     </View>
   );
 };
+
+export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -148,5 +205,3 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
-
-export default ForgotPasswordScreen;

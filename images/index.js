@@ -13,6 +13,8 @@ const images = {
   banner2: require('./banner2.webp'),
   banner3: require('./banner3.jpg'),
   banner4: require('./banner4.webp'),
+
+  noNotice: require('./notice.webp'),
 };
 
 export default images;

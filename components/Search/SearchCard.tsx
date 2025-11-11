@@ -19,10 +19,11 @@ const SearchCard = ({
   quantityRating,
 }: SearchCardProps) => {
   const navigation = useNavigation<any>();
+  const id = 1;
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('tourDetail')}
+      onPress={() => navigation.navigate('tourDetail', { id })}
     >
       <Image source={image} style={styles.thumbnail} />
 

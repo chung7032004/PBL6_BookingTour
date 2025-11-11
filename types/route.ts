@@ -1,9 +1,13 @@
 export type RootStackParamList = {
   AppTabs: undefined;
 
+  notice: undefined;
+
   homeTab: undefined;
   home: undefined;
-  tourDetail: undefined;
+  tourDetail: {
+    id: number;
+  };
   provider: undefined;
   paymentScreen: {
     tourName: string;
@@ -29,9 +33,13 @@ export type RootStackParamList = {
   bookingDetail: undefined;
   reviewScreen: undefined;
 
-  login: { redirect?: keyof RootStackParamList; params?: any } | undefined;
+  login:
+    | { redirect?: keyof RootStackParamList; params?: any; message?: string }
+    | undefined;
   signup: undefined;
   forgotPassword: undefined;
+  verifyCode: { email: string; message?: string };
+  resetPassword: { email: string; message?: string };
 
   profileTab: undefined;
   profile: undefined;

@@ -1,9 +1,10 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../types/route';
 
 const AppHeader = () => {
-  const navigation: NavigationProp<any> = useNavigation();
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -16,7 +17,11 @@ const AppHeader = () => {
         <Text style={styles.input}>Tìm kiếm...</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('notice');
+        }}
+      >
         <Icon name="notifications" size={24} />
       </TouchableOpacity>
     </View>

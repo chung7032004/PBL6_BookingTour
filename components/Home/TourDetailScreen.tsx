@@ -16,6 +16,7 @@ import ExpandableText from './ExpandableText';
 import SelectDateModal from './modals/SelectDate.modal';
 import {
   NavigationProp,
+  RouteProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -23,12 +24,16 @@ import ActiveModal from './modals/Active.modal';
 import ActiveCard from './ActiveCard';
 import CustomButton from '../component/CustomButton';
 import { getTourDetail, TourDetail } from '../api/fakeTours';
+import { RootStackParamList } from '../../types/route';
+import Notification from '../component/Notification';
+import ReviewModal from './modals/Review.modal';
+import ReviewCard from './ReviewCard';
 
 const { width } = Dimensions.get('window');
 
 const TourDetailScreen = () => {
-  const navigation: NavigationProp<any> = useNavigation();
-  const route: any = useRoute();
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const route: RouteProp<RootStackParamList, 'tourDetail'> = useRoute();
   const { id } = route.params;
   const [activeIndex, setActiveIndex] = useState(0);
   const [showSelectModal, setShowSelectModal] = useState(false);
@@ -36,6 +41,21 @@ const TourDetailScreen = () => {
 
   const [tour, setTour] = useState<TourDetail | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [wishList, setWishList] = useState(false);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
+
+  const reviews = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    name: `Người dùng ${i + 1}`,
+    avatar: images.account,
+    rating: Math.floor(Math.random() * 2) + 4,
+    time: `${i + 1} ngày trước`,
+    content:
+      'Trải nghiệm tuyệt vời, hướng dẫn viên thân thiện, cảnh đẹp và đồ ăn ngon. Rất đáng để thử!',
+  }));
+  const [quantityReview] = useState<number>(164);
+  const [showModalReview, setShowModalReview] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -58,11 +78,15 @@ const TourDetailScreen = () => {
   };
 
   const handleFavorite = () => {
-    Alert.alert('Đã thêm vào danh sách yêu thích ');
+    setWishList(!wishList);
+    const newState = !wishList;
+    setShowNotification(
+      newState
+        ? 'Đã thêm vào danh sách yêu thích'
+        : 'Đã xóa khỏi danh sách yêu thích',
+    );
   };
 
-  const random = Math.floor(Math.random() * 5) + 1;
-  const randomArr = Array.from({ length: random }, (_, i) => i);
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -72,138 +96,144 @@ const TourDetailScreen = () => {
     );
   }
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{tour?.title}</Text>
-        <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
-          <Icon
-            name="favorite"
-            size={20}
-            color="#ff4d4d"
-            style={styles.favoriteIcon}
-          />
-          <Text style={styles.favoriteText}>Yêu thích</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Hình ảnh chính */}
-      <View style={styles.imageSection}>
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        >
-          {tourImages.map((img, index) => (
-            <Image key={index} source={img} style={styles.imageTour} />
-          ))}
-        </ScrollView>
-
-        {/* Dots */}
-        <View style={styles.dotContainer}>
-          {tourImages.map((_, index) => (
-            <View
-              key={index}
-              style={[styles.dot, activeIndex === index && styles.activeDot]}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/*  Mô tả & giá */}
-      <View style={styles.section}>
-        <ExpandableText text={tour?.description} limit={100} />
-
-        <View style={styles.priceRow}>
-          <Text style={styles.priceText}>
-            Giá từ:{' '}
-            <Text style={styles.priceHighlight}>
-              ₫{tour?.price.toLocaleString('vi-VN')}
-            </Text>{' '}
-            /khách
-          </Text>
-          <TouchableOpacity
-            style={styles.bookButton}
-            onPress={() => setShowSelectModal(true)}
+    <View style={styles.mainContainer}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Hình ảnh chính */}
+        <View style={styles.imageSection}>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           >
-            <Text style={styles.bookButtonText}>Chọn ngày</Text>
+            {tourImages.map((img, index) => (
+              <Image key={index} source={img} style={styles.imageTour} />
+            ))}
+          </ScrollView>
+
+          {/* Dots */}
+          <View style={styles.dotContainer}>
+            {tourImages.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, activeIndex === index && styles.activeDot]}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/*  Mô tả & giá */}
+        <View style={styles.section}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{tour?.title}</Text>
+            <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
+              <Icon
+                name={wishList ? 'favorite' : 'favorite-border'} // Đổi icon khi chưa yêu thích
+                size={22} // Tăng kích thước icon
+                color={wishList ? '#ff4d4d' : '#666'} // Màu xám nhạt hơn khi chưa yêu thích
+                style={styles.favoriteIcon} // Áp dụng style căn chỉnh
+              />
+              <Text
+                style={[
+                  styles.favoriteText,
+                  // Ghi đè màu sắc và font weight khi đã yêu thích
+                  !wishList && styles.unfavoriteText,
+                ]}
+              >
+                Yêu thích
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ExpandableText text={tour?.description} limit={100} />
+        </View>
+
+        {/* Hoạt động nổi bật */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
+          <TouchableOpacity onPress={() => setShowActiveModal(true)}>
+            {[1, 2].map(i => (
+              <ActiveCard
+                key={i}
+                title="Làng chày cổ"
+                description="Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của người dân địa phương"
+                image={images.banner3}
+              />
+            ))}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowActiveModal(true)}>
+            <Text style={styles.moreText}>Xem tất cả hoạt động</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Hoạt động nổi bật */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
-        <TouchableOpacity onPress={() => setShowActiveModal(true)}>
-          {[1, 2].map(i => (
-            <ActiveCard
-              key={i}
-              title="Làng chày cổ"
-              description="Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của người dân địa phương"
-              image={images.banner3}
-            />
-          ))}
-        </TouchableOpacity>
-        <CustomButton
-          title="Hiển thị tất cả hoạt động"
-          onPress={() => setShowActiveModal(true)}
-          style={styles.buttonActive}
-        />
-      </View>
-
-      {/* Thông tin Host */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Thông tin Host</Text>
-        <TouchableOpacity
-          style={styles.hostContainer}
-          onPress={() => navigation.navigate('provider')}
-        >
-          <Image source={images.banner4} style={styles.hostAvatar} />
-          <View style={{ flex: 1, flexShrink: 1 }}>
-            <Text style={styles.hostName}>Nguyễn Minh An</Text>
-            <Text style={styles.hostDesc}>
-              Hướng dẫn viên địa phương với hơn 5 năm kinh nghiệm.
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/*  Đánh giá */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Đánh giá</Text>
-
-        <View style={styles.ratingSummary}>
-          <Text style={styles.ratingValue}>{tour?.rating}</Text>
-          <Icon name="star" size={20} color="#FFD700" style={styles.starIcon} />
-          <Text style={styles.ratingCount}>(1.001 đánh giá)</Text>
+        {/* Thông tin Host */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Thông tin Host</Text>
+          <TouchableOpacity
+            style={styles.hostContainer}
+            onPress={() => navigation.navigate('provider')}
+          >
+            <Image source={images.banner4} style={styles.hostAvatar} />
+            <View style={{ flex: 1, flexShrink: 1 }}>
+              <Text style={styles.hostName}>Nguyễn Minh An</Text>
+              <Text style={styles.hostDesc}>
+                Hướng dẫn viên địa phương với hơn 5 năm kinh nghiệm.
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.reviewItem}>
-          <View style={styles.reviewHeader}>
-            <Image source={images.banner1} style={styles.reviewAvatar} />
-            <Text style={styles.reviewerName}>Trần Hải Nam</Text>
+        {/*  Đánh giá */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Đánh giá</Text>
+
+          <View style={styles.ratingSummary}>
+            <Text style={styles.ratingValue}>{tour?.rating}</Text>
+            <Icon
+              name="star"
+              size={20}
+              color="#FFD700"
+              style={styles.starIcon}
+            />
+            <Text style={styles.ratingCount}>({quantityReview} đánh giá)</Text>
           </View>
 
-          <View style={styles.reviewMeta}>
-            <View style={{ flexDirection: 'row' }}>
-              {randomArr.map(i => (
-                <Icon key={i} name="star" size={18} color="#FFD700" />
-              ))}
-            </View>
-            <Text style={styles.reviewTime}>2 ngày trước</Text>
-          </View>
-          <Text style={styles.reviewText}>
-            Trải nghiệm tuyệt vời, hướng dẫn viên thân thiện, cảnh đẹp và đồ ăn
-            ngon. Rất đáng để thử!
-          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.reviewRow}
+          >
+            {reviews.slice(0, 4).map(item => (
+              <ReviewCard key={item.id} {...item} />
+            ))}
+          </ScrollView>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowModalReview(true)}>
             <Text style={styles.moreText}>Hiển thị thêm</Text>
           </TouchableOpacity>
         </View>
+        <View style={{ height: 80 }}></View>
+      </ScrollView>
+
+      {/* footer */}
+      <View style={styles.stickyFooter}>
+        <View style={styles.priceRowFooter}>
+          <Text style={styles.priceTextFooter}>
+            Giá từ:
+            <Text style={styles.priceHighlightFooter}>
+              {' '}
+              {tour?.price.toLocaleString('vi-VN')}₫
+            </Text>
+          </Text>
+          <CustomButton
+            title="Chọn ngày"
+            onPress={() => setShowSelectModal(true)}
+            style={styles.footerButton}
+            textStyle={styles.footerButtonText}
+          />
+        </View>
       </View>
+
       <SelectDateModal
         visible={showSelectModal}
         onClose={() => setShowSelectModal(false)}
@@ -214,30 +244,48 @@ const TourDetailScreen = () => {
           image: images.banner1,
         }}
       />
-
       <ActiveModal
         visible={showActiveModal}
         onClose={() => {
           setShowActiveModal(false);
         }}
       />
-    </ScrollView>
+      <ReviewModal
+        reviews={reviews}
+        onClose={() => setShowModalReview(false)}
+        quantityReview={quantityReview}
+        visible={showModalReview}
+      />
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type="success"
+          autoClose
+          position="top"
+          duration={3000}
+        />
+      )}
+    </View>
   );
 };
 
 export default TourDetailScreen;
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#FFEBEC',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
-    padding: 10,
+    paddingHorizontal: 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginVertical: 6,
   },
   title: {
     fontSize: 20,
@@ -255,17 +303,19 @@ const styles = StyleSheet.create({
     color: '#ff4d4f',
     fontWeight: '600',
   },
-
+  unfavoriteText: {
+    color: '#666',
+    fontWeight: '500',
+  },
   imageSection: {
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 15,
+    marginVertical: 12,
   },
   imageTour: {
     width: width - 20,
     height: 250,
     borderRadius: 12,
-    marginRight: 10,
   },
   dotContainer: {
     flexDirection: 'row',
@@ -299,25 +349,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  priceText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
-  },
-  priceHighlight: {
-    color: '#e63946',
-    fontWeight: 'bold',
-  },
-  bookButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  bookButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
@@ -344,6 +375,10 @@ const styles = StyleSheet.create({
     color: '#666',
     flexWrap: 'wrap',
   },
+  reviewRow: {
+    paddingLeft: 5,
+    paddingBottom: 10,
+  },
 
   ratingSummary: {
     flexDirection: 'row',
@@ -360,43 +395,54 @@ const styles = StyleSheet.create({
   ratingCount: {
     color: '#666',
   },
-
-  reviewItem: {
-    marginTop: 10,
-  },
-  reviewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  reviewAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  reviewerName: {
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  reviewMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 5,
-  },
-  reviewTime: {
-    color: '#999',
-  },
-  reviewText: {
-    marginTop: 6,
-    color: '#444',
-    lineHeight: 20,
-  },
   moreText: {
     color: '#007bff',
     marginTop: 4,
     fontWeight: '500',
   },
-  buttonActive: {
-    backgroundColor: '#ccc',
+  // Style cho Footer cố định (Sticky Footer)
+  stickyFooter: {
+    position: 'absolute', // KEY: Định vị tuyệt đối
+    bottom: 0, // KEY: Dính vào đáy
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingVertical: 10,
+    paddingHorizontal: 15, // Padding bên trong footer
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 10, // Shadow cho Android
+    zIndex: 10, // Đảm bảo nó luôn nằm trên cùng
+  },
+  priceRowFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  priceTextFooter: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  priceHighlightFooter: {
+    color: '#e63946',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  footerButton: {
+    backgroundColor: '#ff4d4f', // Màu nổi bật hơn
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    minWidth: 150,
+  },
+  footerButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });

@@ -13,6 +13,7 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import EditGuests from '../Home/modals/EditGuests.modal';
 import { Quantity } from '../Home/quantity';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { RootStackParamList } from '../../types/route';
 
 const WishListDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -57,7 +58,7 @@ const WishListDetailScreen = () => {
         label="Phổ biến"
         image={images.banner1}
         currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail')}
+        onPress={() => navigation.navigate('tourDetail', { id: 1 })}
       />
       <WishListDetailCard
         title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
@@ -68,7 +69,7 @@ const WishListDetailScreen = () => {
         label="Phổ biến"
         image={images.banner1}
         currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail')}
+        onPress={() => navigation.navigate('tourDetail', { id: 1 })}
       />
       <WishListDetailCard
         title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
@@ -79,7 +80,7 @@ const WishListDetailScreen = () => {
         label="Phổ biến"
         image={images.banner1}
         currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail')}
+        onPress={() => navigation.navigate('tourDetail', { id: 1 })}
       />
       <EditGuests
         visible={showEditGuests}

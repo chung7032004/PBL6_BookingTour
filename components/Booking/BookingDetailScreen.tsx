@@ -28,6 +28,7 @@ const BookingDetailScreen = () => {
   const route = useRoute<RouteProp<{ params: BookingDetailProps }, 'params'>>();
   const navigation = useNavigation<any>();
   const booking = route.params?.booking;
+  const id = 1;
 
   if (!booking) {
     return (
@@ -218,7 +219,7 @@ const BookingDetailScreen = () => {
           <TouchableOpacity
             activeOpacity={0.8}
             style={[styles.actionButton, { backgroundColor: '#1E88E5' }]}
-            onPress={() => navigation.navigate('tourDetail')}
+            onPress={() => navigation.navigate('tourDetail', { id })}
           >
             <Text style={styles.actionText}>Xem chi tiết trải nghiêm</Text>
           </TouchableOpacity>

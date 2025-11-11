@@ -34,8 +34,6 @@ const ProfileDetailScreen = () => {
           <Icon name="edit" size={20} color="#007bff" style={styles.editIcon} />
           <Text style={styles.editText}>Chỉnh sửa hồ sơ</Text>
         </TouchableOpacity>
-
-        <Text style={styles.userInfo}>0 Đánh giá</Text>
       </View>
 
       {/* Custom Tabs */}
@@ -56,7 +54,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   profileSection: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingTop: 5,
     backgroundColor: '#fff',
     marginBottom: 5,
   },
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
     height: 90,
     width: 90,
     borderRadius: 45,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   userName: { fontSize: 20, fontWeight: '600', color: '#000', marginBottom: 8 },
   editButton: {

@@ -5,6 +5,7 @@ import AppHeader from './app.header';
 import ProviderScreen from '../Home/ProviderScreen';
 import PaymentScreen from '../Home/PaymentScreen';
 import PaymentSuccessScreen from '../Home/PaymentSuccessScreen';
+import NoticeScreen from '../Home/NoticeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,21 +39,11 @@ export default function HomeStack() {
         component={PaymentSuccessScreen}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen
-        name="login"
-        component={LoginScreen}
-        options={{ title: 'Login', headerShown: false }}
-      />
       <Stack.Screen
-        name="signup"
-        component={SignUpScreen}
-        options={{ title: 'Sign Up', headerShown: false }}
+        name="notice"
+        component={NoticeScreen}
+        options={{ title: 'Thông báo' }}
       />
-      <Stack.Screen
-        name="forgotPassword"
-        component={ForgotPasswordScreen}
-        options={{ title: 'Forgot Password', headerShown: false }}
-      /> */}
     </Stack.Navigator>
   );
 }

@@ -2,7 +2,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/route';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   TextInput,
   View,
@@ -10,11 +10,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { login } from '../api/fakeAuth';
-import images from '../../images';
+import { login } from '../api/auth/login';
+import LoadingOverlay from '../component/LoadingOverlay';
+import Notification from '../component/Notification';
 
 //Ở màn hình LoginScreen chỉ được gọi những route có trong RootStackParamList
 type LoginScreenNavigationProp = NativeStackNavigationProp<
@@ -32,6 +32,14 @@ const LoginScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (route.params?.message) {
+      setShowNotification(route.params.message);
+    }
+  }, [route.params]);
 
   const handleLogin = async () => {
     if (email.length === 0) {
@@ -40,14 +48,29 @@ const LoginScreen = () => {
     } else if (password.length === 0) {
       setError('Mật khẩu không được để trống');
       return;
-    } else if (password.length < 6) {
-      setError('Mật khẩu phải dài ít nhất 6 ký tự');
+    } else if (password.length < 8) {
+      setError('Mật khẩu phải dài ít nhất 8 ký tự');
       return;
     }
 
-    // Gọi "fake API"
-    const user = await login(email, password);
-    if (user) {
+    setLoading(true);
+    setError('');
+    const result = await login(email, password);
+    setLoading(false);
+
+    if (result != null) {
+      if (!result.success) {
+        if (result.message === 'Invalid email or password') {
+          setError('Email hoặc mật khẩu không đúng!');
+          return;
+        } else if (result.message === 'Email is not confirmed') {
+          setError('Email chưa được xác thực!');
+          return;
+        } else {
+          setError('Máy chủ không phản hồi. Vui lòng thử lại sau!');
+          return;
+        }
+      }
       const redirect = route.params?.redirect;
       const redirectParams = route.params?.params;
       if (redirect) {
@@ -69,9 +92,35 @@ const LoginScreen = () => {
           routes: [{ name: 'AppTabs' }],
         });
       }
-    } else {
-      setError('Email hoặc mật khẩu không đúng!');
     }
+
+    // // Gọi "fake API"
+    //  const user = await login(email, password);
+    // if (user) {
+    //   const redirect = route.params?.redirect;
+    //   const redirectParams = route.params?.params;
+    //   if (redirect) {
+    //     navigation.reset({
+    //       index: 0,
+    //       routes: [
+    //         {
+    //           name: 'AppTabs',
+    //           params: {
+    //             screen: redirect,
+    //             params: redirectParams,
+    //           },
+    //         },
+    //       ],
+    //     });
+    //   } else {
+    //     navigation.reset({
+    //       index: 0,
+    //       routes: [{ name: 'AppTabs' }],
+    //     });
+    //   }
+    // } else {
+    //   setError('Email hoặc mật khẩu không đúng!');
+    // }
   };
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -90,6 +139,7 @@ const LoginScreen = () => {
             placeholder="Email của bạn"
             placeholderTextColor="#999"
             keyboardType="email-address"
+            testID="login-input-email"
           />
         </View>
         {/* Password */}
@@ -103,6 +153,7 @@ const LoginScreen = () => {
             placeholder="Nhập mật khẩu"
             placeholderTextColor="#999"
             secureTextEntry={!passwordVisible}
+            testID="login-input-password"
           />
           <TouchableOpacity
             onPress={() => setPasswordVisible(!passwordVisible)}
@@ -116,9 +167,17 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+        {error.length > 0 && (
+          <Text style={styles.error} testID="login-text-error">
+            {error}
+          </Text>
+        )}
 
-        <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleLogin()}
+          testID="login-btn-submit"
+        >
           <Text style={styles.buttonText}>Đăng nhập</Text>
         </TouchableOpacity>
 
@@ -132,11 +191,25 @@ const LoginScreen = () => {
         </View>
         <View style={styles.loginRow}>
           <Text>Không có tài khoảng</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('signup')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('signup')}
+            testID="signup-link"
+          >
             <Text style={styles.loginLink}> Đăng kí</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <LoadingOverlay visible={loading} message={'Đang xử lý ...'} />
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type="success"
+          autoClose
+          position="top"
+          duration={3000}
+        />
+      )}
     </ScrollView>
   );
 };
@@ -146,7 +219,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 22,
     justifyContent: 'center',
-    backgroundColor: '#FFEBEC',
+    backgroundColor: '#FFF',
   },
   titleContainer: {
     alignItems: 'center',
