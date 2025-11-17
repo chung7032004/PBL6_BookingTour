@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import WishListCard from './WishListCard';
 import images from '../../images';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/route';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;

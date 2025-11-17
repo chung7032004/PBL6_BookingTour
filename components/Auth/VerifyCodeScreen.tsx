@@ -36,14 +36,13 @@ const VerifyCodeScreen = () => {
   const handleConfirm = async () => {
     if (code.length !== 6) return;
 
-    setLoading(true);
     setError('');
-
+    setLoading(true);
     const res: any = await verifyCode(email, code);
     setLoading(false);
 
     if (!res.success) {
-      setError(res.message);
+      setError(res.message || '');
       return;
     }
 

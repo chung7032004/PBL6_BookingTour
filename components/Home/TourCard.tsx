@@ -2,17 +2,21 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { TourCardProps } from '../../types/experience';
+import { RootStackParamList } from '../../types/route';
 
 const TourCard = ({
   id,
   image,
   title,
+  location,
   price,
-  rating,
-  popular,
+  duration,
+  cancellation,
+  activityLevel,
   showFavorite = false,
-}: any) => {
-  const navigation: NavigationProp<any> = useNavigation();
+}: TourCardProps) => {
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   return (
     <TouchableOpacity
@@ -22,13 +26,12 @@ const TourCard = ({
     >
       {/* Ảnh tour */}
       <View style={styles.imageContainer}>
-        <Image source={image} style={styles.cardImage} />
-        {/* Nhãn "Popular" */}
-        {popular && (
+        <Image source={{ uri: image }} style={styles.cardImage} />
+        {/*{popular && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Popular</Text>
           </View>
-        )}
+        )} */}
         {/* Icon yêu thích */}
         {showFavorite && (
           <Icon
@@ -45,6 +48,9 @@ const TourCard = ({
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
+        <Text style={styles.location} numberOfLines={1}>
+          {location}
+        </Text>
 
         <Text style={styles.price}>
           Chỉ từ{' '}
@@ -53,11 +59,20 @@ const TourCard = ({
           </Text>{' '}
           / khách
         </Text>
+        <Text style={styles.duration}>{duration}</Text>
 
-        <View style={styles.ratingRow}>
-          <Text style={styles.ratingText}>{rating}</Text>
-          <Icon name="star" size={18} color="#FFD700" style={styles.starIcon} />
-        </View>
+        {cancellation && (
+          <Text style={styles.cancellation}>{cancellation}</Text>
+        )}
+
+        {activityLevel && (
+          <Text style={styles.level}>Độ hoạt động: {activityLevel}</Text>
+        )}
+
+        {/* <View style={styles.ratingRow}> */}
+        {/* <Text style={styles.ratingText}>{rating}</Text> */}
+        {/* <Icon name="star" size={18} color="#FFD700" style={styles.starIcon} /> */}
+        {/* </View> */}
       </View>
     </TouchableOpacity>
   );
@@ -112,10 +127,30 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 5,
   },
+  location: {
+    fontSize: 12,
+    color: '#777',
+  },
   price: {
     color: '#666',
     fontSize: 13,
     marginBottom: 5,
+  },
+  duration: {
+    fontSize: 12,
+    color: '#444',
+    marginTop: 2,
+  },
+  cancellation: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#28a745',
+    fontWeight: '500',
+  },
+  level: {
+    fontSize: 12,
+    color: '#555',
+    marginTop: 2,
   },
   ratingRow: {
     flexDirection: 'row',

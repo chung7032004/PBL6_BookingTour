@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
 import { checkEmailExists } from '../api/fakeAuth';
 import LoadingOverlay from '../component/LoadingOverlay';
-import { signup } from '../api/fakeAuth';
+import { signup } from '../api/auth/signup';
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -27,11 +27,12 @@ const SignUpScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const handleEmailBlur = async () => {
-    const check = await checkEmailExists(email);
-    if (check) {
-      setError('Email đã tồn tại');
-      setDisable(true);
-    } else if (!isValidEmail(email)) {
+    // const check = await checkEmailExists(email);
+    // if (check) {
+    // setError('Email đã tồn tại');
+    // setDisable(true);
+    // } else
+    if (!isValidEmail(email)) {
       setError('Email không hợp lệ');
       setDisable(true);
     } else {
@@ -60,29 +61,19 @@ const SignUpScreen = () => {
       return;
     }
 
-    // setLoading(true);
-    // setError('');
-    // const result = await signup(email, password, fullName);
-    // setLoading(false);
+    setLoading(true);
+    setError('');
+    const result = await signup(email, password, fullName);
+    setLoading(false);
 
-    // if (result != null) {
-    //   if (result.accountId) {
-    //      navigation.navigate('login', {
-    //   message: 'Đăng ký thành công, vui lòng đăng nhập',
-    // });
-    //   } else {
-    //     setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại!');
-    //   }
-    // }
-
-    const name = fullName.length === 0 ? 'Người dùng mới' : fullName;
-    const user = await signup(email, password, name);
-    if (user) {
-      navigation.navigate('login', {
-        message: 'Đăng ký thành công, vui lòng đăng nhập',
-      });
-    } else {
-      setError('Đăng ký thất bại, Email đã tồn tại');
+    if (result != null) {
+      if (result.accountId) {
+        navigation.navigate('login', {
+          message: 'Đăng ký thành công, vui lòng đăng nhập',
+        });
+      } else {
+        setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại!');
+      }
     }
   };
 

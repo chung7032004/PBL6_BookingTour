@@ -2,17 +2,20 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import images from '../../images';
 
 interface ActiveCardProps {
+  stepNumber: number;
   image: any;
   title: string;
   description: string;
 }
 const ActiveCard = (props: ActiveCardProps) => {
-  const { image = images.banner3, title, description } = props;
+  const { image = images.banner3, title, description, stepNumber } = props;
   return (
     <View style={styles.activityCard}>
-      <Image source={image} style={styles.activityImage} />
+      <Image source={{ uri: image }} style={styles.activityImage} />
       <View style={{ flex: 1, marginLeft: 10 }}>
-        <Text style={styles.activityTitle}>{title}</Text>
+        <Text style={styles.activityTitle}>
+          {stepNumber}. {title}
+        </Text>
         <Text style={styles.activityDesc}>{description}</Text>
       </View>
     </View>

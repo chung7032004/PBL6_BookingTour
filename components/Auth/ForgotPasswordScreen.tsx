@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
-import { forgotPassword } from '../api/fakeAuth';
+import { forgotPassword } from '../api/auth/forgotPassword';
 import LoadingOverlay from '../component/LoadingOverlay';
 
 const ForgotPasswordScreen = () => {
@@ -36,7 +36,7 @@ const ForgotPasswordScreen = () => {
     setLoading(false);
 
     if (!res.success) {
-      setError(res.message);
+      setError(res.message || '');
       return;
     }
     setTimeout(() => {

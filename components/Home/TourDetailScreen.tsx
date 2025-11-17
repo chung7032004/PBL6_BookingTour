@@ -23,11 +23,15 @@ import {
 import ActiveModal from './modals/Active.modal';
 import ActiveCard from './ActiveCard';
 import CustomButton from '../component/CustomButton';
-import { getTourDetail, TourDetail } from '../api/fakeTours';
+// import { getTourDetail, TourDetail } from '../api/fakeTours';
 import { RootStackParamList } from '../../types/route';
 import Notification from '../component/Notification';
 import ReviewModal from './modals/Review.modal';
 import ReviewCard from './ReviewCard';
+import LoadingView from '../component/LoadingView';
+import { Experience } from '../../types/experience';
+import ErrorView from '../component/ErrorView';
+import { getExperiencesById } from '../api/experiences/experiences';
 
 const { width } = Dimensions.get('window');
 
@@ -39,8 +43,10 @@ const TourDetailScreen = () => {
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [showActiveModal, setShowActiveModal] = useState(false);
 
-  const [tour, setTour] = useState<TourDetail | null>(null);
+  // const [tour, setTour] = useState<TourDetail | null>(null);
+  const [tour, setTour] = useState<Experience | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [wishList, setWishList] = useState(false);
   const [showNotification, setShowNotification] = useState<string | null>(null);
@@ -57,20 +63,49 @@ const TourDetailScreen = () => {
   const [quantityReview] = useState<number>(164);
   const [showModalReview, setShowModalReview] = useState(false);
 
+  // useEffect(() => {
+  // loadData();
+  // }, [id]);
+  // const loadData = async () => {
+  // const data = await getTourDetail(1);
+  // setTour(data);
+  // setLoading(false);
+  // };
+  // const tourImages = [
+  // images.banner1,
+  // images.banner2,
+  // images.banner3,
+  // images.banner4,
+  // ];
+
   useEffect(() => {
     loadData();
   }, [id]);
   const loadData = async () => {
-    const data = await getTourDetail(id);
-    setTour(data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const res = await getExperiencesById(id);
+      if (res.message) {
+        setError(res.message);
+        return;
+      }
+      console.log(res.experience);
+      setTour(res.experience);
+    } catch (error) {
+      setError('Lỗi không xác định');
+    } finally {
+      setLoading(false);
+    }
   };
-  const tourImages = [
-    images.banner1,
-    images.banner2,
-    images.banner3,
-    images.banner4,
-  ];
+  const tourImages = tour
+    ? [
+        ...(tour.media?.map(m => m.url) || []),
+        ...(tour.itineraries?.map(i => i.photoUrl) || []),
+      ]
+    : [];
+  const limitedItineraries = (tour?.itineraries || []).sort(
+    (a, b) => a.stepNumber - b.stepNumber,
+  );
 
   const handleScroll = (event: any) => {
     const slide = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -88,11 +123,17 @@ const TourDetailScreen = () => {
   };
 
   if (loading) {
+    return <LoadingView />;
+  }
+  if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#ff4d4f" />
-        <Text style={{ marginTop: 8 }}>Đang tải dữ liệu...</Text>
-      </View>
+      <ErrorView
+        message={error}
+        onPress={() => {
+          setError(null);
+          loadData();
+        }}
+      />
     );
   }
   return (
@@ -107,8 +148,12 @@ const TourDetailScreen = () => {
             onScroll={handleScroll}
             scrollEventThrottle={16}
           >
-            {tourImages.map((img, index) => (
-              <Image key={index} source={img} style={styles.imageTour} />
+            {tourImages.map((url, index) => (
+              <Image
+                key={index}
+                source={{ uri: url }}
+                style={styles.imageTour}
+              />
             ))}
           </ScrollView>
 
@@ -126,18 +171,19 @@ const TourDetailScreen = () => {
         {/*  Mô tả & giá */}
         <View style={styles.section}>
           <View style={styles.header}>
-            <Text style={styles.title}>{tour?.title}</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {tour?.title}
+            </Text>
             <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
               <Icon
-                name={wishList ? 'favorite' : 'favorite-border'} // Đổi icon khi chưa yêu thích
-                size={22} // Tăng kích thước icon
-                color={wishList ? '#ff4d4d' : '#666'} // Màu xám nhạt hơn khi chưa yêu thích
-                style={styles.favoriteIcon} // Áp dụng style căn chỉnh
+                name={wishList ? 'favorite' : 'favorite-border'}
+                size={22}
+                color={wishList ? '#ff4d4d' : '#666'}
+                style={styles.favoriteIcon}
               />
               <Text
                 style={[
                   styles.favoriteText,
-                  // Ghi đè màu sắc và font weight khi đã yêu thích
                   !wishList && styles.unfavoriteText,
                 ]}
               >
@@ -146,18 +192,53 @@ const TourDetailScreen = () => {
             </TouchableOpacity>
           </View>
           <ExpandableText text={tour?.description} limit={100} />
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Địa chỉ: </Text>
+            <Text style={styles.detailValue}>
+              {tour?.address}, {tour?.distance}, {tour?.city}, {tour?.country}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Duration: </Text>
+            <Text style={styles.detailValue}>{tour?.duration}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Max Participants: </Text>
+            <Text style={styles.detailValue}>{tour?.maxParticipants}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Activity Lever: </Text>
+            <Text style={styles.detailValue}>{tour?.activityLevel}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Skill Lever: </Text>
+            <Text style={styles.detailValue}>{tour?.skillLevel}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Max Participants: </Text>
+            <Text style={styles.detailValue}>{tour?.maxParticipants}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Cancellation Policy: </Text>
+            <Text style={styles.detailValue}>{tour?.cancellationPolicy}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Language: </Text>
+            <Text style={styles.detailValue}>{tour?.language}</Text>
+          </View>
         </View>
 
         {/* Hoạt động nổi bật */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
           <TouchableOpacity onPress={() => setShowActiveModal(true)}>
-            {[1, 2].map(i => (
+            {limitedItineraries.slice(0, 3).map(iti => (
               <ActiveCard
-                key={i}
-                title="Làng chày cổ"
-                description="Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của người dân địa phương"
-                image={images.banner3}
+                key={iti.id}
+                stepNumber={iti.stepNumber}
+                title={iti.title}
+                description={iti.description}
+                image={iti.photoUrl}
               />
             ))}
           </TouchableOpacity>
@@ -183,7 +264,7 @@ const TourDetailScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/*  Đánh giá */}
+        {/*  Đánh giá 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Đánh giá</Text>
 
@@ -212,6 +293,7 @@ const TourDetailScreen = () => {
             <Text style={styles.moreText}>Hiển thị thêm</Text>
           </TouchableOpacity>
         </View>
+        */}
         <View style={{ height: 80 }}></View>
       </ScrollView>
 
@@ -222,7 +304,8 @@ const TourDetailScreen = () => {
             Giá từ:
             <Text style={styles.priceHighlightFooter}>
               {' '}
-              {tour?.price.toLocaleString('vi-VN')}₫
+              {/* {tour?.price.toLocaleString('vi-VN')}₫ */}
+              {tour?.adultPrice.toLocaleString('vi-VN')}₫
             </Text>
           </Text>
           <CustomButton
@@ -240,7 +323,7 @@ const TourDetailScreen = () => {
         title="Chọn thời gian"
         navigation={navigation}
         tourInfo={{
-          name: 'Tour Khám Phá Hội An',
+          name: tour?.title || 'Tour',
           image: images.banner1,
         }}
       />
@@ -249,6 +332,7 @@ const TourDetailScreen = () => {
         onClose={() => {
           setShowActiveModal(false);
         }}
+        itineraries={limitedItineraries}
       />
       <ReviewModal
         reviews={reviews}
@@ -291,10 +375,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#222',
+    width: '75%',
   },
   favorite: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '25%',
   },
   favoriteIcon: {
     marginRight: 4,
@@ -306,6 +392,19 @@ const styles = StyleSheet.create({
   unfavoriteText: {
     color: '#666',
     fontWeight: '500',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    marginBottom: 6,
+  },
+  detailLabel: {
+    fontWeight: '600',
+    color: '#444',
+    marginRight: 4,
+  },
+  detailValue: {
+    color: '#666',
+    flexShrink: 1,
   },
   imageSection: {
     borderRadius: 12,

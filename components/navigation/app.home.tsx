@@ -6,10 +6,13 @@ import ProviderScreen from '../Home/ProviderScreen';
 import PaymentScreen from '../Home/PaymentScreen';
 import PaymentSuccessScreen from '../Home/PaymentSuccessScreen';
 import NoticeScreen from '../Home/NoticeScreen';
+import HeaderNotificationIcon from '../component/HeaderNotificationIcon';
+import { useState } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 export default function HomeStack() {
+  const [count, setCount] = useState(10);
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -17,32 +20,39 @@ export default function HomeStack() {
         component={HomeScreen}
         options={{
           headerTitle: () => <AppHeader />,
+          headerRight: () => <HeaderNotificationIcon count={count} />,
         }}
       />
       <Stack.Screen
         name="tourDetail"
         component={TourDetailScreen}
-        options={{ title: 'Chi tiết tour', headerTitle: () => <AppHeader /> }}
+        options={{
+          title: 'Chi tiết tour',
+          headerTitle: () => <AppHeader />,
+          headerRight: () => <HeaderNotificationIcon count={count} />,
+        }}
       />
       <Stack.Screen
         name="provider"
         component={ProviderScreen}
-        options={{ title: 'Thông tin host', headerTitle: () => <AppHeader /> }}
+        options={{
+          headerRight: () => <HeaderNotificationIcon count={count} />,
+          title: 'Thông tin host',
+          headerTitle: () => <AppHeader />,
+        }}
       />
       <Stack.Screen
         name="paymentScreen"
         component={PaymentScreen}
-        options={{ title: 'Xác nhận và thanh toán' }}
+        options={{
+          headerRight: () => <HeaderNotificationIcon count={count} />,
+          title: 'Xác nhận và thanh toán',
+        }}
       />
       <Stack.Screen
         name="paymentSuccessScreen"
         component={PaymentSuccessScreen}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="notice"
-        component={NoticeScreen}
-        options={{ title: 'Thông báo' }}
       />
     </Stack.Navigator>
   );

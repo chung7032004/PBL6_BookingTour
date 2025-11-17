@@ -188,7 +188,10 @@ const ProfileScreen = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.touch}>
+        <TouchableOpacity
+          style={styles.touch}
+          onPress={() => navigation.navigate('contact')}
+        >
           <Icon name="call" size={24} color="#000000ff" style={styles.icon} />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Liên hệ chúng tôi</Text>

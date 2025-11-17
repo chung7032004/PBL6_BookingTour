@@ -1,84 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, Dimensions } from 'react-native';
-import images from '../../images';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import TourCard from './TourCard';
 import { getHot, getTopRated, getTours, Tour } from '../api/fakeTours';
+import { Experience, TourCardProps } from '../../types/experience';
+import { getExperiences } from '../api/experiences/experiences';
+import { mapExperToTourCard } from '../api/experiences/mapExperToTourCard';
+import CustomButton from '../component/CustomButton';
+import LoadingView from '../component/LoadingView';
+import ErrorView from '../component/ErrorView';
 
 const { width } = Dimensions.get('window');
 
-const highlightData = [
-  images.banner1,
-  images.banner2,
-  images.banner3,
-  images.banner4,
-];
-
-const categoryData = [
-  { id: 1, icon: images.food, name: 'Ẩm thực' },
-  { id: 2, icon: images.culture, name: 'Văn hóa' },
-  { id: 3, icon: images.nature, name: 'Thiên nhiên' },
-  { id: 4, icon: images.workshop, name: 'Workshop' },
-];
-
 const HomeScreen = () => {
-  const [suggest, setSuggest] = useState<Tour[]>([]);
-  const [topRated, setTopRated] = useState<Tour[]>([]);
-  const [hot, setHot] = useState<Tour[]>([]);
+  // const [suggest, setSuggest] = useState<Tour[]>([]);
+  // const [topRated, setTopRated] = useState<Tour[]>([]);
+  // const [hot, setHot] = useState<Tour[]>([]);
+
+  // useEffect(() => {
+  // loadData();
+  // }, []);
+  // const loadData = async () => {
+  // const suggestData = await getTours();
+  // const topRatedData = await getTopRated();
+  // const hotData = await getHot();
+
+  // setSuggest(suggestData.slice(0, 10));
+  // setTopRated(topRatedData);
+  // setHot(hotData);
+  // };
+
+  const [suggest, setSuggest] = useState<TourCardProps[]>([]);
+  const [topRated, setTopRated] = useState<TourCardProps[]>([]);
+  const [hot, setHot] = useState<TourCardProps[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
   }, []);
   const loadData = async () => {
-    const suggestData = await getTours();
-    const topRatedData = await getTopRated();
-    const hotData = await getHot();
+    try {
+      setLoading(true);
+      const res = await getExperiences(1, 10);
+      if (res.messages) {
+        setError(res.messages);
+        return;
+      }
 
-    setSuggest(suggestData.slice(0, 10));
-    setTopRated(topRatedData);
-    setHot(hotData);
+      const tours = mapExperToTourCard(res.experiences);
+      setSuggest(tours);
+    } catch (error) {
+      setError('Lỗi không xác định');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return <LoadingView />;
+  }
+  if (error) {
+    return (
+      <ErrorView
+        message={error}
+        onPress={() => {
+          setError(null);
+          loadData();
+        }}
+      />
+    );
+  }
   return (
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
-      {/* Nổi bật */}
-      {/*       
-      <Text style={styles.sectionTitle}>Nổi bật</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.bannerContainer}
-      >
-        {highlightData.map((img, index) => (
-          <Image key={index} source={img} style={styles.banner} />
-        ))}
-      </ScrollView>
-
- 
-      <Text style={styles.sectionTitle}>Trải nghiệm</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesContainer}
-      >
-        {categoryData.map(item => (
-          <View key={item.id} style={styles.category}>
-            <Image source={item.icon} style={styles.categoryIcon} />
-            <Text style={styles.categoryName}>{item.name}</Text>
-          </View>
-        ))}
-      </ScrollView> */}
-
-      {/* Gợi ý cho bạn */}
-
       <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardRow}
       >
+        {/* {suggest.map(tour => (<TourCard key={tour.id} {...tour} />))} */}
         {suggest.map(tour => (
           <TourCard key={tour.id} {...tour} />
         ))}

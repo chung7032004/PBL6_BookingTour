@@ -33,9 +33,15 @@ export async function signup(
         message: null,
       };
     } else {
+      let errorMsg = data?.Message || 'Đăng ký thất bại';
+
+      if (data?.Message !== null && data?.Errors) {
+        const error = Object.values(data.Errors).flat().join('\n');
+        errorMsg = error || errorMsg;
+      }
       return {
         accountId: null,
-        message: data?.Message || 'Đăng ký thất bại',
+        message: errorMsg,
       };
     }
   } catch (error) {

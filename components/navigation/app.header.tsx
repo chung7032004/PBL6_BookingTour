@@ -10,19 +10,10 @@ const AppHeader = () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.searchContainer}
-        // 👉 Chuyển sang tab "searchTab" thay vì mở màn mới
         onPress={() => navigation.navigate('searchTab')}
       >
         <Icon name="search" size={24} />
         <Text style={styles.input}>Tìm kiếm...</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('notice');
-        }}
-      >
-        <Icon name="notifications" size={24} />
       </TouchableOpacity>
     </View>
   );
@@ -36,6 +27,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
   searchContainer: {
     width: '70%',

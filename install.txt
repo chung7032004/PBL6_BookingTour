@@ -17,10 +17,9 @@ npm install react-native-gesture-handler react-native-reanimated
 # Reanimated cần thêm worklets
 npm install react-native-worklets
 
-⚙️ babel.config.js
 
+babel.config.js
 Phải có react-native-reanimated/plugin ở cuối plugins:
-
 module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   plugins: ['react-native-reanimated/plugin'],

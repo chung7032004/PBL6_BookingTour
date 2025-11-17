@@ -9,15 +9,15 @@ import {
 } from 'react-native';
 import ActiveCard from '../ActiveCard';
 import images from '../../../images';
+import { Itinerary } from '../../../types/experience';
 
 interface ActiveModalProps {
+  itineraries: Itinerary[];
   visible: boolean;
   onClose: () => void;
 }
 
-const ActiveModal = ({ visible, onClose }: ActiveModalProps) => {
-  const allActivities = Array.from({ length: 10 }, (_, i) => i + 1);
-
+const ActiveModal = ({ itineraries, visible, onClose }: ActiveModalProps) => {
   return (
     <Modal
       animationType="slide"
@@ -37,12 +37,13 @@ const ActiveModal = ({ visible, onClose }: ActiveModalProps) => {
 
           {/* Danh sách hoạt động */}
           <ScrollView contentContainerStyle={{ padding: 12 }}>
-            {allActivities.map(i => (
+            {itineraries.map(iti => (
               <ActiveCard
-                key={i}
-                title={`Hoạt động ${i}`}
-                description="Tận hưởng không khí mặn mòi và nhịp sống lao động chân thực của người dân địa phương"
-                image={images.banner3}
+                key={iti.id}
+                stepNumber={iti.stepNumber}
+                title={iti.title}
+                description={iti.description}
+                image={iti.photoUrl}
               />
             ))}
           </ScrollView>

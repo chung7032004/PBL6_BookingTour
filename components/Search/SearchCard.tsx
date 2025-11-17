@@ -19,7 +19,7 @@ const SearchCard = ({
   quantityRating,
 }: SearchCardProps) => {
   const navigation = useNavigation<any>();
-  const id = 1;
+  const id = 'a2b5d37e-bd40-447e-b7b6-b8351313f4ef';
   return (
     <TouchableOpacity
       style={styles.card}

@@ -93,34 +93,6 @@ const LoginScreen = () => {
         });
       }
     }
-
-    // // Gọi "fake API"
-    //  const user = await login(email, password);
-    // if (user) {
-    //   const redirect = route.params?.redirect;
-    //   const redirectParams = route.params?.params;
-    //   if (redirect) {
-    //     navigation.reset({
-    //       index: 0,
-    //       routes: [
-    //         {
-    //           name: 'AppTabs',
-    //           params: {
-    //             screen: redirect,
-    //             params: redirectParams,
-    //           },
-    //         },
-    //       ],
-    //     });
-    //   } else {
-    //     navigation.reset({
-    //       index: 0,
-    //       routes: [{ name: 'AppTabs' }],
-    //     });
-    //   }
-    // } else {
-    //   setError('Email hoặc mật khẩu không đúng!');
-    // }
   };
   return (
     <ScrollView contentContainerStyle={styles.container}>

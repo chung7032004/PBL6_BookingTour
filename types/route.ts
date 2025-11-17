@@ -6,7 +6,7 @@ export type RootStackParamList = {
   homeTab: undefined;
   home: undefined;
   tourDetail: {
-    id: number;
+    id: string;
   };
   provider: undefined;
   paymentScreen: {
@@ -45,6 +45,7 @@ export type RootStackParamList = {
   profile: undefined;
   profileDetail: undefined;
   profileEdit: undefined;
+  contact: undefined;
 
   port: undefined;
   comment: undefined;
