@@ -8,6 +8,11 @@ import {
   ScrollView,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/route';
 
 interface CardProps {
   nameIcon: string;
@@ -16,6 +21,22 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <View style={styles.cardContainer}>
       <View style={styles.iconWrapper}>

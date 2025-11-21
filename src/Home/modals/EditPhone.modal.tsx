@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CustomTextInput from '../../components/CustomTextInput';
 import { useState, useEffect } from 'react';
 import CustomButton from '../../components/CustomButton';

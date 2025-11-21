@@ -15,6 +15,20 @@ export interface Category {
   id: string;
   name: string;
 }
+export interface TourCardProps {
+  id: string;
+  title: string;
+  description: string;
+  maxParticipants: number;
+  address: string;
+  category: Category;
+  adultPrice: number;
+  childPrice: number;
+  duration: number;
+  averageRating: number;
+  totalReviews: number;
+  media: Media[];
+}
 export interface Experience {
   id: string;
   hostId: string;
@@ -44,20 +58,8 @@ export interface Experience {
 }
 
 export interface ExperiencesResponse {
-  data: Experience[];
+  data: TourCardProps[];
   totalCount: number;
   pageNumber: number;
   pageSize: number;
-}
-
-export interface TourCardProps {
-  id: string;
-  image: string;
-  title: string;
-  location: string;
-  price: number;
-  duration: string;
-  cancellation?: string;
-  activityLevel?: string;
-  showFavorite?: boolean;
 }

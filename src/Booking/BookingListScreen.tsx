@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -7,14 +7,44 @@ import {
   StyleSheet,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import BookingCard from './BookingCard';
 import images from '../../images';
+import { checkLoginAndRole } from '../api/auth/login';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import { RootStackParamList } from '../../types/route';
 
 const BookingListScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [filter, setFilter] = useState('Tất cả');
 
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'bookingTab',
+      params: { screen: 'bookingListScreen' },
+    });
+  };
+  if (loading) {
+    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  }
+  if (error) {
+    return (
+      <ErrorView
+        textButton="Đăng nhập"
+        message={error}
+        onPress={() => {
+          handleLogin();
+        }}
+      />
+    );
+  }
   // === Dữ liệu demo ===
   // const bookings: any[] = []; // danh sách rỗng để hiển thị "Không có booking nào"
   const bookings = [

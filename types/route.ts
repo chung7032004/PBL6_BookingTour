@@ -1,3 +1,5 @@
+import { Quantity } from '../src/Home/quantity';
+
 export type RootStackParamList = {
   AppTabs: undefined;
 
@@ -29,9 +31,19 @@ export type RootStackParamList = {
 
   bookingTab: undefined;
   booking: undefined;
-  bookingList: undefined;
-  bookingDetail: undefined;
-  reviewScreen: undefined;
+  bookingList: { refresh: Boolean };
+  bookingDetail: {
+    booking: {
+      id: number;
+      nameTour: string;
+      image: any;
+      date: string;
+      quantity: Quantity;
+      total: number;
+      status: string;
+    };
+  };
+  reviewScreen: { bookingId: string };
 
   login:
     | { redirect?: keyof RootStackParamList; params?: any; message?: string }

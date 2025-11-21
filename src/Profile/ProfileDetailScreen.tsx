@@ -7,16 +7,38 @@ import images from '../../images';
 import CustomTabs from '../components/CustomTabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
-
   const tabs = [
     { key: 'posts', label: 'Thông tin' },
     { key: 'comments', label: 'Đánh giá' },
   ];
-
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'bookingTab',
+      params: { screen: 'bookingListScreen' },
+    });
+  };
+  if (loading) {
+    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  }
+  if (error) {
+    return (
+      <ErrorView
+        textButton="Đăng nhập"
+        message={error}
+        onPress={() => {
+          handleLogin();
+        }}
+      />
+    );
+  }
   return (
     <View style={styles.container}>
       {/* Header profile */}

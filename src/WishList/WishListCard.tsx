@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface WishListCardProps {
   title: string;
-  date?: string;
   saved: string;
   image?: any;
   images?: any[];
@@ -11,7 +10,7 @@ interface WishListCardProps {
 }
 
 const WishListCard = (props: WishListCardProps) => {
-  const { title, date, saved, image, images, onPress } = props;
+  const { title, saved, image, images, onPress } = props;
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       {/* Vùng ảnh vuông */}
@@ -30,7 +29,6 @@ const WishListCard = (props: WishListCardProps) => {
       {/* Nội dung */}
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{title}</Text>
-        {date ? <Text style={styles.date}>{date}</Text> : null}
         <Text style={styles.saved}>{saved}</Text>
       </View>
     </TouchableOpacity>

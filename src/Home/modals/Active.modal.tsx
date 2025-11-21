@@ -37,10 +37,10 @@ const ActiveModal = ({ itineraries, visible, onClose }: ActiveModalProps) => {
 
           {/* Danh sách hoạt động */}
           <ScrollView contentContainerStyle={{ padding: 12 }}>
-            {itineraries.map(iti => (
+            {itineraries.map((iti, index) => (
               <ActiveCard
                 key={iti.id}
-                stepNumber={iti.stepNumber}
+                stepNumber={index + 1}
                 title={iti.title}
                 description={iti.description}
                 image={iti.photoUrl}

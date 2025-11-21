@@ -30,6 +30,7 @@ import LoadingView from '../components/LoadingView';
 import { Experience } from '../../types/experience';
 import ErrorView from '../components/ErrorView';
 import { getExperiencesById } from '../api/experiences/experiences';
+import WishListModal from './modals/wishList.modal';
 
 const { width } = Dimensions.get('window');
 
@@ -60,6 +61,7 @@ const TourDetailScreen = () => {
   }));
   const [quantityReview] = useState<number>(164);
   const [showModalReview, setShowModalReview] = useState(false);
+  const [showModalWistList, setShowModalWishList] = useState(false);
 
   // useEffect(() => {
   // loadData();
@@ -97,8 +99,8 @@ const TourDetailScreen = () => {
   };
   const tourImages = tour
     ? [
-        ...(tour.media?.map(m => m.url) || []),
-        ...(tour.itineraries?.map(i => i.photoUrl) || []),
+        ...(tour.media?.map(m => m.url).filter(Boolean) || []),
+        ...(tour.itineraries?.map(i => i.photoUrl).filter(Boolean) || []),
       ]
     : [];
   const limitedItineraries = (tour?.itineraries || []).sort(
@@ -111,13 +113,14 @@ const TourDetailScreen = () => {
   };
 
   const handleFavorite = () => {
-    setWishList(!wishList);
-    const newState = !wishList;
-    setShowNotification(
-      newState
-        ? 'Đã thêm vào danh sách yêu thích'
-        : 'Đã xóa khỏi danh sách yêu thích',
-    );
+    // setWishList(!wishList);
+    // const newState = !wishList;
+    // setShowNotification(
+    // newState
+    // ? 'Đã thêm vào danh sách yêu thích'
+    // : 'Đã xóa khỏi danh sách yêu thích',
+    // );
+    setShowModalWishList(true);
   };
 
   if (loading) {
@@ -230,10 +233,10 @@ const TourDetailScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
           <TouchableOpacity onPress={() => setShowActiveModal(true)}>
-            {limitedItineraries.slice(0, 3).map(iti => (
+            {limitedItineraries.slice(0, 3).map((iti, index) => (
               <ActiveCard
                 key={iti.id}
-                stepNumber={iti.stepNumber}
+                stepNumber={index + 1}
                 title={iti.title}
                 description={iti.description}
                 image={iti.photoUrl}
@@ -338,6 +341,10 @@ const TourDetailScreen = () => {
         quantityReview={quantityReview}
         visible={showModalReview}
       />
+      <WishListModal
+        visible={showModalWistList}
+        onClose={() => setShowModalWishList(false)}
+      />
       {showNotification && (
         <Notification
           message={showNotification}
@@ -357,7 +364,7 @@ export default TourDetailScreen;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#FFEBEC',
+    backgroundColor: '#f7f7f7',
   },
   container: {
     flex: 1,

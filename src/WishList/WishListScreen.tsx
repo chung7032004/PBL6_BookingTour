@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,6 +12,9 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CreateListModal from './modals/CreateList.modal';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -26,14 +29,12 @@ const WishListScreen = () => {
     {
       id: '1',
       title: 'Đã xem gần đây',
-      date: 'Hôm nay',
       saved: 'Đã lưu 4 mục',
       images: [images.banner1, images.banner2, images.banner3, images.banner4],
     },
     {
       id: '2',
       title: 'Trải nghiệm 2026',
-      date: '30 – 31 thg 10 (+2)',
       saved: 'Đã lưu 9 mục',
       image: images.banner1,
     },
@@ -44,6 +45,27 @@ const WishListScreen = () => {
       image: images.banner2,
     },
   ];
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'bookingTab',
+      params: { screen: 'bookingListScreen' },
+    });
+  };
+  if (loading) {
+    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  }
+  if (error) {
+    return (
+      <ErrorView
+        textButton="Đăng nhập"
+        message={error}
+        onPress={() => {
+          handleLogin();
+        }}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -55,7 +77,6 @@ const WishListScreen = () => {
           <View style={{ width: CARD_WIDTH }}>
             <WishListCard
               title={item.title}
-              date={item.date}
               saved={item.saved}
               image={item.image}
               images={item.images}

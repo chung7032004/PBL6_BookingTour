@@ -60,14 +60,18 @@ const LoginScreen = () => {
 
     if (result != null) {
       if (!result.success) {
-        if (result.message === 'Invalid email or password') {
-          setError('Email hoặc mật khẩu không đúng!');
-          return;
-        } else if (result.message === 'Email is not confirmed') {
-          setError('Email chưa được xác thực!');
-          return;
-        } else {
-          setError('Máy chủ không phản hồi. Vui lòng thử lại sau!');
+        // if (result.message === 'Invalid email or password') {
+        // setError('Email hoặc mật khẩu không đúng!');
+        // return;
+        // } else if (result.message === 'Email is not confirmed') {
+        // setError('Email chưa được xác thực!');
+        // return;
+        // } else {
+        // setError('Máy chủ không phản hồi. Vui lòng thử lại sau!');
+        // return;
+        // }
+        if (result.message !== null) {
+          setError(result.message);
           return;
         }
       }

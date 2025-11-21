@@ -1,12 +1,38 @@
-import { Experience, ExperiencesResponse } from '../../../types/experience';
+import {
+  Experience,
+  ExperiencesResponse,
+  TourCardProps,
+} from '../../../types/experience';
 import { fetchWithTimeout } from '../auth/login';
 import { url } from '../url';
+
+export function formatDuration(minutes: number): string {
+  if (minutes <= 0) return "0'";
+
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+
+  if (h === 0) {
+    const rounded = Math.round(m / 15) * 15;
+    if (rounded === 60) return '1h';
+    return `${rounded}'`;
+  }
+
+  if (m === 0) {
+    return `${h}h`;
+  } else {
+    const roundedM = Math.round(m / 15) * 15;
+    if (roundedM === 0) return `${h}h`;
+    if (roundedM === 60) return `${h + 1}h`;
+    return `${h}h${roundedM}'`;
+  }
+}
 
 export async function getExperiences(
   page: number = 1,
   pageSize: number = 10,
 ): Promise<{
-  experiences: Experience[];
+  experiences: TourCardProps[];
   totalCount?: number;
   messages: string | null;
 }> {

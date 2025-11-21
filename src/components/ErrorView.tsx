@@ -4,14 +4,19 @@ import CustomButton from './CustomButton';
 interface ErrorViewProps {
   message: string;
   onPress: () => void;
+  textButton?: string;
 }
 const ErrorView = (props: ErrorViewProps) => {
-  const { message, onPress } = props;
+  const { message, onPress, textButton = 'Thử lại' } = props;
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{message}</Text>
 
-      <CustomButton title="Thử lại" style={styles.button} onPress={onPress} />
+      <CustomButton
+        title={textButton}
+        style={styles.button}
+        onPress={onPress}
+      />
     </View>
   );
 };

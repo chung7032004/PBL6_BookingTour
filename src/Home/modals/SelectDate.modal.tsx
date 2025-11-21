@@ -13,6 +13,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
 import { formatVNDate } from '../../components/FormatDate';
+import { checkLoginAndRole } from '../../api/auth/login';
 
 interface SelectDateModalProps {
   visible: boolean;
@@ -91,8 +92,22 @@ const SelectDateModal = (props: SelectDateModalProps) => {
     { time: '20:00 - 23:59', price: 1500000, quantity: 5 },
   ];
 
-  const handlePayment = () => {
+  const checkLogin = async () => {
+    const { isLoggedIn, isUserRole } = await checkLoginAndRole();
+    if (!isLoggedIn || !isUserRole) {
+      props.navigation.navigate('login', {
+        redirect: 'homeTab',
+        params: { screen: 'tourDetail' },
+        message: 'Bạn cần đăng nhập để đặt tour',
+      });
+      return false;
+    }
+    return true;
+  };
+  const handlePayment = async () => {
     {
+      const allow = await checkLogin();
+      if (!allow) return;
       if (selectedSlot) {
         const total = selectedSlot.price * quantity.total;
         props.navigation.navigate('paymentScreen', {

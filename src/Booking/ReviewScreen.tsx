@@ -12,16 +12,22 @@ import {
   Alert,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-
-interface ReviewScreenProps {
-  bookingId: number;
-}
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+  NavigationProp,
+} from '@react-navigation/native';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { RootStackParamList } from '../../types/route';
+type ReviewScreenRouteProp = RouteProp<RootStackParamList, 'reviewScreen'>;
 
 const ReviewScreen = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute<RouteProp<{ params: ReviewScreenProps }, 'params'>>();
-  const bookingId = route.params?.bookingId || 1;
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const route = useRoute<ReviewScreenRouteProp>();
+  const bookingId = route.params.bookingId;
 
   // Dữ liệu tour mẫu (thực tế sẽ fetch từ API)
   const booking = {
@@ -72,6 +78,21 @@ const ReviewScreen = () => {
     </TouchableOpacity>
   );
 
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}

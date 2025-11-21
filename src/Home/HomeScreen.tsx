@@ -9,34 +9,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import TourCard from './TourCard';
-import { getHot, getTopRated, getTours, Tour } from '../api/fakeTours';
-import { Experience, TourCardProps } from '../../types/experience';
+import { TourCardProps } from '../../types/experience';
 import { getExperiences } from '../api/experiences/experiences';
-import { mapExperToTourCard } from '../api/experiences/mapExperToTourCard';
-import CustomButton from '../components/CustomButton';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 
 const { width } = Dimensions.get('window');
 
 const HomeScreen = () => {
-  // const [suggest, setSuggest] = useState<Tour[]>([]);
-  // const [topRated, setTopRated] = useState<Tour[]>([]);
-  // const [hot, setHot] = useState<Tour[]>([]);
-
-  // useEffect(() => {
-  // loadData();
-  // }, []);
-  // const loadData = async () => {
-  // const suggestData = await getTours();
-  // const topRatedData = await getTopRated();
-  // const hotData = await getHot();
-
-  // setSuggest(suggestData.slice(0, 10));
-  // setTopRated(topRatedData);
-  // setHot(hotData);
-  // };
-
   const [suggest, setSuggest] = useState<TourCardProps[]>([]);
   const [topRated, setTopRated] = useState<TourCardProps[]>([]);
   const [hot, setHot] = useState<TourCardProps[]>([]);
@@ -55,7 +35,7 @@ const HomeScreen = () => {
         return;
       }
 
-      const tours = mapExperToTourCard(res.experiences);
+      const tours = res.experiences;
       setSuggest(tours);
     } catch (error) {
       setError('Lỗi không xác định');

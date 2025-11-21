@@ -17,8 +17,14 @@ import EditAvatarModal from './modals/EditAvatar.modal';
 import EditGenderModal from './modals/EditGender.modal';
 import BirthdayPicker from './BirthdayPicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/route';
 
 const ProfileEditScreen = () => {
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [infoState, setInfoState] = useState(true);
   const [phoneState, setPhoneState] = useState(true);
   const [showModalDesc, setShowModalDesc] = useState(false);
@@ -45,6 +51,21 @@ const ProfileEditScreen = () => {
     Alert.alert('Lưu số điện thoại thành công');
   };
 
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <ScrollView style={styles.container}>
       {/* Header Profile */}

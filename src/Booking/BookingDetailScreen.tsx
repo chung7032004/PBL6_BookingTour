@@ -6,15 +6,23 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import {
+  RouteProp,
+  useRoute,
+  useNavigation,
+  NavigationProp,
+} from '@react-navigation/native';
 import { Quantity } from '../Home/quantity';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { RootStackParamList } from '../../types/route';
 
 interface BookingDetailProps {
   booking: {
-    id: number;
+    id: string;
     nameTour: string;
     image: any;
     date: Date;
@@ -26,14 +34,14 @@ interface BookingDetailProps {
 
 const BookingDetailScreen = () => {
   const route = useRoute<RouteProp<{ params: BookingDetailProps }, 'params'>>();
-  const navigation = useNavigation<any>();
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const booking = route.params?.booking;
 
   if (!booking) {
     return (
-      <SafeAreaView style={styles.centered}>
+      <View style={styles.centered}>
         <Text style={styles.errorText}>Không tìm thấy thông tin booking.</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -49,6 +57,21 @@ const BookingDetailScreen = () => {
 
   const config = statusConfig[status];
 
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -156,7 +179,7 @@ const BookingDetailScreen = () => {
               style={styles.cancelBtn}
               onPress={() => {
                 // Thêm logic hủy thật ở đây
-                navigation.navigate('BookingList', { refresh: true });
+                navigation.navigate('bookingList', { refresh: true });
               }}
             >
               <MaterialIcons name="cancel" size={22} color="#D32F2F" />

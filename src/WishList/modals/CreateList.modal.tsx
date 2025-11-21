@@ -94,7 +94,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
+    paddingBottom: 5,
+    borderBottomColor: '#e0e0e0',
+    borderBottomWidth: 1,
   },
   title: {
     fontSize: 20,

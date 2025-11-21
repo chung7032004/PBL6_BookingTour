@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import {
+  useRoute,
+  RouteProp,
+  useNavigation,
+  NavigationProp,
+} from '@react-navigation/native';
 import {
   Image,
   ScrollView,
@@ -21,12 +26,15 @@ import EditPhoneModal from './modals/EditPhone.modal';
 import DiscountCodeModal from './modals/DiscountCode.modal';
 import { RootStackParamList } from '../../types/route';
 import Notification from '../components/Notification';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
 
 type PaymentRouteProp = RouteProp<RootStackParamList, 'paymentScreen'>;
 
 const PaymentScreen = () => {
   const route = useRoute<PaymentRouteProp>();
-  const navigation = useNavigation<any>();
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const { tourName, image, date, time, pricePerGuest, quantity, total } =
     route.params;
 
@@ -58,6 +66,21 @@ const PaymentScreen = () => {
       method: method,
     });
   };
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <View style={{ flex: 1 }}>
       <ScrollView

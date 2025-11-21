@@ -14,6 +14,9 @@ import EditGuests from '../Home/modals/EditGuests.modal';
 import { Quantity } from '../Home/quantity';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const WishListDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -23,6 +26,21 @@ const WishListDetailScreen = () => {
     total: 1,
   });
   const [showEditGuests, setShowEditGuests] = useState(false);
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Tiêu đề + avatar thêm người */}

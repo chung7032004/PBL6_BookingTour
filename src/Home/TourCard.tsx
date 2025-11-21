@@ -4,19 +4,26 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TourCardProps } from '../../types/experience';
 import { RootStackParamList } from '../../types/route';
+import { formatDuration } from '../api/experiences/experiences';
 
-const TourCard = ({
-  id,
-  image,
-  title,
-  location,
-  price,
-  duration,
-  cancellation,
-  activityLevel,
-  showFavorite = false,
-}: TourCardProps) => {
+const TourCard = (props: TourCardProps) => {
+  const {
+    id,
+    title,
+    description,
+    maxParticipants,
+    address,
+    category,
+    adultPrice,
+    childPrice,
+    duration,
+    averageRating,
+    totalReviews,
+    media,
+  } = props;
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const imageUrl = media?.[0]?.url || 'https://placehold.co/600x400';
+  const durationFormat = formatDuration(duration);
 
   return (
     <TouchableOpacity
@@ -26,13 +33,13 @@ const TourCard = ({
     >
       {/* Ảnh tour */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} style={styles.cardImage} />
+        <Image source={{ uri: imageUrl }} style={styles.cardImage} />
         {/*{popular && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Popular</Text>
           </View>
         )} */}
-        {/* Icon yêu thích */}
+        {/* Icon yêu thích 
         {showFavorite && (
           <Icon
             name="favorite-border"
@@ -41,6 +48,7 @@ const TourCard = ({
             style={styles.favoriteIcon}
           />
         )}
+          */}
       </View>
 
       {/* Nội dung dưới ảnh */}
@@ -48,31 +56,25 @@ const TourCard = ({
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
-        <Text style={styles.location} numberOfLines={1}>
-          {location}
+        <Text style={styles.category}>{category?.name}</Text>
+        <Text style={styles.location} numberOfLines={2}>
+          {address}
         </Text>
-
         <Text style={styles.price}>
           Chỉ từ{' '}
           <Text style={{ color: '#000', fontWeight: 'bold' }}>
-            {price.toLocaleString('vi-VN')}₫
+            {adultPrice.toLocaleString('vi-VN')}₫
           </Text>{' '}
           / khách
         </Text>
-        <Text style={styles.duration}>{duration}</Text>
+        <Text style={styles.duration}>{durationFormat}</Text>
 
-        {cancellation && (
-          <Text style={styles.cancellation}>{cancellation}</Text>
-        )}
-
-        {activityLevel && (
-          <Text style={styles.level}>Độ hoạt động: {activityLevel}</Text>
-        )}
-
-        {/* <View style={styles.ratingRow}> */}
-        {/* <Text style={styles.ratingText}>{rating}</Text> */}
-        {/* <Icon name="star" size={18} color="#FFD700" style={styles.starIcon} /> */}
-        {/* </View> */}
+        <View style={styles.ratingRow}>
+          <Icon name="star" size={18} color="#FFD700" style={styles.starIcon} />
+          <Text style={styles.ratingText}>
+            {averageRating} ({totalReviews} đánh giá)
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -141,17 +143,6 @@ const styles = StyleSheet.create({
     color: '#444',
     marginTop: 2,
   },
-  cancellation: {
-    marginTop: 2,
-    fontSize: 12,
-    color: '#28a745',
-    fontWeight: '500',
-  },
-  level: {
-    fontSize: 12,
-    color: '#555',
-    marginTop: 2,
-  },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -162,6 +153,12 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 13,
     color: '#333',
+  },
+  category: {
+    fontSize: 12,
+    color: '#3498db',
+    fontWeight: '500',
+    marginBottom: 3,
   },
 });
 

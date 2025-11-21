@@ -1,8 +1,14 @@
 import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 import images from '../../images';
 import ReviewCard from './ReviewCard';
+import { useAuthGuard } from '../hooks/useAuthGuard';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/route';
 const { width } = Dimensions.get('window');
 const CommentsScreen = () => {
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const reviews = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     name: `Người dùng ${i + 1}`,
@@ -14,6 +20,22 @@ const CommentsScreen = () => {
     nameTour: 'Khám phá Vịnh Hạ Long',
     imageTour: images.banner3,
   }));
+
+  const { loading, error } = useAuthGuard();
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'homeTab',
+      params: 'paymentScreen',
+    });
+  };
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
   return (
     <ScrollView
       style={styles.container}
