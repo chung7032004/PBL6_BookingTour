@@ -3,8 +3,10 @@ import {
   ExperiencesResponse,
   TourCardProps,
 } from '../../../types/experience';
-import { fetchWithTimeout } from '../auth/login';
+import { HostDetail, HostInTour } from '../../../types/host';
+import { fetchWithTimeout } from '../auth/fetch';
 import { url } from '../url';
+import { getHostDetail, toHostInTour } from './host';
 
 export function formatDuration(minutes: number): string {
   if (minutes <= 0) return "0'";
@@ -74,6 +76,7 @@ export async function getExperiences(
 
 export async function getExperiencesById(experienceId: string): Promise<{
   experience: Experience | null;
+  host: HostDetail | null;
   message: string | null;
 }> {
   try {
@@ -90,19 +93,28 @@ export async function getExperiencesById(experienceId: string): Promise<{
     );
     if (!res.ok) {
       if (res.status === 404) {
-        return { experience: null, message: 'Không tìm thấy trải nghiệm' };
+        return {
+          experience: null,
+          host: null,
+          message: 'Không tìm thấy trải nghiệm',
+        };
       }
       throw new Error(`HTTP ${res.status}`);
     }
     const data: Experience = await res.json();
+    const { host } = await getHostDetail(data.hostId);
+    // const hostInTour = host ? toHostInTour(host) : null;
+    console.log(host);
     return {
       experience: data,
+      host: host,
       message: null,
     };
   } catch (error) {
     console.log('getExperience API Error:', error);
     return {
       experience: null,
+      host: null,
       message: 'Không thể kết nối đến máy chủ',
     };
   }

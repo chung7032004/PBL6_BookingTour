@@ -1,20 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { url } from '../url';
 import { jwtDecode } from 'jwt-decode';
-
-export function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeout = 5000,
-): Promise<Response> {
-  return Promise.race([
-    fetch(url, options),
-    new Promise<Response>((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), timeout),
-    ),
-  ]);
-}
-
+import { fetchWithTimeout } from './fetch';
 interface JwtPayload {
   role: string;
   email: string;
@@ -61,9 +48,7 @@ export async function login(
       }
       // Lưu token
       await AsyncStorage.setItem('accessToken', data.accessToken);
-      if (data.accessToken) {
-        await AsyncStorage.setItem('refreshToken', data.refreshToken);
-      }
+      await AsyncStorage.setItem('refreshToken', data.refreshToken);
       await AsyncStorage.setItem('email', email);
 
       return {

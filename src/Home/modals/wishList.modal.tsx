@@ -1,6 +1,5 @@
 import {
   Dimensions,
-  FlatList,
   Modal,
   ScrollView,
   StyleSheet,
@@ -11,13 +10,19 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../../components/CustomButton';
 import WishListCard from '../../WishList/WishListCard';
-import images from '../../../images';
 import CreateListModal from '../../WishList/modals/CreateList.modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  addExpToWishList,
+  createWishList,
+  getMyWishLists,
+} from '../../api/experiences/wishlist';
+import Notification from '../../components/Notification';
+import { MyWishListResponse } from '../../../types/wishlist';
 interface WishListProps {
   visible: boolean;
   onClose: () => void;
-  onSave?: () => void;
+  onSave: (wishListId: string) => void;
 }
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -25,26 +30,47 @@ const CARD_WIDTH = (width - 48) / 2;
 const WishListModal = (props: WishListProps) => {
   const { visible, onClose, onSave } = props;
   const [showCreateListModal, setShowCreateListModal] = useState(false);
-  const data = [
-    {
-      id: '1',
-      title: 'Đã xem gần đây',
-      saved: 'Đã lưu 4 mục',
-      images: [images.banner1, images.banner2, images.banner3, images.banner4],
-    },
-    {
-      id: '2',
-      title: 'Trải nghiệm 2026',
-      saved: 'Đã lưu 9 mục',
-      image: images.banner1,
-    },
-    {
-      id: '3',
-      title: 'Trải nghiệm 2025',
-      saved: 'Đã lưu 2 mục',
-      image: images.banner2,
-    },
-  ];
+  const [wishLists, setWishLists] = useState<MyWishListResponse[]>([]);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
+  const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
+    'success',
+  );
+  useEffect(() => {
+    if (visible) {
+      loadWishLists();
+    }
+  }, [visible]);
+
+  const loadWishLists = async () => {
+    const res = await getMyWishLists();
+    if (res?.message) {
+      setTypeNotification('error');
+      setShowNotification(res?.message);
+      return;
+    }
+    setWishLists(res?.myWishList ? res.myWishList : []);
+  };
+  const handleSave = (wishListId: string) => {
+    onSave(wishListId);
+    onClose();
+  };
+
+  const handleCreate = async (content: string) => {
+    if (!content.trim()) {
+      setTypeNotification('error');
+      setShowNotification('Please enter the list name');
+      return;
+    }
+    const res = await createWishList(content);
+    if (res?.isSuccess) {
+      setTypeNotification('success');
+      await loadWishLists();
+    } else {
+      setTypeNotification('error');
+    }
+    setShowNotification(res?.message);
+    setShowCreateListModal(false);
+  };
   return (
     <Modal
       animationType="fade"
@@ -63,18 +89,17 @@ const WishListModal = (props: WishListProps) => {
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.cardListContainer}>
-              {data.map(item => (
-                <View
+              {wishLists.map(item => (
+                <TouchableOpacity
+                  onPress={() => handleSave(item.id)}
                   key={item.id}
                   style={{ width: CARD_WIDTH, paddingHorizontal: 5 }}
                 >
                   <WishListCard
-                    title={item.title}
-                    saved={item.saved}
-                    image={item.image}
-                    images={item.images}
+                    title={item.name}
+                    saved={item.experienceCount}
                   />
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </ScrollView>
@@ -89,8 +114,18 @@ const WishListModal = (props: WishListProps) => {
       <CreateListModal
         visible={showCreateListModal}
         onClose={() => setShowCreateListModal(false)}
-        onCreate={() => setShowCreateListModal(false)}
+        onCreate={handleCreate}
       />
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type={typeNotification}
+          autoClose
+          position="top"
+          duration={3000}
+        />
+      )}
     </Modal>
   );
 };

@@ -21,7 +21,6 @@ import {
 import ActiveModal from './modals/Active.modal';
 import ActiveCard from './ActiveCard';
 import CustomButton from '../components/CustomButton';
-// import { getTourDetail, TourDetail } from '../api/fakeTours';
 import { RootStackParamList } from '../../types/route';
 import Notification from '../components/Notification';
 import ReviewModal from './modals/Review.modal';
@@ -31,6 +30,9 @@ import { Experience } from '../../types/experience';
 import ErrorView from '../components/ErrorView';
 import { getExperiencesById } from '../api/experiences/experiences';
 import WishListModal from './modals/wishList.modal';
+import { HostDetail, HostInTour } from '../../types/host';
+import { checkLoginAndRole } from '../api/auth/login';
+import { addExpToWishList } from '../api/experiences/wishlist';
 
 const { width } = Dimensions.get('window');
 
@@ -42,41 +44,19 @@ const TourDetailScreen = () => {
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [showActiveModal, setShowActiveModal] = useState(false);
 
-  // const [tour, setTour] = useState<TourDetail | null>(null);
   const [tour, setTour] = useState<Experience | null>(null);
+  const [host, setHost] = useState<HostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [wishList, setWishList] = useState(false);
   const [showNotification, setShowNotification] = useState<string | null>(null);
-
-  const reviews = Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    name: `Người dùng ${i + 1}`,
-    avatar: images.account,
-    rating: Math.floor(Math.random() * 2) + 4,
-    time: `${i + 1} ngày trước`,
-    content:
-      'Trải nghiệm tuyệt vời, hướng dẫn viên thân thiện, cảnh đẹp và đồ ăn ngon. Rất đáng để thử!',
-  }));
   const [quantityReview] = useState<number>(164);
   const [showModalReview, setShowModalReview] = useState(false);
   const [showModalWistList, setShowModalWishList] = useState(false);
-
-  // useEffect(() => {
-  // loadData();
-  // }, [id]);
-  // const loadData = async () => {
-  // const data = await getTourDetail(1);
-  // setTour(data);
-  // setLoading(false);
-  // };
-  // const tourImages = [
-  // images.banner1,
-  // images.banner2,
-  // images.banner3,
-  // images.banner4,
-  // ];
+  const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
+    'success',
+  );
 
   useEffect(() => {
     loadData();
@@ -91,6 +71,7 @@ const TourDetailScreen = () => {
       }
       console.log(res.experience);
       setTour(res.experience);
+      setHost(res.host);
     } catch (error) {
       setError('Lỗi không xác định');
     } finally {
@@ -112,7 +93,33 @@ const TourDetailScreen = () => {
     setActiveIndex(slide);
   };
 
-  const handleFavorite = () => {
+  const checkLogin = async () => {
+    const { isLoggedIn, isUserRole } = await checkLoginAndRole();
+    if (!isLoggedIn || !isUserRole) {
+      navigation.navigate('login', {
+        redirect: 'homeTab',
+        params: { screen: 'tourDetail', params: { id: tour?.id } },
+        message: 'Bạn cần đăng nhập để dùng tính năng này',
+      });
+      return false;
+    }
+    return true;
+  };
+  const handleAddEpxToWishList = async (wishListId: string) => {
+    if (tour?.id === undefined) {
+      setTypeNotification('error');
+      setShowNotification('Experience is undefined');
+      return;
+    }
+    const res = await addExpToWishList(wishListId, tour.id);
+    if (res?.isSuccess) {
+      setTypeNotification('success');
+    } else {
+      setTypeNotification('error');
+    }
+    setShowNotification(res?.message);
+  };
+  const handleFavorite = async () => {
     // setWishList(!wishList);
     // const newState = !wishList;
     // setShowNotification(
@@ -120,6 +127,9 @@ const TourDetailScreen = () => {
     // ? 'Đã thêm vào danh sách yêu thích'
     // : 'Đã xóa khỏi danh sách yêu thích',
     // );
+
+    const allow = await checkLogin();
+    if (!allow) return;
     setShowModalWishList(true);
   };
 
@@ -193,6 +203,9 @@ const TourDetailScreen = () => {
             </TouchableOpacity>
           </View>
           <ExpandableText text={tour?.description} limit={100} />
+          <View style={styles.headerInfo}>
+            <Text style={styles.textHeader}>Thông tin chuyến đi</Text>
+          </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Địa chỉ: </Text>
             <Text style={styles.detailValue}>
@@ -214,10 +227,6 @@ const TourDetailScreen = () => {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Skill Lever: </Text>
             <Text style={styles.detailValue}>{tour?.skillLevel}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Max Participants: </Text>
-            <Text style={styles.detailValue}>{tour?.maxParticipants}</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Cancellation Policy: </Text>
@@ -253,14 +262,16 @@ const TourDetailScreen = () => {
           <Text style={styles.sectionTitle}>Thông tin Host</Text>
           <TouchableOpacity
             style={styles.hostContainer}
-            onPress={() => navigation.navigate('provider')}
+            onPress={() =>
+              navigation.navigate('provider', {
+                hostDetail: host,
+              })
+            }
           >
             <Image source={images.banner4} style={styles.hostAvatar} />
             <View style={{ flex: 1, flexShrink: 1 }}>
-              <Text style={styles.hostName}>Nguyễn Minh An</Text>
-              <Text style={styles.hostDesc}>
-                Hướng dẫn viên địa phương với hơn 5 năm kinh nghiệm.
-              </Text>
+              <Text style={styles.hostName}>{host?.fullName}</Text>
+              <Text style={styles.hostDesc}>{host?.bio}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -305,7 +316,6 @@ const TourDetailScreen = () => {
             Giá từ:
             <Text style={styles.priceHighlightFooter}>
               {' '}
-              {/* {tour?.price.toLocaleString('vi-VN')}₫ */}
               {tour?.adultPrice.toLocaleString('vi-VN')}₫
             </Text>
           </Text>
@@ -335,21 +345,25 @@ const TourDetailScreen = () => {
         }}
         itineraries={limitedItineraries}
       />
+      {/* 
       <ReviewModal
         reviews={reviews}
         onClose={() => setShowModalReview(false)}
         quantityReview={quantityReview}
         visible={showModalReview}
       />
+       */}
+
       <WishListModal
         visible={showModalWistList}
         onClose={() => setShowModalWishList(false)}
+        onSave={handleAddEpxToWishList}
       />
       {showNotification && (
         <Notification
           message={showNotification}
           onClose={() => setShowNotification(null)}
-          type="success"
+          type={typeNotification}
           autoClose
           position="top"
           duration={3000}
@@ -397,6 +411,16 @@ const styles = StyleSheet.create({
   unfavoriteText: {
     color: '#666',
     fontWeight: '500',
+  },
+  headerInfo: {
+    marginVertical: 10,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+  },
+  textHeader: {
+    fontWeight: 600,
+    fontSize: 18,
+    marginBottom: 5,
   },
   detailRow: {
     flexDirection: 'row',

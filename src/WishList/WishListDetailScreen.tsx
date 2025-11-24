@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,26 +7,41 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import images from '../../images';
 import WishListDetailCard from './WishListDetailCard';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import EditGuests from '../Home/modals/EditGuests.modal';
-import { Quantity } from '../Home/quantity';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { useAuthGuard } from '../hooks/useAuthGuard';
+import {
+  getWishListDetail,
+  removeExpToWishList,
+} from '../api/experiences/wishlist';
+import { WishListDetailResponse } from '../../types/wishlist';
+import Notification from '../components/Notification';
+import ConfirmModal from '../components/Confirm.modal';
 
 const WishListDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const [quantity, setQuantity] = useState<Quantity>({
-    adult: 1,
-    children: 0,
-    total: 1,
-  });
-  const [showEditGuests, setShowEditGuests] = useState(false);
+  const route: RouteProp<RootStackParamList, 'wishListDetail'> = useRoute();
   const { loading, error } = useAuthGuard();
+  const [wishListDetail, setWishListsDetail] =
+    useState<WishListDetailResponse | null>(null);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
+  const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
+    'success',
+  );
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  useEffect(() => {
+    loadWishListsDetail();
+  }, []);
+
   const handleLogin = () => {
     navigation.navigate('login', {
       redirect: 'homeTab',
@@ -41,11 +56,48 @@ const WishListDetailScreen = () => {
         onPress={handleLogin}
       />
     );
+  const loadWishListsDetail = async () => {
+    const res = await getWishListDetail(route?.params.wishListId);
+    if (res?.message) {
+      setTypeNotification('success');
+      setWishListsDetail(res.wishListDetail);
+    } else {
+      setTypeNotification('error');
+    }
+    setShowNotification(res?.message);
+  };
+  const handleDelete = async () => {
+    if (!wishListDetail?.id || !selectedId) {
+      setTypeNotification('error');
+      setShowNotification('Undefined Id WishList or Undefined Id Exp ');
+      setShowDeleteConfirm(false);
+      return;
+    }
+    const res = await removeExpToWishList(wishListDetail?.id, selectedId);
+    if (res?.isSuccess) {
+      setWishListsDetail(prev =>
+        prev
+          ? {
+              ...prev,
+              experiences: prev.experiences.filter(
+                exp => exp.id !== selectedId,
+              ),
+            }
+          : prev,
+      );
+      setTypeNotification('success');
+    } else {
+      setTypeNotification('error');
+    }
+    setShowNotification(res?.message);
+    setShowDeleteConfirm(false);
+  };
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Tiêu đề + avatar thêm người */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>Trải nghiệm 2025</Text>
+        <Text style={styles.headerText}>{wishListDetail?.name}</Text>
+        <Text>{wishListDetail?.experiences.length}</Text>
         {/* 
         <TouchableOpacity style={styles.iconButton}>
           <Image source={images.account} style={styles.iconSmall} />
@@ -69,41 +121,54 @@ const WishListDetailScreen = () => {
         </TouchableOpacity>
       </View>
       */}
-
-      {/* Danh sách tour */}
-      <WishListDetailCard
-        title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
-        subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price={650000}
-        rating="4.96"
-        reviews="799 đánh giá"
-        label="Phổ biến"
-        image={images.banner1}
-        currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail', { id: '1' })}
+      {wishListDetail?.experiences.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            Danh sách này chưa có trải nghiệm nào
+          </Text>
+          <TouchableOpacity
+            style={styles.emptyButton}
+            onPress={() => navigation.navigate('homeTab')}
+          >
+            <Text style={styles.emptyButtonText}>Khám phá trải nghiệm</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {wishListDetail?.experiences.map(item => {
+        return (
+          <WishListDetailCard
+            key={item.id}
+            title={item.title}
+            subtitle={item.description}
+            price={item.adultPrice}
+            rating="5.0"
+            reviews="799 đánh giá"
+            image={item.media[0]}
+            onPress={() => navigation.navigate('tourDetail', { id: item.id })}
+            onLongPress={() => {
+              setSelectedId(item.id);
+              setShowDeleteConfirm(true);
+            }}
+          />
+        );
+      })}
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type={typeNotification}
+          autoClose
+          position="bottom"
+          duration={3000}
+        />
+      )}
+      <ConfirmModal
+        visible={showDeleteConfirm}
+        message="Bạn có chắc muốn xóa trải nghiệm này khỏi danh sách?"
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
       />
-      <WishListDetailCard
-        title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
-        subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price={650000}
-        rating="4.96"
-        reviews="799 đánh giá"
-        label="Phổ biến"
-        image={images.banner1}
-        currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail', { id: '1' })}
-      />
-      <WishListDetailCard
-        title="Hành khách nữ - Ẩm thực và tham quan đường phố bằng xe máy"
-        subtitle="Trải nghiệm ẩm thực · 3,5 giờ"
-        price={650000}
-        rating="4.96"
-        reviews="799 đánh giá"
-        label="Phổ biến"
-        image={images.banner1}
-        currentUserId="user_2"
-        onPress={() => navigation.navigate('tourDetail', { id: '1' })}
-      />
+      {/* 
       <EditGuests
         visible={showEditGuests}
         onClose={() => setShowEditGuests(false)}
@@ -111,6 +176,7 @@ const WishListDetailScreen = () => {
         onSave={newQuantity => setQuantity(newQuantity)}
         title="Chỉnh sửa số khách"
       />
+      */}
     </ScrollView>
   );
 };
@@ -183,6 +249,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 2,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+    paddingHorizontal: 20,
+  },
+
+  emptyText: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
+  emptyButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+  },
+
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

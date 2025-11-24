@@ -3,51 +3,33 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, StatusBar } from 'react-native';
 import SearchHeader from './Search.header';
 import SearchCard from './SearchCard';
-import images from '../../images';
-import { useNavigation } from '@react-navigation/native';
-
-const fakeTours = [
-  {
-    id: 1,
-    image: images.banner1,
-    desc: 'Tour Đà Nẵng – Hội An – Bà Nà Hills 3N2Đ',
-    price: 1690000,
-    originalPrice: 2490000,
-    rating: 4.8,
-    quantityRating: 128,
-    isHot: true,
-  },
-  {
-    id: 2,
-    image: images.banner2,
-    desc: 'Khách sạn 4 sao biển Mỹ Khê – Buffet sáng',
-    price: 850000,
-    originalPrice: 1200000,
-    rating: 4.6,
-    quantityRating: 62,
-    isHot: false,
-  },
-  {
-    id: 3,
-    image: images.banner3,
-    desc: 'Vòng quanh Phú Quốc 2 ngày 1 đêm – Cano 6 đảo',
-    price: 1350000,
-    originalPrice: 1890000,
-    rating: 4.9,
-    quantityRating: 210,
-    isHot: true,
-  },
-];
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/route';
+import { search } from '../api/experiences/search';
+import { TourCardProps } from '../../types/experience';
 
 const SearchScreen = () => {
-  const navigation = useNavigation();
-  const [filtered, setFiltered] = useState(fakeTours);
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState('');
+  const [filtered, setFiltered] = useState<TourCardProps[]>([]);
 
-  const handleSearch = (keyword: string) => {
-    const key = keyword.trim().toLowerCase();
-    if (!key) return setFiltered(fakeTours);
-
-    setFiltered(fakeTours.filter(t => t.desc.toLowerCase().includes(key)));
+  const handleSearch = async (keyword: string) => {
+    search(keyword);
+    try {
+      // setLoading(true);
+      const res = await search(keyword);
+      if (res.message) {
+        // setError(res.message);
+        return;
+      }
+      const tours = res.experiences;
+      setFiltered(tours);
+    } catch (error) {
+      // setError('Lỗi không xác định');
+    } finally {
+      // setLoading(false);
+    }
   };
 
   useLayoutEffect(() => {

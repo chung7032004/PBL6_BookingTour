@@ -26,6 +26,7 @@ export default function HomeStack() {
       <Stack.Screen
         name="tourDetail"
         component={TourDetailScreen}
+        initialParams={{ id: undefined }}
         options={{
           title: 'Chi tiết tour',
           headerTitle: () => <AppHeader />,

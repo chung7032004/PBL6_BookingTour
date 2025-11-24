@@ -1,47 +1,47 @@
 import { useNavigation } from '@react-navigation/native';
 import { Image, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { TourCardProps } from '../../types/experience';
 
-interface SearchCardProps {
-  image: any;
-  price: number;
-  rating: number;
-  desc: string;
-  quantityRating: number;
-}
-
-const SearchCard = ({
-  image,
-  price,
-  rating,
-  desc,
-  quantityRating,
-}: SearchCardProps) => {
+const SearchCard = (props: TourCardProps) => {
+  const {
+    id,
+    title,
+    description,
+    maxParticipants,
+    address,
+    category,
+    adultPrice,
+    childPrice,
+    duration,
+    averageRating,
+    totalReviews,
+    media,
+  } = props;
   const navigation = useNavigation<any>();
-  const id = 'a2b5d37e-bd40-447e-b7b6-b8351313f4ef';
-
+  const imageUrl = media?.[0]?.url || 'https://placehold.co/600x400';
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate('tourDetail', { id })}
     >
-      <Image source={image} style={styles.thumbnail} />
+      <Image source={{ uri: imageUrl }} style={styles.thumbnail} />
 
       <View style={styles.right}>
         <Text style={styles.desc} numberOfLines={2}>
-          {desc}
+          {title}
         </Text>
 
         <View style={styles.ratingRow}>
           <MaterialIcon name="star" size={16} color="#FFD700" />
-          <Text style={styles.rating}>{rating}</Text>
-          <Text style={styles.count}>({quantityRating})</Text>
+          <Text style={styles.rating}>{averageRating}</Text>
+          <Text style={styles.count}>({totalReviews})</Text>
         </View>
 
         <Text style={styles.price}>
           Chỉ từ{' '}
           <Text style={styles.priceValue}>
-            {price.toLocaleString('vi-VN')}₫
+            {adultPrice.toLocaleString('vi-VN')}₫
           </Text>{' '}
           / khách
         </Text>

@@ -1,18 +1,32 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-
+import imagesDefault from '../../images';
 interface WishListCardProps {
   title: string;
-  saved: string;
+  saved: number;
   image?: any;
   images?: any[];
   onPress?: () => void;
+  onLongPress: () => void;
 }
 
 const WishListCard = (props: WishListCardProps) => {
-  const { title, saved, image, images, onPress } = props;
+  const {
+    title,
+    saved,
+    image = imagesDefault.activity_default,
+    images,
+    onPress,
+    onLongPress,
+  } = props;
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.8}
+      onLongPress={onLongPress}
+      delayLongPress={500}
+    >
       {/* Vùng ảnh vuông */}
       <View style={styles.imageContainer}>
         {images ? (
@@ -29,7 +43,7 @@ const WishListCard = (props: WishListCardProps) => {
       {/* Nội dung */}
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.saved}>{saved}</Text>
+        <Text style={styles.saved}>{saved} đã lưu</Text>
       </View>
     </TouchableOpacity>
   );

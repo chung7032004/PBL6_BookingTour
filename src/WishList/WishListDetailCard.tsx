@@ -30,7 +30,7 @@ interface TourCardProps {
   image: any;
   label?: string;
   onPress?: () => void;
-  currentUserId: string;
+  onLongPress?: () => void;
 }
 
 const WishListDetailCard: React.FC<TourCardProps> = ({
@@ -42,7 +42,7 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
   image,
   label,
   onPress,
-  currentUserId,
+  onLongPress,
 }) => {
   // const [showModalNote, setShowModalNote] = useState(false);
   // const [showModalNoteDisplay, setShowModalNoteDisplay] = useState(false);
@@ -77,7 +77,13 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
   }
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.9}
+      onLongPress={onLongPress}
+      delayLongPress={500}
+    >
       {/* Ảnh */}
       <View style={styles.imageContainer}>
         <Image source={image} style={styles.image} />
@@ -89,12 +95,7 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
         <TouchableOpacity
           style={styles.heartButton}
           onPress={() => {
-            setMessage(
-              favorite
-                ? 'Bạn có muốn thêm vào danh sách yêu thích không?'
-                : 'Bạn có chắc muốn xóa khỏi danh sách yêu thích?',
-            );
-            setModalVisible(true);
+            onLongPress;
           }}
         >
           <Icon

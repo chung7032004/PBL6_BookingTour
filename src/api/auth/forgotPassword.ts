@@ -1,5 +1,5 @@
 import { url } from '../url';
-import { fetchWithTimeout } from './login';
+import { fetchWithTimeout } from './fetch';
 
 export async function forgotPassword(
   email: string,

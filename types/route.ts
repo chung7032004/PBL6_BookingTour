@@ -1,4 +1,5 @@
 import { Quantity } from '../src/Home/quantity';
+import { HostDetail } from './host';
 
 export type RootStackParamList = {
   AppTabs: undefined;
@@ -10,7 +11,9 @@ export type RootStackParamList = {
   tourDetail: {
     id: string;
   };
-  provider: undefined;
+  provider: {
+    hostDetail: HostDetail | null;
+  };
   paymentScreen: {
     tourName: string;
     image: any;
@@ -69,5 +72,5 @@ export type RootStackParamList = {
   wishList: undefined;
   personalScheduleScreen: undefined;
   wishListScreen: undefined;
-  wishListDetail: undefined;
+  wishListDetail: { wishListId: string };
 };

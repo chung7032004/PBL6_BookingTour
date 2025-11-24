@@ -95,6 +95,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
   const checkLogin = async () => {
     const { isLoggedIn, isUserRole } = await checkLoginAndRole();
     if (!isLoggedIn || !isUserRole) {
+      props.onClose();
       props.navigation.navigate('login', {
         redirect: 'homeTab',
         params: { screen: 'tourDetail' },

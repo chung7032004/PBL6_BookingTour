@@ -76,7 +76,7 @@ const LoginScreen = () => {
         }
       }
       const redirect = route.params?.redirect;
-      const redirectParams = route.params?.params;
+      const nestedParams = route.params?.params as any;
       if (redirect) {
         navigation.reset({
           index: 0,
@@ -85,7 +85,7 @@ const LoginScreen = () => {
               name: 'AppTabs',
               params: {
                 screen: redirect,
-                params: redirectParams,
+                params: nestedParams,
               },
             },
           ],

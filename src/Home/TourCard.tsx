@@ -148,7 +148,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   starIcon: {
-    marginLeft: 4,
+    marginLeft: 0,
+    marginRight: 2,
   },
   ratingText: {
     fontSize: 13,

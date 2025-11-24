@@ -21,8 +21,8 @@ const ProfileDetailScreen = () => {
   const { loading, error } = useAuthGuard();
   const handleLogin = () => {
     navigation.navigate('login', {
-      redirect: 'bookingTab',
-      params: { screen: 'bookingListScreen' },
+      redirect: 'profileTab',
+      params: { screen: 'profileDetail' },
     });
   };
   if (loading) {
