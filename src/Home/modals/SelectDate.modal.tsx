@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import {
   Modal,
   ScrollView,
@@ -14,32 +14,36 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
 import { formatVNDate } from '../../components/FormatDate';
 import { checkLoginAndRole } from '../../api/auth/login';
+import { Slot } from '../../../types/experience';
+import { getExperienceAvailability } from '../../api/experiences/experiences';
+import { RootStackParamList } from '../../../types/route';
 
 interface SelectDateModalProps {
   visible: boolean;
   title: string;
   onClose: () => void;
-  navigation: NavigationProp<any>;
+  navigation: NavigationProp<RootStackParamList>;
+  experienceId: string;
+  adultPrice: number;
+  childPrice: number;
   tourInfo: {
     name: string;
     image: any;
   };
 }
 
-interface Slot {
-  time: string;
-  price: number;
-  quantity: number;
-}
-
 const SelectDateCard = ({
   slot,
   selected,
   onPress,
+  adultPrice,
+  childPrice,
 }: {
   slot: Slot;
   selected: boolean;
   onPress: () => void;
+  adultPrice: number;
+  childPrice: number;
 }) => {
   return (
     <TouchableOpacity
@@ -47,28 +51,40 @@ const SelectDateCard = ({
       onPress={onPress}
     >
       <View>
-        <Text style={styles.cardTime}>{slot.time}</Text>
+        <Text style={styles.cardDate}>{slot.date}</Text>
+        <Text style={styles.cardTime}>
+          {slot.startTime} - {slot.endTime}
+        </Text>
         <Text style={styles.cardPrice}>
-          {slot.price.toLocaleString()} đ / khách
+          {adultPrice.toLocaleString()}đ/ khách - {childPrice.toLocaleString()}
+          đ/ trẻ em
         </Text>
       </View>
-      <Text style={styles.cardQuantity}>{slot.quantity} chỗ trống</Text>
+      <Text style={styles.cardQuantity}>{slot.spotsAvailable} chỗ trống</Text>
     </TouchableOpacity>
   );
 };
 
 const SelectDateModal = (props: SelectDateModalProps) => {
-  const { visible, title = 'Chọn thời gian', onClose } = props;
+  const {
+    visible,
+    title = 'Chọn thời gian',
+    onClose,
+    adultPrice,
+    childPrice,
+    experienceId,
+  } = props;
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
 
   const [quantity, setQuantity] = useState<Quantity>({
-    adult: 2,
-    children: 1,
-    total: 3,
+    adult: 1,
+    children: 0,
+    total: 1,
   });
   const [showEditGuests, setShowEditGuests] = useState(false);
 
   const [date, setDate] = useState(new Date());
+  const [slots, setSlots] = useState<Slot[] | null>(null);
 
   const handleChangeDate = (event: any, selectedDate?: Date) => {
     if (event.type === 'set' && selectedDate) {
@@ -86,12 +102,6 @@ const SelectDateModal = (props: SelectDateModalProps) => {
     });
   };
 
-  const slots: Slot[] = [
-    { time: '18:00 - 22:00', price: 1000000, quantity: 10 },
-    { time: '19:00 - 23:00', price: 1200000, quantity: 8 },
-    { time: '20:00 - 23:59', price: 1500000, quantity: 5 },
-  ];
-
   const checkLogin = async () => {
     const { isLoggedIn, isUserRole } = await checkLoginAndRole();
     if (!isLoggedIn || !isUserRole) {
@@ -105,18 +115,35 @@ const SelectDateModal = (props: SelectDateModalProps) => {
     }
     return true;
   };
+  useEffect(() => {
+    loadSlots();
+  }, [date]);
+
+  const toYMD = (d: Date) => d.toISOString().split('T')[0];
+  const loadSlots = async () => {
+    const startDate = toYMD(date);
+    const endDate = toYMD(new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000));
+    const slots = await getExperienceAvailability(
+      experienceId,
+      startDate,
+      endDate,
+    );
+    setSlots(slots);
+  };
+
   const handlePayment = async () => {
     {
       const allow = await checkLogin();
       if (!allow) return;
       if (selectedSlot) {
-        const total = selectedSlot.price * quantity.total;
+        const total =
+          childPrice * quantity.children + adultPrice * quantity.adult;
         props.navigation.navigate('paymentScreen', {
           tourName: props.tourInfo.name,
           image: props.tourInfo.image,
-          date: date.toISOString(),
-          time: selectedSlot.time,
-          pricePerGuest: selectedSlot.price,
+          slot: selectedSlot,
+          adultPrice: adultPrice,
+          childPrice: childPrice,
           quantity: quantity,
           total: total,
         });
@@ -167,31 +194,42 @@ const SelectDateModal = (props: SelectDateModalProps) => {
 
           {/* Danh sách giờ */}
           <ScrollView style={{ marginTop: 10 }}>
-            <Text style={styles.sectionLabel}>
-              {formatVNDate(date.toDateString())}
-            </Text>
-            {slots.map((slot, index) => (
-              <SelectDateCard
-                key={index}
-                slot={slot}
-                selected={selectedSlot?.time === slot.time}
-                onPress={() => setSelectedSlot(slot)}
-              />
-            ))}
+            {/* <Text style={styles.sectionLabel}> */}
+            {/* {formatVNDate(date.toDateString())} */}
+            {/* </Text> */}
+            {!slots ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Chưa có khung giờ</Text>
+              </View>
+            ) : (
+              slots.map((slot, index) => (
+                <SelectDateCard
+                  key={index}
+                  slot={slot}
+                  selected={selectedSlot === slot}
+                  onPress={() => setSelectedSlot(slot)}
+                  adultPrice={adultPrice}
+                  childPrice={childPrice}
+                />
+              ))
+            )}
           </ScrollView>
 
           {/* Payment bar - chỉ hiển thị khi chọn */}
           {selectedSlot && (
             <View style={styles.payment}>
-              {quantity.total > selectedSlot.quantity ? (
+              {quantity.total > selectedSlot.spotsAvailable ? (
                 <Text style={[styles.paymentText, { color: 'red' }]}>
                   Không có đủ chỗ cho khung giờ này
                 </Text>
               ) : (
                 <>
                   <Text style={styles.paymentText}>
-                    {(selectedSlot.price * quantity.total).toLocaleString()} đ
-                    cho {quantity.total} khách
+                    {(
+                      adultPrice * quantity.adult +
+                      childPrice * quantity.children
+                    ).toLocaleString()}{' '}
+                    đ cho {quantity.total} khách
                   </Text>
                   <TouchableOpacity
                     style={styles.payButton}
@@ -286,6 +324,10 @@ const styles = StyleSheet.create({
     borderColor: '#007AFF',
     backgroundColor: '#E6F0FF',
   },
+  cardDate: {
+    fontWeight: '700',
+    fontSize: 18,
+  },
   cardTime: {
     fontWeight: '600',
     fontSize: 16,
@@ -321,5 +363,17 @@ const styles = StyleSheet.create({
   payButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+    paddingHorizontal: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

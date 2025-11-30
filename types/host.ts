@@ -36,3 +36,14 @@ export interface HostDetail {
   instagramUrl: string | null;
   linkedInUrl: string | null;
 }
+
+export interface userProfile {
+  id: string;
+  email: string;
+  phoneNumber: string;
+  fullName: string;
+  dateOfBirth: string;
+  gender: 'Male' | 'Female' | 'Other';
+  avatarUrl: string;
+  country: string;
+}

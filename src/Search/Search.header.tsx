@@ -1,4 +1,3 @@
-// Search.header.tsx - Thanh tìm kiếm đẹp, hiện đại
 import React, { useState } from 'react';
 import {
   View,
@@ -18,7 +17,6 @@ const SearchHeader = ({ onSearch }: Props) => {
 
   const handleClear = () => {
     setSearchText('');
-    onSearch('');
   };
 
   return (

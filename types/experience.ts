@@ -63,3 +63,10 @@ export interface ExperiencesResponse {
   pageNumber: number;
   pageSize: number;
 }
+
+export interface Slot {
+  date: string;
+  startTime: string;
+  endTime: string;
+  spotsAvailable: number;
+}

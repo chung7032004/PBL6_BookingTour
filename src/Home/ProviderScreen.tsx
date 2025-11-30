@@ -19,7 +19,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
-import { tourDetails } from '../api/fakeTours';
 
 const ProviderScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -140,7 +139,33 @@ const ProviderScreen = () => {
             <Text style={styles.verifiedText}>Đã xác minh danh tính</Text>
           </View>
         )}
-
+        {/*Điện thoại*/}
+        {hostDetail?.phoneNumber && (
+          <View style={styles.infoRowNew}>
+            <Icon name="phone" size={20} color="#666" />
+            <Text style={styles.infoText}>{hostDetail.phoneNumber}</Text>
+          </View>
+        )}
+        {/*Email*/}
+        {hostDetail?.email && (
+          <View style={styles.infoRowNew}>
+            <Icon name="email" size={20} color="#666" />
+            <Text style={styles.infoText}>{hostDetail.email}</Text>
+          </View>
+        )}
+        {/*Giới tính*/}
+        {hostDetail?.gender && (
+          <View style={styles.infoRowNew}>
+            <Icon
+              name={
+                hostDetail.gender?.toUpperCase() === 'MALE' ? 'male' : 'female'
+              }
+              size={20}
+              color="#666"
+            />
+            <Text style={styles.infoText}>{hostDetail.gender}</Text>
+          </View>
+        )}
         {/* Ngôn ngữ */}
         {hostDetail?.spokenLanguages &&
           hostDetail.spokenLanguages.length > 0 && (

@@ -54,7 +54,6 @@ const WishListModal = (props: WishListProps) => {
     onSave(wishListId);
     onClose();
   };
-
   const handleCreate = async (content: string) => {
     if (!content.trim()) {
       setTypeNotification('error');
@@ -98,6 +97,7 @@ const WishListModal = (props: WishListProps) => {
                   <WishListCard
                     title={item.name}
                     saved={item.experienceCount}
+                    onPress={() => handleSave(item.id)}
                   />
                 </TouchableOpacity>
               ))}

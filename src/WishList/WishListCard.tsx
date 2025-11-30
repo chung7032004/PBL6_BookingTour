@@ -7,7 +7,7 @@ interface WishListCardProps {
   image?: any;
   images?: any[];
   onPress?: () => void;
-  onLongPress: () => void;
+  onLongPress?: () => void;
 }
 
 const WishListCard = (props: WishListCardProps) => {

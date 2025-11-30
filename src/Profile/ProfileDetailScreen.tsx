@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PostsScreen from './PostsScreen';
 import CommentsScreen from './CommentsScreen';
@@ -10,6 +10,8 @@ import { RootStackParamList } from '../../types/route';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { useAuthGuard } from '../hooks/useAuthGuard';
+import { userProfile } from '../../types/host';
+import { getMyProfile } from '../api/experiences/host';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -19,35 +21,68 @@ const ProfileDetailScreen = () => {
     { key: 'comments', label: 'Đánh giá' },
   ];
   const { loading, error } = useAuthGuard();
+  const [myProfile, setMyProfile] = useState<userProfile | null>();
+  const avatarSource = myProfile?.avatarUrl
+    ? { uri: myProfile.avatarUrl } // Nếu có URL, sử dụng ảnh từ API
+    : images.account; // Nếu không có, sử dụng ảnh mặc định
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [errorProfile, setErrorProfile] = useState<string | null>(null);
+  useEffect(() => {
+    loadProfile();
+  }, []);
+  const loadProfile = async () => {
+    try {
+      setLoadingProfile(true);
+      const myProfile = await getMyProfile();
+      if (!myProfile) {
+        setErrorProfile('Không tìm thấy my profile');
+      }
+      setMyProfile(myProfile);
+    } catch (error) {
+      setErrorProfile('Lỗi không xác định: ' + error);
+      return;
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
   const handleLogin = () => {
     navigation.navigate('login', {
-      redirect: 'profileTab',
-      params: { screen: 'profileDetail' },
+      redirect: 'homeTab',
+      params: 'paymentScreen',
     });
   };
-  if (loading) {
-    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  }
-  if (error) {
+  if (loadingProfile) return <LoadingView message="Đang tải dữ liệu ..." />;
+  if (errorProfile)
     return (
       <ErrorView
-        textButton="Đăng nhập"
-        message={error}
-        onPress={() => {
-          handleLogin();
-        }}
+        message={errorProfile}
+        onPress={loadProfile}
+        textButton="Tải lại trang"
       />
     );
-  }
+  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (error)
+    return (
+      <ErrorView
+        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        onPress={handleLogin}
+      />
+    );
+
   return (
     <View style={styles.container}>
       {/* Header profile */}
       <View style={styles.profileSection}>
         <TouchableOpacity>
-          <Image style={styles.avatarImage} source={images.account} />
+          <Image
+            source={avatarSource}
+            style={styles.avatarImage}
+            resizeMode="cover"
+            defaultSource={images.account}
+          />
         </TouchableOpacity>
 
-        <Text style={styles.userName}>Tên của bạn</Text>
+        <Text style={styles.userName}>{myProfile?.fullName}</Text>
 
         <TouchableOpacity
           style={styles.editButton}
@@ -66,7 +101,11 @@ const ProfileDetailScreen = () => {
       />
 
       <View style={{ flex: 1 }}>
-        {activeTab === 'posts' ? <PostsScreen /> : <CommentsScreen />}
+        {activeTab === 'posts' ? (
+          <PostsScreen myProfile={myProfile} />
+        ) : (
+          <CommentsScreen />
+        )}
       </View>
     </View>
   );

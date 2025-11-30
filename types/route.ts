@@ -1,5 +1,6 @@
 import { Quantity } from '../src/Home/quantity';
-import { HostDetail } from './host';
+import { Slot } from './experience';
+import { HostDetail, userProfile } from './host';
 
 export type RootStackParamList = {
   AppTabs: undefined;
@@ -17,9 +18,9 @@ export type RootStackParamList = {
   paymentScreen: {
     tourName: string;
     image: any;
-    date: string;
-    time: string;
-    pricePerGuest: number;
+    slot: Slot;
+    adultPrice: number;
+    childPrice: number;
     quantity: {
       adult: number;
       children: number;
@@ -62,7 +63,9 @@ export type RootStackParamList = {
   profileEdit: undefined;
   contact: undefined;
 
-  port: undefined;
+  post: {
+    userProfile: userProfile | undefined;
+  };
   comment: undefined;
 
   search: undefined;

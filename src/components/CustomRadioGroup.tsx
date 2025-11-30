@@ -1,15 +1,18 @@
+// CustomRadioGroup.tsx (hoặc RadioGroup.tsx)
+
 import React from 'react';
 import { View } from 'react-native';
 import CustomRadioButton from './CustomRadioButton';
 
-interface RadioGroupProps {
-  options: { label: string; value: string }[];
-  selectedValue: string;
-  onValueChange: (value: string) => void;
+interface RadioGroupProps<T extends string> {
+  options: { label: string; value: T }[];
+  selectedValue: T;
+  onValueChange: (value: T) => void;
 }
 
-const RadioGroup = (props: RadioGroupProps) => {
+const RadioGroup = <T extends string>(props: RadioGroupProps<T>) => {
   const { options, selectedValue, onValueChange } = props;
+
   return (
     <View>
       {options.map(option => (

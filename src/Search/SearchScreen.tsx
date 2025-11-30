@@ -7,17 +7,24 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import { search } from '../api/experiences/search';
 import { TourCardProps } from '../../types/experience';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const SearchScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   // const [error, setError] = useState('');
   const [filtered, setFiltered] = useState<TourCardProps[]>([]);
 
   const handleSearch = async (keyword: string) => {
-    search(keyword);
+    const trimmed = keyword.trim();
+
+    if (trimmed === '') {
+      setFiltered([]);
+      setLoading(false);
+      return;
+    }
     try {
-      // setLoading(true);
+      setLoading(true);
       const res = await search(keyword);
       if (res.message) {
         // setError(res.message);
@@ -28,7 +35,7 @@ const SearchScreen = () => {
     } catch (error) {
       // setError('Lỗi không xác định');
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -55,6 +62,7 @@ const SearchScreen = () => {
           </View>
         )}
       </ScrollView>
+      <LoadingOverlay visible={loading} message={'Đang tìm kiếm ...'} />
     </View>
   );
 };

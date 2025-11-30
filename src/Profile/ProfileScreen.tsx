@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import images from '../../images';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { users } from '../api/fakeAuth';
 import { checkLogin, logout } from '../api/auth/login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../types/route';
@@ -28,29 +27,17 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     const checkLoginUI = async () => {
-      const check = await checkLogin();
+      const logged = await checkLogin();
+      if (!logged) return;
+
       const email = await AsyncStorage.getItem('email');
-      const currentUser = users.find(u => u.email === email);
-      if (check && currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+      setUser({
+        name: email?.split('@')[0],
+        email,
+      });
     };
     checkLoginUI();
   }, []);
-
-  // useEffect(() => {
-  //   const checkLogin = async () => {
-  //     const currentUser = await getCurrentUser();
-  //     if (currentUser) {
-  //       setUser(currentUser);
-  //     } else {
-  //       setUser(null);
-  //     }
-  //   };
-  //   checkLogin();
-  // }, []);
 
   const handleLogout = async () => {
     await logout();

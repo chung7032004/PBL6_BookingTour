@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,8 +11,14 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
+import { userProfile } from '../../types/host';
 
 interface CardProps {
   nameIcon: string;
@@ -21,22 +27,6 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const { loading, error } = useAuthGuard();
-  const handleLogin = () => {
-    navigation.navigate('login', {
-      redirect: 'homeTab',
-      params: 'paymentScreen',
-    });
-  };
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  if (error)
-    return (
-      <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
-        onPress={handleLogin}
-      />
-    );
   return (
     <View style={styles.cardContainer}>
       <View style={styles.iconWrapper}>
@@ -49,27 +39,40 @@ const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
     </View>
   );
 };
-
-const PostsScreen = () => {
+interface PostsScreenProps {
+  myProfile: userProfile | null | undefined;
+}
+const PostsScreen = (props: PostsScreenProps) => {
+  const myProfile = props.myProfile;
+  if (!myProfile)
+    return <LoadingView message="Không tìm thấy dữ liệu hồ sơ." />;
   return (
     <ScrollView style={styles.container}>
-      <Card nameIcon="person-outline" title="Tên đầy đủ" data="Nguyễn Văn A" />
       <Card
-        nameIcon="email"
-        title="Địa chỉ Email"
-        data="nguyenvana@example.com"
+        nameIcon="person-outline"
+        title="Tên đầy đủ"
+        data={myProfile.fullName}
       />
+      <Card nameIcon="email" title="Địa chỉ Email" data={myProfile.email} />
       <Card
         nameIcon="phone-iphone"
         title="Số điện thoại"
-        data="(+84) 901 234 567"
+        data={myProfile?.phoneNumber ? myProfile.phoneNumber : 'Chưa cập nhật'}
       />
-      <Card nameIcon="transgender" title="Giới tính" data="Nam" />
-      <Card nameIcon="date-range" title="Ngày sinh" data="01/01/2001" />
+      <Card
+        nameIcon="transgender"
+        title="Giới tính"
+        data={myProfile?.gender ? myProfile.gender : 'Chưa cập nhật'}
+      />
+      <Card
+        nameIcon="date-range"
+        title="Ngày sinh"
+        data={myProfile?.dateOfBirth ? myProfile.dateOfBirth : 'Chưa cập nhật'}
+      />
       <Card
         nameIcon="home"
-        title="Địa chỉ"
-        data="123 Đường ABC, Quận 1, TP.HCM"
+        title="Quốc gia"
+        data={myProfile?.country ? myProfile.country : 'Chưa cập nhật'}
       />
     </ScrollView>
   );

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
@@ -29,98 +29,77 @@ import ConfirmModal from '../components/Confirm.modal';
 const WishListDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const route: RouteProp<RootStackParamList, 'wishListDetail'> = useRoute();
-  const { loading, error } = useAuthGuard();
   const [wishListDetail, setWishListsDetail] =
     useState<WishListDetailResponse | null>(null);
-  const [showNotification, setShowNotification] = useState<string | null>(null);
-  const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
-    'success',
-  );
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   useEffect(() => {
     loadWishListsDetail();
   }, []);
-
-  const handleLogin = () => {
-    navigation.navigate('login', {
-      redirect: 'homeTab',
-      params: 'paymentScreen',
-    });
-  };
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  if (error)
-    return (
-      <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
-        onPress={handleLogin}
-      />
-    );
   const loadWishListsDetail = async () => {
-    const res = await getWishListDetail(route?.params.wishListId);
-    if (res?.message) {
-      setTypeNotification('success');
-      setWishListsDetail(res.wishListDetail);
-    } else {
-      setTypeNotification('error');
+    try {
+      const res = await getWishListDetail(route.params.wishListId);
+
+      // ĐÚNG: Kiểm tra wishListDetail có dữ liệu không (không cần kiểm tra message)
+      if (res.wishListDetail) {
+        setWishListsDetail(res.wishListDetail);
+        console.log('Đã load thành công:', res.wishListDetail.name);
+      } else {
+        console.log('Không có dữ liệu:', res.message);
+        // Có thể hiện thông báo lỗi nếu cần
+      }
+    } catch (err) {
+      console.log('Lỗi load:', err);
     }
-    setShowNotification(res?.message);
   };
   const handleDelete = async () => {
-    if (!wishListDetail?.id || !selectedId) {
-      setTypeNotification('error');
-      setShowNotification('Undefined Id WishList or Undefined Id Exp ');
+    try {
+      if (!wishListDetail?.id || !selectedId) {
+        setShowNotification('Undefined Id WishList or Undefined Id Exp ');
+        setShowDeleteConfirm(false);
+        return;
+      }
+      const res = await removeExpToWishList(wishListDetail?.id, selectedId);
+      if (res?.isSuccess) {
+        setWishListsDetail(prev =>
+          prev
+            ? {
+                ...prev,
+                experiences: prev.experiences.filter(
+                  exp => exp.id !== selectedId,
+                ),
+              }
+            : prev,
+        );
+        setShowNotification('Đã xóa khỏi danh sách yêu thích');
+      } else {
+        setShowNotification(res?.message || 'Xóa thất bại, vui lòng thử lại');
+      }
       setShowDeleteConfirm(false);
-      return;
+    } catch (error) {
+      console.log('Lỗi xoá', error);
     }
-    const res = await removeExpToWishList(wishListDetail?.id, selectedId);
-    if (res?.isSuccess) {
-      setWishListsDetail(prev =>
-        prev
-          ? {
-              ...prev,
-              experiences: prev.experiences.filter(
-                exp => exp.id !== selectedId,
-              ),
-            }
-          : prev,
-      );
-      setTypeNotification('success');
-    } else {
-      setTypeNotification('error');
-    }
-    setShowNotification(res?.message);
-    setShowDeleteConfirm(false);
+  };
+  const handleLongPress = (expId: string) => {
+    setSelectedId(expId);
+    setShowDeleteConfirm(true);
   };
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Tiêu đề + avatar thêm người */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>{wishListDetail?.name}</Text>
-        <Text>{wishListDetail?.experiences.length}</Text>
-        {/* 
-        <TouchableOpacity style={styles.iconButton}>
-          <Image source={images.account} style={styles.iconSmall} />
-          <Icon name="add" size={16} color="#007bff" style={styles.iconAdd} />
-        </TouchableOpacity>
-        */}
-      </View>
+        <Text style={styles.headerText} numberOfLines={2}>
+          {wishListDetail?.name || 'Danh sách yêu thích'}
+        </Text>
 
-      {/* Thanh chọn ngày & khách */}
-      {/*
-      <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Thêm ngày</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => setShowEditGuests(true)}
-        >
-          <Text style={styles.filterText}>{quantity.total} khách</Text>
-        </TouchableOpacity>
+        <View style={styles.countBadge}>
+          <Icon name="favorite" size={16} color="#FF3B30" />
+          <Text style={styles.countNumber}>
+            {wishListDetail?.experiences.length ?? 0}
+          </Text>
+        </View>
       </View>
-      */}
       {wishListDetail?.experiences.length === 0 && (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
@@ -134,49 +113,38 @@ const WishListDetailScreen = () => {
           </TouchableOpacity>
         </View>
       )}
-      {wishListDetail?.experiences.map(item => {
-        return (
-          <WishListDetailCard
-            key={item.id}
-            title={item.title}
-            subtitle={item.description}
-            price={item.adultPrice}
-            rating="5.0"
-            reviews="799 đánh giá"
-            image={item.media[0]}
-            onPress={() => navigation.navigate('tourDetail', { id: item.id })}
-            onLongPress={() => {
-              setSelectedId(item.id);
-              setShowDeleteConfirm(true);
-            }}
-          />
-        );
-      })}
+      {wishListDetail?.experiences.map(item => (
+        <WishListDetailCard
+          key={item.id}
+          title={item.title}
+          subtitle={item.description}
+          price={item.adultPrice}
+          rating="5.0"
+          reviews="799 đánh giá"
+          image={item.media[0].url}
+          onPress={() => navigation.navigate('tourDetail', { id: item.id })}
+          onLongPress={() => handleLongPress(item.id)}
+        />
+      ))}
       {showNotification && (
         <Notification
           message={showNotification}
           onClose={() => setShowNotification(null)}
-          type={typeNotification}
+          type="success"
           autoClose
-          position="bottom"
+          position="top"
           duration={3000}
         />
       )}
-      <ConfirmModal
-        visible={showDeleteConfirm}
-        message="Bạn có chắc muốn xóa trải nghiệm này khỏi danh sách?"
-        onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleDelete}
-      />
-      {/* 
-      <EditGuests
-        visible={showEditGuests}
-        onClose={() => setShowEditGuests(false)}
-        initialValue={quantity}
-        onSave={newQuantity => setQuantity(newQuantity)}
-        title="Chỉnh sửa số khách"
-      />
-      */}
+      {showDeleteConfirm && (
+        <ConfirmModal
+          key={showDeleteConfirm ? 'delete-visible' : 'delete-hidden'}
+          visible={showDeleteConfirm}
+          message="Bạn có chắc muốn xóa trải nghiệm này khỏi danh sách?"
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+        />
+      )}
     </ScrollView>
   );
 };
@@ -192,15 +160,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   headerText: {
-    flex: 1,
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#000',
-    marginRight: 10,
-    flexShrink: 1,
+    flex: 1,
+    marginRight: 12,
+  },
+  countBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF0F0',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  countNumber: {
+    marginLeft: 6,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FF3B30',
   },
 
   filterRow: {

@@ -1,6 +1,7 @@
 import {
   Experience,
   ExperiencesResponse,
+  Slot,
   TourCardProps,
 } from '../../../types/experience';
 import { HostDetail, HostInTour } from '../../../types/host';
@@ -117,5 +118,33 @@ export async function getExperiencesById(experienceId: string): Promise<{
       host: null,
       message: 'Không thể kết nối đến máy chủ',
     };
+  }
+}
+export async function getExperienceAvailability(
+  experienceId: string,
+  startDate: string,
+  endDate: string,
+): Promise<Slot[] | null> {
+  try {
+    const fullUrl = `${url}/api/experiences/${experienceId}/availability?startDate=${startDate}&endDate=${endDate}`;
+    const res = await fetchWithTimeout(
+      fullUrl,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      3000,
+    );
+    if (!res.ok) {
+      console.error('Có lỗi xảy ra:' + res.status);
+      return null;
+    }
+    const slots: Slot[] = await res.json();
+    return slots;
+  } catch (error) {
+    console.error('Network Error: ' + error);
+    return null;
   }
 }

@@ -35,7 +35,7 @@ type PaymentRouteProp = RouteProp<RootStackParamList, 'paymentScreen'>;
 const PaymentScreen = () => {
   const route = useRoute<PaymentRouteProp>();
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const { tourName, image, date, time, pricePerGuest, quantity, total } =
+  const { tourName, image, adultPrice, childPrice, slot, quantity, total } =
     route.params;
 
   const tabBarHeight = useBottomTabBarHeight();
@@ -125,9 +125,9 @@ const PaymentScreen = () => {
           {/* Date Section */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Ngày</Text>
-            <Text style={styles.sectionValue}>{formatVNDate(date)}</Text>
+            <Text style={styles.sectionValue}>{formatVNDate(slot.date)}</Text>
             <Text style={styles.sectionSub}>
-              {time ?? formatVNTimeRange(date)}
+              {slot.startTime} - {slot.endTime}
             </Text>
           </View>
           <View style={styles.separator} />
@@ -178,21 +178,21 @@ const PaymentScreen = () => {
             </Text>
             <View style={styles.rowBetween}>
               <Text style={styles.detailText}>
-                {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.adult}{' '}
-                người lớn
+                {adultPrice.toLocaleString('vi-VN')}₫ x {quantity.adult} người
+                lớn
               </Text>
               <Text style={styles.priceText}>
-                {(quantity.adult * pricePerGuest).toLocaleString('vi-VN')}₫
+                {(quantity.adult * adultPrice).toLocaleString('vi-VN')}₫
               </Text>
             </View>
             {quantity.children ? (
               <View style={styles.rowBetween}>
                 <Text style={styles.detailText}>
-                  {pricePerGuest.toLocaleString('vi-VN')}₫ x {quantity.children}{' '}
+                  {childPrice.toLocaleString('vi-VN')}₫ x {quantity.children}{' '}
                   trẻ em
                 </Text>
                 <Text style={styles.priceText}>
-                  {(quantity.children * pricePerGuest).toLocaleString('vi-VN')}₫
+                  {(quantity.children * childPrice).toLocaleString('vi-VN')}₫
                 </Text>
               </View>
             ) : null}

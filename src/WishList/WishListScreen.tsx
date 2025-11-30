@@ -8,7 +8,11 @@ import {
 } from 'react-native';
 import WishListCard from './WishListCard';
 import images from '../../images';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useNavigation,
+  useIsFocused,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CreateListModal from './modals/CreateList.modal';
@@ -31,6 +35,7 @@ const CARD_WIDTH = (width - 48) / 2;
 const WishListScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const { loading, error } = useAuthGuard();
+  const isFocused = useIsFocused();
   const [showCreateListModal, setShowCreateListModal] = useState(false);
   const handleAdd = () => {
     setShowCreateListModal(true);
@@ -125,7 +130,7 @@ const WishListScreen = () => {
         <FlatList
           data={wishLists}
           numColumns={2}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <View style={{ width: CARD_WIDTH }}>
               <WishListCard
@@ -164,8 +169,9 @@ const WishListScreen = () => {
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
       />
-      {showNotification && (
+      {showNotification && isFocused && (
         <Notification
+          key={showDeleteConfirm ? 'confirm-visible' : 'confirm-hidden'}
           message={showNotification}
           onClose={() => setShowNotification(null)}
           type={typeNotification}

@@ -69,7 +69,6 @@ const TourDetailScreen = () => {
         setError(res.message);
         return;
       }
-      console.log(res.experience);
       setTour(res.experience);
       setHost(res.host);
     } catch (error) {
@@ -335,8 +334,11 @@ const TourDetailScreen = () => {
         navigation={navigation}
         tourInfo={{
           name: tour?.title || 'Tour',
-          image: images.banner1,
+          image: tour?.media[0],
         }}
+        adultPrice={tour?.adultPrice ? tour.adultPrice : 0}
+        childPrice={tour?.childPrice ? tour.childPrice : 0}
+        experienceId={tour?.id ? tour.id : ''}
       />
       <ActiveModal
         visible={showActiveModal}

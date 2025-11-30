@@ -17,7 +17,7 @@ const WishListStack = () => {
         name="wishList"
         component={WishList}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />
@@ -25,7 +25,7 @@ const WishListStack = () => {
         name="wishListDetail"
         component={WishListDetailScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />

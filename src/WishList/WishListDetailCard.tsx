@@ -11,7 +11,6 @@ import {
 
 import NoteDisplayModal from './modals/NoteDisplay.modal';
 import NoteModal from './modals/Note.modal';
-import ConfirmModal from '../components/Confirm.modal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
@@ -20,7 +19,6 @@ interface NoteItem {
   userId: string;
   text: string;
 }
-
 interface TourCardProps {
   title: string;
   subtitle: string;
@@ -46,9 +44,6 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
 }) => {
   // const [showModalNote, setShowModalNote] = useState(false);
   // const [showModalNoteDisplay, setShowModalNoteDisplay] = useState(false);
-  const [favorite, setFavorite] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [message, setMessage] = useState('');
   // 🔹 Fake ghi chú để test
   {
     /*
@@ -86,24 +81,24 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
     >
       {/* Ảnh */}
       <View style={styles.imageContainer}>
-        <Image source={image} style={styles.image} />
+        <Image source={{ uri: image }} style={styles.image} />
         {label && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{label}</Text>
           </View>
         )}
+        {/*
         <TouchableOpacity
           style={styles.heartButton}
-          onPress={() => {
-            onLongPress;
-          }}
+          onPress={onLongPress}
         >
-          <Icon
-            name="favorite"
-            size={28}
-            color={favorite ? '#ff4d4d' : '#888'}
-          />
+          <Icon name="favorite" size={28} color={'#ff4d4d'} />
         </TouchableOpacity>
+        */}
+        {/* Chỉ để trang trí */}
+        <View style={styles.heartButton}>
+          <Icon name="favorite" size={28} color={'#ff4d4d'} />
+        </View>
       </View>
 
       {/* Thông tin */}
@@ -182,14 +177,6 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
         onClose={() => setShowModalNoteDisplay(false)}
       />
       */}
-      <ConfirmModal
-        visible={modalVisible}
-        message={message}
-        onClose={() => setModalVisible(false)}
-        onConfirm={() => {
-          setModalVisible(false);
-        }}
-      />
     </TouchableOpacity>
   );
 };

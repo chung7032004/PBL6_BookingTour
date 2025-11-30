@@ -7,8 +7,8 @@ interface EditGenderProps {
   title: string;
   visible: boolean;
   onClose: () => void;
-  onSave: (value: string) => void;
-  initialValue: string;
+  onSave: (value: 'Male' | 'Female' | 'Other') => void;
+  initialValue: 'Male' | 'Female' | 'Other';
 }
 
 const EditGenderModal = (props: EditGenderProps) => {
@@ -20,7 +20,7 @@ const EditGenderModal = (props: EditGenderProps) => {
     initialValue,
   } = props;
 
-  const [selected, setSelected] = useState('male');
+  const [selected, setSelected] = useState<'Male' | 'Female' | 'Other'>('Male');
 
   useEffect(() => {
     setSelected(initialValue);
@@ -45,8 +45,9 @@ const EditGenderModal = (props: EditGenderProps) => {
           <Text style={styles.title}>{title}</Text>
           <RadioGroup
             options={[
-              { label: 'Nam', value: 'male' },
-              { label: 'Nữ', value: 'female' },
+              { label: 'Nam', value: 'Male' },
+              { label: 'Nữ', value: 'Female' },
+              { label: 'Khác', value: 'Other' },
             ]}
             selectedValue={selected}
             onValueChange={setSelected}

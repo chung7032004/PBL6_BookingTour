@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
@@ -22,13 +22,17 @@ import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
+import { getMyProfile, updateMyProfile } from '../api/experiences/host';
+import { userProfile } from '../../types/host';
+import Notification from '../components/Notification';
 
 const ProfileEditScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [infoState, setInfoState] = useState(true);
+  const [phone, setPhone] = useState('');
   const [phoneState, setPhoneState] = useState(true);
   const [showModalDesc, setShowModalDesc] = useState(false);
-  const [description, setDescription] = useState('Chúng tôi biết về bạn');
+  // const [description, setDescription] = useState('Chúng tôi biết về bạn');
 
   const [showModalEditAvatar, setShowModalEditAvatar] = useState(false);
   const [avatar, setAvatar] = useState<ImageSourcePropType>(images.account);
@@ -37,20 +41,99 @@ const ProfileEditScreen = () => {
   const [name, setName] = useState('Tên của bạn');
 
   const [showModalEditGender, setShowModalEditGender] = useState(false);
-  const [gender, SetGender] = useState('male');
+  const [gender, SetGender] = useState<'Male' | 'Female' | 'Other'>('Male');
 
   const [birthday, setBirthday] = useState<Date>(new Date(2000, 0, 1));
+  const [country, setCountry] = useState('');
+  const [showNotification, setShowNotification] = useState<string | null>(null);
 
-  const handleSaveInfo = () => {
-    setInfoState(true);
-    Alert.alert('Lưu thành công');
+  useEffect(() => {
+    loadProfile();
+  }, []);
+  const loadProfile = async () => {
+    const myProfile = await getMyProfile();
+    if (!myProfile) return; // xử lý lỗi sau
+    setName(myProfile.fullName ?? 'Tên của bạn');
+    setBirthday(
+      myProfile.dateOfBirth
+        ? new Date(myProfile.dateOfBirth)
+        : new Date(2000, 0, 1),
+    );
+    SetGender(myProfile.gender);
+    setCountry(myProfile.country ?? 'Chưa cập nhật');
+    setPhone(myProfile.phoneNumber ?? 'Chưa cập nhật');
+    if (myProfile.avatarUrl) setAvatar({ uri: myProfile.avatarUrl });
   };
 
-  const handleSavePhone = () => {
-    setPhoneState(true);
-    Alert.alert('Lưu số điện thoại thành công');
+  const formatDateForBackend = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // → "1999-12-31"
   };
+  const handleSaveInfo = async () => {
+    const result = await updateMyProfile({
+      FullName: name,
+      DateOfBirth: formatDateForBackend(birthday),
+      Gender: gender,
+      Country: country,
+      PhoneNumber: phone,
+      Avatar: avatar,
+    });
 
+    if (result) {
+      setInfoState(true);
+      setShowNotification('Cập nhật thành công');
+    }
+  };
+  const handleSavePhone = async () => {
+    let phoneNumber = phone.replace(/\D/g, '');
+
+    if (phoneNumber.startsWith('0')) {
+      phoneNumber = '+84' + phoneNumber.slice(1);
+    } else if (!phoneNumber.startsWith('+84') && phoneNumber.length >= 9) {
+      phoneNumber = '+84' + phoneNumber;
+    } else if (!phoneNumber) {
+      setPhoneState(true);
+      return;
+    }
+
+    const result = await updateMyProfile({
+      FullName: name.trim() || 'Người dùng',
+      PhoneNumber: phoneNumber,
+      DateOfBirth: formatDateForBackend(birthday),
+      Gender: gender,
+      Country: country,
+      Avatar: avatar,
+    });
+
+    if (result) {
+      setPhone(phoneNumber); // hoặc setPhone('0' + phoneNumber.slice(3)) nếu muốn hiển thị 0...
+      setPhoneState(true);
+      setShowNotification('Lưu số điện thoại thành công');
+    }
+  };
+  const handleSaveAvatar = async (uri: string) => {
+    const avatarFile = {
+      uri,
+      name: 'avatar.jpg',
+      type: 'image/jpeg',
+    } as any;
+
+    const result = await updateMyProfile({
+      FullName: name,
+      DateOfBirth: formatDateForBackend(birthday),
+      Gender: gender,
+      Country: country,
+      PhoneNumber: phone,
+      Avatar: avatarFile,
+    });
+
+    if (result) {
+      setAvatar({ uri });
+      setShowNotification('Cập nhật ảnh đại diện thành công');
+    }
+  };
   const { loading, error } = useAuthGuard();
   const handleLogin = () => {
     navigation.navigate('login', {
@@ -92,13 +175,14 @@ const ProfileEditScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Description */}
+        {/* Description 
         <TouchableOpacity
           style={styles.input}
           onPress={() => setShowModalDesc(true)}
         >
           <Text style={{ color: '#aaa' }}>{description}</Text>
         </TouchableOpacity>
+        */}
       </View>
 
       {/* Dữ liệu cá nhân */}
@@ -117,10 +201,12 @@ const ProfileEditScreen = () => {
         <View>
           <Text style={styles.subtitle}>Tên đầy đủ</Text>
           <TextInput
+            value={name}
             style={styles.input}
             placeholder="Tên của bạn"
             placeholderTextColor="#aaa"
             onFocus={() => setInfoState(false)}
+            onChangeText={setName}
           />
         </View>
 
@@ -146,7 +232,7 @@ const ProfileEditScreen = () => {
             >
               <Text style={styles.genderText}>
                 {' '}
-                {gender === 'male' ? 'Nam' : 'Nữ'}
+                {gender === 'Male' ? 'Nam' : 'Nữ'}
               </Text>
               <Icon name="keyboard-arrow-down" size={20} color="#666" />
             </TouchableOpacity>
@@ -154,10 +240,12 @@ const ProfileEditScreen = () => {
         </View>
 
         <View>
-          <Text style={styles.subtitle}>Địa chỉ</Text>
+          <Text style={styles.subtitle}>Quốc gia</Text>
           <TextInput
+            value={country}
+            onChangeText={setCountry}
             style={styles.input}
-            placeholder="Địa chỉ của bạn"
+            placeholder="Quốc gia"
             placeholderTextColor="#aaa"
             onFocus={() => setInfoState(false)}
           />
@@ -185,6 +273,8 @@ const ProfileEditScreen = () => {
 
         <TextInput
           style={styles.input}
+          value={phone}
+          onChangeText={setPhone}
           placeholder="Số điện thoại của bạn"
           placeholderTextColor="#aaa"
           onFocus={() => setPhoneState(false)}
@@ -201,7 +291,7 @@ const ProfileEditScreen = () => {
         title={'Chọn ảnh đại diện'}
         visible={showModalEditAvatar}
         onClose={() => setShowModalEditAvatar(false)}
-        onSave={uri => setAvatar({ uri })}
+        onSave={uri => handleSaveAvatar(uri)}
       />
       <EditNameModal
         visible={showModalEditName}
@@ -210,6 +300,7 @@ const ProfileEditScreen = () => {
         title="Chỉnh sửa tên người dùng"
         initialValue={name}
       />
+      {/* 
       <DescriptionModal
         visible={showModalDesc}
         onClose={() => setShowModalDesc(false)}
@@ -217,6 +308,7 @@ const ProfileEditScreen = () => {
         title="Chỉnh sửa tiểu sử"
         initialValue={description}
       />
+      */}
       <EditGenderModal
         visible={showModalEditGender}
         onClose={() => setShowModalEditGender(false)}
@@ -224,6 +316,16 @@ const ProfileEditScreen = () => {
         title="Chọn giới tính"
         initialValue={gender}
       />
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type={'success'}
+          autoClose
+          position="bottom"
+          duration={3000}
+        />
+      )}
     </ScrollView>
   );
 };

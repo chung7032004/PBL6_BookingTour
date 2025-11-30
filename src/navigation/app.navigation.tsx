@@ -56,6 +56,7 @@ const AppNavigation = () => {
         component={WishListStack}
         options={{
           title: 'Yêu thích',
+          unmountOnBlur: true,
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="favorite-outline" size={size} color={color} />
           ),

@@ -1,5 +1,5 @@
 import { ExperiencesResponse, TourCardProps } from '../../../types/experience';
-import { fetchWithTimeout } from '../auth/login';
+import { fetchWithTimeout } from '../auth/fetch';
 import { url } from '../url';
 
 export async function search(
