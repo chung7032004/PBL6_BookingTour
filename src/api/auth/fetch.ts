@@ -23,134 +23,61 @@ export function fetchWithTimeout(
   ]);
 }
 
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(p => {
+    error ? p.reject(error) : p.resolve(token!);
+  });
+  failedQueue = [];
+};
 async function refreshToken(): Promise<string | null> {
+  if (isRefreshing) {
+    return new Promise<string>((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
   try {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     if (!refreshToken) {
-      console.log('No refresh token found');
-      return null;
+      throw new Error('No refresh token');
     }
 
     const res = await fetch(url + '/api/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        command: { refreshToken },
-      }),
+      body: JSON.stringify({ refreshToken }),
     });
 
     if (!res.ok) {
-      console.log('Refresh token failed with status:', res.status);
-      return null;
+      throw new Error('Refresh token failed with status:' + res.status);
     }
 
     const text = await res.text();
     if (!text) {
-      console.log('Refresh response empty');
-      return null;
+      throw new Error('Refresh response empty');
     }
 
     const data = JSON.parse(text);
-    if (data?.accessToken) {
-      await AsyncStorage.setItem('accessToken', data.accessToken);
-      return data.accessToken;
+    if (!data?.accessToken) {
+      throw new Error('No accessToken in response');
     }
-
+    await AsyncStorage.setItem('accessToken', data.accessToken);
+    return data.accessToken;
+  } catch (error) {
+    processQueue(error);
+    await logout();
     return null;
-  } catch (e: any) {
-    console.log('Refresh token exception:', e.message || e);
-    return null;
+  } finally {
+    isRefreshing = false;
   }
 }
-// export async function fetchWithAuth(
-// endpoint: string,
-// options: RetryableRequestInit = {},
-// ): Promise<Response> {
-// Sử dụng cờ để kiểm tra xem request này có phải là lần retry hay không
-// const _retry = (options as any)._retry || false;
-// let accessToken = await AsyncStorage.getItem('accessToken');
-// let finalOptions: RequestInit = { ...options }; // 1. Thêm Access Token vào Header
-//
-// if (accessToken) {
-// finalOptions.headers = {
-// ...(options.headers || {}),
-// Authorization: `Bearer ${accessToken}`,
-// 'Content-Type': 'application/json', // Thêm Content-Type mặc định
-// };
-// } else {
-// Nếu không có token, vẫn set Content-Type và gửi request
-// finalOptions.headers = {
-// ...(options.headers || {}),
-// 'Content-Type': 'application/json',
-// };
-// }
-//
-// let res = await fetch(url + endpoint, finalOptions); // 2. Xử lý lỗi 401 (Unauthorized - Token hết hạn)
-//
-// if (res.status === 401 && !_retry) {
-// console.log('Access token expired → refreshing...');
-//
-// const newToken = await refreshToken();
-//
-// if (!newToken) {
-// console.log('Refresh Token failed or not found');
-// await logout();
-// return res;
-// } // Tái gửi request với Token mới
-//
-// console.log('Token refreshed. Retrying original request...'); // Cập nhật token mới và thêm cờ _retry
-// const retryOptions: RetryableRequestInit = {
-// ...options,
-// headers: {
-// ...(options.headers || {}),
-// Authorization: `Bearer ${newToken}`,
-// 'Content-Type': 'application/json',
-// },
-// _retry: true,
-// }; // Thực hiện lại fetch với token mới và tùy chọn ban đầu
-//
-// return fetch(url + endpoint, retryOptions);
-// }
-//
-// return res;
-// }
-// export const apiFetch = {
-// get: (endpoint: string, options: ApiFetchOptions = {}) => {
-// return fetchWithAuth(endpoint, { ...prepareBody(options), method: 'GET' });
-// },
-
-// post: (endpoint: string, data?: any, options: ApiFetchOptions = {}) => {
-// return fetchWithAuth(endpoint, {
-// ...prepareBody({ ...options, body: data }),
-// method: 'POST',
-// });
-// },
-
-// put: (endpoint: string, data: any, options: ApiFetchOptions = {}) => {
-// return fetchWithAuth(endpoint, {
-// ...prepareBody({ ...options, body: data }),
-// method: 'PUT',
-// });
-// },
-
-// delete: (endpoint: string, options: ApiFetchOptions = {}) => {
-// return fetchWithAuth(endpoint, {
-// ...prepareBody(options),
-// method: 'DELETE',
-// });
-// },
-// };
-// Hàm chuyển đổi body thành chuỗi JSON
-// const prepareBody = (options: ApiFetchOptions): RetryableRequestInit => {
-// const finalOptions = { ...options };
-//
-// if (finalOptions.body && typeof finalOptions.body !== 'string') {
-// finalOptions.body = JSON.stringify(finalOptions.body);
-// }
-//
-// return finalOptions as RetryableRequestInit;
-// };
-//
 
 export async function fetchWithAuth(
   endpoint: string,
@@ -208,24 +135,6 @@ export async function fetchWithAuth(
 
   return response;
 }
-// const prepareRequest = (
-// method: string,
-// data?: any,
-// options: ApiFetchOptions = {},
-// ): [string, RetryableRequestInit] => {
-// const isFormData = data instanceof FormData;
-// const body = isFormData ? data : data ? JSON.stringify(data) : undefined;
-//
-// return [
-// '',
-// {
-// ...options,
-// method,
-// body,
-// headers: options.headers || {},
-// } as RetryableRequestInit,
-// ];
-// };
 
 const prepareRequest = (
   method: string,
@@ -241,23 +150,6 @@ const prepareRequest = (
     headers: options.headers || {},
   };
 };
-//
-// export const apiFetch = {
-// get: (endpoint: string, options?: ApiFetchOptions) =>
-// fetchWithAuth(endpoint, { ...options, method: 'GET' }),
-//
-// post: (endpoint: string, data?: any, options?: ApiFetchOptions) => {
-// const [, init] = prepareRequest('POST', data, options);
-// return fetchWithAuth(endpoint, init);
-// },
-// put: (endpoint: string, data?: any, options?: ApiFetchOptions) => {
-// const [, init] = prepareRequest('PUT', data, options);
-// return fetchWithAuth(endpoint, init);
-// },
-//
-// delete: (endpoint: string, options?: ApiFetchOptions) =>
-// fetchWithAuth(endpoint, { ...options, method: 'DELETE' }),
-// };
 
 export const apiFetch = {
   get: (endpoint: string, options?: ApiFetchOptions) =>

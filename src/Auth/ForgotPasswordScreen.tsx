@@ -40,7 +40,7 @@ const ForgotPasswordScreen = () => {
       return;
     }
     setTimeout(() => {
-      navigation.navigate('verifyCode', {
+      navigation.navigate('resetPassword', {
         email,
         message: 'Liên kết xác nhận đã được gửi đến email của bạn',
       });

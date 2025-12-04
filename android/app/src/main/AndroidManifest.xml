@@ -1,7 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+  <queries>
+        <!-- Cho phép mở tất cả link https -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <!-- Cho phép mở app MoMo chính thức -->
+        <package android:name="com.mservice.momotransfer" />
+        <!-- Nếu bạn dùng môi trường test thì thêm cái này cũng cần -->
+        <package android:name="com.mservice.momotransfer.test" />
+    </queries>
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -20,6 +30,7 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
+            
         </intent-filter>
       </activity>
     </application>

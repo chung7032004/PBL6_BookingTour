@@ -267,7 +267,12 @@ const TourDetailScreen = () => {
               })
             }
           >
-            <Image source={images.banner4} style={styles.hostAvatar} />
+            <Image
+              source={
+                host?.avatarUrl ? { uri: host.avatarUrl } : images.banner4
+              }
+              style={styles.hostAvatar}
+            />
             <View style={{ flex: 1, flexShrink: 1 }}>
               <Text style={styles.hostName}>{host?.fullName}</Text>
               <Text style={styles.hostDesc}>{host?.bio}</Text>
@@ -334,7 +339,7 @@ const TourDetailScreen = () => {
         navigation={navigation}
         tourInfo={{
           name: tour?.title || 'Tour',
-          image: tour?.media[0],
+          image: tour?.media[0].url || '',
         }}
         adultPrice={tour?.adultPrice ? tour.adultPrice : 0}
         childPrice={tour?.childPrice ? tour.childPrice : 0}

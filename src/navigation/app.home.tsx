@@ -8,6 +8,7 @@ import PaymentSuccessScreen from '../Home/PaymentSuccessScreen';
 import NoticeScreen from '../Home/NoticeScreen';
 import HeaderNotificationIcon from '../components/HeaderNotificationIcon';
 import { useState } from 'react';
+import PaymentProcessingScreen from '../Home/PaymentProcessingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +21,7 @@ export default function HomeStack() {
         component={HomeScreen}
         options={{
           headerTitle: () => <AppHeader />,
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
         }}
       />
       <Stack.Screen
@@ -30,14 +31,14 @@ export default function HomeStack() {
         options={{
           title: 'Chi tiết tour',
           headerTitle: () => <AppHeader />,
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
         }}
       />
       <Stack.Screen
         name="provider"
         component={ProviderScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           title: 'Thông tin host',
           headerTitle: () => <AppHeader />,
         }}
@@ -46,13 +47,18 @@ export default function HomeStack() {
         name="paymentScreen"
         component={PaymentScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           title: 'Xác nhận và thanh toán',
         }}
       />
       <Stack.Screen
         name="paymentSuccessScreen"
         component={PaymentSuccessScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="paymentProcessingScreen"
+        component={PaymentProcessingScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

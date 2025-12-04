@@ -20,17 +20,46 @@ const EditPhoneModal = (props: EditPhoneProps) => {
   // Cập nhật lại mỗi khi mở modal
   useEffect(() => {
     if (visible) {
-      setPhone(initialValue);
+      let normalized = initialValue.trim();
+      // 0xxxxxxxxx → +84xxxxxxxxx
+      if (/^0\d{9}$/.test(normalized)) {
+        normalized = '+84' + normalized.slice(1);
+      }
+      // 84xxxxxxxxx → +84xxxxxxxxx
+      if (/^84\d{9}$/.test(normalized)) {
+        normalized = '+' + normalized;
+      }
+      // Nếu không bắt đầu +84 → tự thêm
+      if (!normalized.startsWith('+84')) {
+        normalized = '+84';
+      }
+      setPhone(normalized);
       setShowError(false);
     }
   }, [visible, initialValue]);
+
   const handleSave = () => {
-    if (!/^\d{9}$/.test(phone.trim())) {
+    // +84 và 9 số = 12 ký tự
+    if (!/^\+84\d{9}$/.test(phone)) {
       setShowError(true);
       return;
     }
     onSave(phone);
     onClose();
+  };
+  const handleChangePhone = (text: string) => {
+    // Luôn bắt đầu bằng +84
+    let clean = text.replace(/[^0-9+]/g, '');
+    // Đảm bảo luôn giữ +84 ở đầu
+    if (!clean.startsWith('+84')) {
+      clean = '+84';
+    }
+    // Chỉ giữ số phía sau +84
+    clean = '+84' + clean.slice(3).replace(/[^0-9]/g, '');
+    // Giới hạn tối đa +84 + 9 số = 12 ký tự
+    if (clean.length <= 12) {
+      setPhone(clean);
+    }
   };
 
   return (
@@ -56,14 +85,16 @@ const EditPhoneModal = (props: EditPhoneProps) => {
           <CustomTextInput
             title="Số điện thoại"
             value={phone}
-            onChangeText={setPhone}
+            onChangeText={handleChangePhone}
             keyboardType="phone-pad"
+            maxLength={12}
           />
+          <Text style={styles.counter}>{phone.length}/12</Text>
 
           {showError && (
             <View style={styles.errorContainer}>
               <MaterialIcons name="error-outline" size={16} color="red" />
-              <Text style={styles.error}>Số điện thoại chỉ gồm 9 số</Text>
+              <Text style={styles.error}>Số điện thoại chỉ gồm số</Text>
             </View>
           )}
 
@@ -124,5 +155,11 @@ const styles = StyleSheet.create({
     color: 'red',
     marginLeft: 4,
     fontSize: 13,
+  },
+  counter: {
+    textAlign: 'right',
+    color: '#888',
+    fontSize: 13,
+    marginBottom: 8,
   },
 });

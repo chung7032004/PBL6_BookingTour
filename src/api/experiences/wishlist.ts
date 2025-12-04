@@ -24,7 +24,7 @@ export async function createWishList(name: string): Promise<WishlistResponse> {
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Create wishlist failed with status:',
         res.status,
         errorText || 'No body',
@@ -38,7 +38,7 @@ export async function createWishList(name: string): Promise<WishlistResponse> {
 
     const data = await safeJson<WishlistResponse>(res);
     if (!data || !data.isSuccess) {
-      console.error('Wishlist creation failed:', data?.message || data);
+      console.log('Wishlist creation failed:', data?.message || data);
       return {
         id: '',
         isSuccess: false,
@@ -49,7 +49,7 @@ export async function createWishList(name: string): Promise<WishlistResponse> {
     console.log('Wishlist created:', data);
     return data;
   } catch (e: any) {
-    console.error('Create WishList network error:', e.message || e);
+    console.log('Create WishList network error:', e.message || e);
     return {
       id: '',
       isSuccess: false,
@@ -65,7 +65,7 @@ export async function deleteWishList(
     const res = await apiFetch.delete(`/api/wishlists/${wishListId}`);
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Delete wishlist failed with status:',
         res.status,
         errorText || 'No body',
@@ -77,7 +77,7 @@ export async function deleteWishList(
     }
     const data = await safeJson<DeleteWishlistResponse>(res);
     if (!data || !data.isSuccess) {
-      console.error('Wishlist deleted failed:', data?.message || data);
+      console.log('Wishlist deleted failed:', data?.message || data);
       return {
         isSuccess: false,
         message: data?.message || 'Wishlist deleted failed!',
@@ -85,7 +85,7 @@ export async function deleteWishList(
     }
     return data;
   } catch (e: any) {
-    console.error('Delete WishList network error:', e.message || e);
+    console.log('Delete WishList network error:', e.message || e);
     return {
       isSuccess: false,
       message: 'Network error',
@@ -101,7 +101,7 @@ export async function getMyWishLists(): Promise<{
     const res = await apiFetch.get('/api/wishlists');
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Get my wishlists failed with status:',
         res.status,
         errorText || 'No body',
@@ -113,7 +113,7 @@ export async function getMyWishLists(): Promise<{
     }
     const data = await safeJson<MyWishListResponse[]>(res);
     if (!data) {
-      console.error('Get my wishlist failed:', data);
+      console.log('Get my wishlist failed:', data);
       return {
         myWishList: null,
         message: 'Get my wishlist failed.',
@@ -124,7 +124,7 @@ export async function getMyWishLists(): Promise<{
       message: null,
     };
   } catch (e: any) {
-    console.error('Create WishList network error:', e.message || e);
+    console.log('Create WishList network error:', e.message || e);
     return {
       myWishList: null,
       message: 'Network error',
@@ -140,7 +140,7 @@ export async function getWishListDetail(wishListId: string): Promise<{
     const res = await apiFetch.get(`/api/wishlists/${wishListId}`);
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Get wishlists detail failed with status:',
         res.status,
         errorText || 'No body',
@@ -152,7 +152,7 @@ export async function getWishListDetail(wishListId: string): Promise<{
     }
     const data = await safeJson<WishListDetailResponse>(res);
     if (!data || !data?.id) {
-      console.error(
+      console.log(
         'Get wishlist detail, but API reported failure or invalid response:',
         data,
       );
@@ -169,7 +169,7 @@ export async function getWishListDetail(wishListId: string): Promise<{
       message: null,
     };
   } catch (e: any) {
-    console.error('Create WishList network error:', e.message || e);
+    console.log('Create WishList network error:', e.message || e);
     return {
       wishListDetail: null,
       message: 'Network error',
@@ -187,7 +187,7 @@ export async function addExpToWishList(
     );
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Add experience to wishlists failed with status:',
         res.status,
         errorText || 'No body',
@@ -199,7 +199,7 @@ export async function addExpToWishList(
     }
     const data = await safeJson<AddExperienceToWishListResponse>(res);
     if (!data || !data?.isSuccess) {
-      console.error(
+      console.log(
         'Add experience to wishlists, but API reported failure or invalid response:',
         data,
       );
@@ -213,7 +213,7 @@ export async function addExpToWishList(
     console.log('Wishlist created:', data);
     return data;
   } catch (e: any) {
-    console.error('Add experience to wishlists network error:', e.message || e);
+    console.log('Add experience to wishlists network error:', e.message || e);
     return {
       isSuccess: false,
       message: 'Network error',
@@ -231,7 +231,7 @@ export async function removeExpToWishList(
     );
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
+      console.log(
         'Delete experience from wishlists failed with status:',
         res.status,
         errorText || 'No body',
@@ -243,7 +243,7 @@ export async function removeExpToWishList(
     }
     const data = await safeJson<RemoveExperienceFromWishListResponse>(res);
     if (!data || !data?.isSuccess) {
-      console.error(
+      console.log(
         'Delete experience from wishlists, but API reported failure or invalid response:',
         data,
       );
@@ -257,7 +257,7 @@ export async function removeExpToWishList(
     console.log('Wishlist created:', data);
     return data;
   } catch (e: any) {
-    console.error('Add experience to wishlists network error:', e.message || e);
+    console.log('Add experience to wishlists network error:', e.message || e);
     return {
       isSuccess: false,
       message: 'Network error',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
   NavigationProp,
   useNavigation,
   useIsFocused,
+  useFocusEffect,
 } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -47,9 +48,11 @@ const WishListScreen = () => {
   );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  useEffect(() => {
-    loadWishLists();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadWishLists();
+    }, []),
+  );
   const loadWishLists = async () => {
     const res = await getMyWishLists();
     if (res?.message) {

@@ -16,6 +16,7 @@ export type RootStackParamList = {
     hostDetail: HostDetail | null;
   };
   paymentScreen: {
+    experienceId: string;
     tourName: string;
     image: any;
     slot: Slot;
@@ -27,10 +28,20 @@ export type RootStackParamList = {
       total: number;
     };
     total: number;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    note?: string;
   };
   paymentSuccessScreen: {
     total: number;
     method: string;
+    bookingCode: string;
+    bookingId: string;
+  };
+  paymentProcessingScreen: {
+    paymentUrl: string;
+    deeplink?: string;
   };
 
   bookingTab: undefined;

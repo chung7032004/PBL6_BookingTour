@@ -15,15 +15,16 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
-import { resetPassword } from '../api/fakeAuth';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Notification from '../components/Notification';
+import { resetPassword } from '../api/auth/forgotPassword';
 
 const ResetPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const route: RouteProp<RootStackParamList, 'resetPassword'> = useRoute();
   const { email } = route.params;
 
+  const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [visible, setVisible] = useState(false);
@@ -42,13 +43,14 @@ const ResetPasswordScreen = () => {
       setError('Mật khẩu phải dài ít nhất 8 ký tự');
       return;
     }
+    if (code.length !== 6) return;
     if (password !== confirmPassword) {
       setError('Mật khẩu không khớp');
       return;
     }
 
     setLoading(true);
-    const res = await resetPassword(email, password);
+    const res = await resetPassword(email, code, password);
     setLoading(false);
 
     if (!res.success) {
@@ -79,7 +81,20 @@ const ResetPasswordScreen = () => {
             editable={false}
           />
         </View>
-
+        <Text style={styles.text}>
+          Mã gồm 6 số đã được gửi đến email: **{email}**
+        </Text>
+        <TextInput
+          testID="codeInput"
+          style={styles.codeInput}
+          keyboardType="number-pad"
+          maxLength={6}
+          value={code}
+          onChangeText={t => {
+            setError('');
+            setCode(t);
+          }}
+        />
         {/* Mật khẩu */}
         <Text style={styles.text}>Mật khẩu mới</Text>
         <View style={styles.inputWrapper}>
@@ -252,5 +267,15 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#007AFF',
     fontWeight: '600',
+  },
+  codeInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    fontSize: 22,
+    textAlign: 'center',
+    letterSpacing: 8,
+    paddingVertical: 12,
+    marginBottom: 25,
   },
 });

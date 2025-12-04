@@ -20,7 +20,7 @@ export default function ProfileStack() {
         component={ProfileDetailScreen}
         options={{
           title: 'Trang cá nhân',
-          headerRight: () => <HeaderNotificationIcon count={10} />,
+          // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />
       <Stack.Screen
@@ -28,7 +28,7 @@ export default function ProfileStack() {
         component={ProfileEditScreen}
         options={{
           title: 'Thông tin tài khoản',
-          headerRight: () => <HeaderNotificationIcon count={10} />,
+          // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />
       <Stack.Screen
@@ -36,7 +36,7 @@ export default function ProfileStack() {
         component={ContactScreen}
         options={{
           title: 'Liên hệ chúng tôi',
-          headerRight: () => <HeaderNotificationIcon count={10} />,
+          // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />
     </Stack.Navigator>

@@ -49,24 +49,35 @@ export async function getMyProfile(): Promise<userProfile | null> {
   const endpoint = '/api/users/me';
   try {
     const res = await apiFetch.get(endpoint);
+    if (res.status === 401) {
+      return null;
+    }
     if (!res.ok) {
-      let errorBody = null;
+      let message = 'Lấy thông tin hồ sơ thất bại';
       try {
         const text = await res.text();
-        errorBody = text ? JSON.parse(text) : null;
+        if (text) {
+          const errorJson = JSON.parse(text);
+          message = errorJson.message || errorJson.error || message;
+        }
       } catch {
-        console.error(`Get my profile failed: ${res.status}`, errorBody || '');
-        return null;
+        // ignore parse error
       }
+      throw new Error(`${message} (${res.status})`);
     }
     const text = await res.text();
     if (!text) return null;
     const profile: userProfile = JSON.parse(text);
-    console.log(profile);
-    return profile ?? null;
-  } catch (error) {
-    console.error('Network error : ' + error);
-    return null;
+    return profile;
+  } catch (error: any) {
+    if (
+      error.name === 'TypeError' ||
+      error.message.includes('fetch') ||
+      error.message === 'REQUEST_TIMEOUT'
+    ) {
+      throw new Error('Không có kết nối mạng');
+    }
+    throw error;
   }
 }
 
@@ -90,18 +101,20 @@ export async function updateMyProfile(data: {
     if (data.Avatar === null) formData.append('Avatar', '');
     if (data.Avatar) formData.append('Avatar', data.Avatar as any);
 
+    console.log('Updating profile with data:', formData);
     const res = await apiFetch.put('/api/users', formData);
     if (!res.ok) {
       const err = await res.text();
       if (res.status === 401) await logout();
-      console.error('Cập nhật profile thất bại:', res.status, err);
+      console.log('Cập nhật profile thất bại:', res.status, err);
       return null;
     }
 
     const text = await res.text();
+    console.log('Cập nhật profile thành công:', text);
     return text ? JSON.parse(text) : null;
   } catch (error) {
-    console.log(error);
+    console.log('Lỗi', error);
     return null;
   }
 }

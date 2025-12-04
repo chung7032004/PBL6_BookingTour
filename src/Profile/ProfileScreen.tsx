@@ -1,10 +1,11 @@
 import {
   NavigationProp,
   RouteProp,
+  useFocusEffect,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   Image,
@@ -19,29 +20,45 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { checkLogin, logout } from '../api/auth/login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../types/route';
+import { userProfile } from '../../types/host';
+import { getMyProfile } from '../api/experiences/host';
+import LoadingView from '../components/LoadingView';
+import ErrorView from '../components/ErrorView';
 
 const ProfileScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const route: RouteProp<RootStackParamList, 'profile'> = useRoute();
-  const [user, setUser] = useState<any>(null);
+  const [myProfile, setMyProfile] = useState<userProfile | null>();
+  const avatarSource = myProfile?.avatarUrl
+    ? { uri: myProfile.avatarUrl } // Nếu có URL, sử dụng ảnh từ API
+    : images.account; // Nếu không có, sử dụng ảnh mặc định
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [errorProfile, setErrorProfile] = useState<string | null>(null);
+  const [errorLogin, setErrorLogin] = useState<string | null>(null);
 
-  useEffect(() => {
-    const checkLoginUI = async () => {
-      const logged = await checkLogin();
-      if (!logged) return;
-
-      const email = await AsyncStorage.getItem('email');
-      setUser({
-        name: email?.split('@')[0],
-        email,
-      });
-    };
-    checkLoginUI();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, []),
+  );
+  const loadProfile = async () => {
+    try {
+      setLoadingProfile(true);
+      const myProfile = await getMyProfile();
+      if (!myProfile) {
+        setErrorLogin('Vui lòng đăng nhập để xem thông tin');
+      }
+      setMyProfile(myProfile);
+    } catch (error: any) {
+      setErrorProfile('Không tải được hồ sơ');
+      return;
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
-    setUser(null);
+    setMyProfile(null);
   };
   const handleLogin = () => {
     navigation.navigate('login', {
@@ -49,19 +66,40 @@ const ProfileScreen = () => {
       params: { screen: 'profile' },
     });
   };
+  if (loadingProfile) return <LoadingView message="Đang tải dữ liệu ..." />;
+  if (errorProfile)
+    return (
+      <ErrorView
+        message={errorProfile}
+        onPress={loadProfile}
+        textButton="Tải lại trang"
+      />
+    );
+  if (errorLogin)
+    return (
+      <ErrorView
+        message={errorLogin}
+        onPress={handleLogin}
+        textButton="Đăng nhập"
+      />
+    );
   return (
     <ScrollView style={styles.container}>
       {/* Header Avatar */}
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('profileDetail')}>
-          <Image style={styles.avatarImage} source={images.account} />
+          <Image style={styles.avatarImage} source={avatarSource} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.userName}>{user ? user.name : 'Khách'}</Text>
-          {user && (
-            <Text style={styles.userInfo}>{user ? user.email : ''}</Text>
+          <Text style={styles.userName}>
+            {myProfile ? myProfile.fullName : 'Khách'}
+          </Text>
+          {myProfile && (
+            <Text style={styles.userInfo}>
+              {myProfile ? myProfile.email : ''}
+            </Text>
           )}
-          <Text style={styles.userInfo}>0 Đánh giá</Text>
+          {/* <Text style={styles.userInfo}>0 Đánh giá</Text> */}
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('profileEdit')}>
           <Icon name="edit" size={24} color="#007bff" />
@@ -70,7 +108,7 @@ const ProfileScreen = () => {
 
       {/* Menu items */}
       <View style={styles.menuSection}>
-        {!user && (
+        {!myProfile && (
           <TouchableOpacity
             style={styles.touch}
             onPress={handleLogin}
@@ -214,7 +252,7 @@ const ProfileScreen = () => {
             style={styles.nextIcon}
           />
         </TouchableOpacity>
-        {user && (
+        {myProfile && (
           <TouchableOpacity style={styles.touch} onPress={handleLogout}>
             <Icon
               name="logout"

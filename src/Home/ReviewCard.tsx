@@ -53,7 +53,7 @@ const ReviewCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
     borderRadius: 14,
     padding: 14,
     marginRight: 12,

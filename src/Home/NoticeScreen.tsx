@@ -169,7 +169,7 @@ const styleNoNotice = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
   text: {
     color: '#FF5A5F',

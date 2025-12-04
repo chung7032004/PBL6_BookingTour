@@ -42,3 +42,50 @@ export async function forgotPassword(
     };
   }
 }
+
+export async function resetPassword(
+  email: string,
+  token: string,
+  password: string,
+): Promise<{ success: boolean; message: string | null }> {
+  try {
+    const res = await fetchWithTimeout(
+      url + '/api/auth/password/reset',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          token: token,
+          Password: password,
+          confirmPassword: password,
+        }),
+      },
+      10000,
+    );
+    const data = await res.json();
+    if (res.ok) {
+      return {
+        success: data.success || true,
+        message: data.message || 'Cập nhật mật khẩu thành công',
+      };
+    } else {
+      let errorMessage = 'Mã code không hợp lệ.';
+      if (data && data?.Message) {
+        errorMessage = data.Message;
+      }
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  } catch (error) {
+    console.log('Reset Password API Error:', error);
+    return {
+      success: false,
+      message: 'Không thể kết nối đến máy chủ',
+    };
+  }
+}

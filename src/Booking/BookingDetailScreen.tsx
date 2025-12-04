@@ -57,21 +57,21 @@ const BookingDetailScreen = () => {
 
   const config = statusConfig[status];
 
-  const { loading, error } = useAuthGuard();
-  const handleLogin = () => {
-    navigation.navigate('login', {
-      redirect: 'homeTab',
-      params: 'paymentScreen',
-    });
-  };
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  if (error)
-    return (
-      <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
-        onPress={handleLogin}
-      />
-    );
+  // const { loading, error } = useAuthGuard();
+  // const handleLogin = () => {
+  //   navigation.navigate('login', {
+  //     redirect: 'homeTab',
+  //     params: 'paymentScreen',
+  //   });
+  // };
+  // if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  // if (error)
+  //   return (
+  //     <ErrorView
+  //       message="Bạn cần đăng nhập để sử dụng tính năng này"
+  //       onPress={handleLogin}
+  //     />
+  //   );
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

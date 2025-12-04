@@ -18,20 +18,6 @@ import { Slot } from '../../../types/experience';
 import { getExperienceAvailability } from '../../api/experiences/experiences';
 import { RootStackParamList } from '../../../types/route';
 
-interface SelectDateModalProps {
-  visible: boolean;
-  title: string;
-  onClose: () => void;
-  navigation: NavigationProp<RootStackParamList>;
-  experienceId: string;
-  adultPrice: number;
-  childPrice: number;
-  tourInfo: {
-    name: string;
-    image: any;
-  };
-}
-
 const SelectDateCard = ({
   slot,
   selected,
@@ -51,20 +37,34 @@ const SelectDateCard = ({
       onPress={onPress}
     >
       <View>
+        <Text style={styles.cardQuantity}>{slot.spotsAvailable} chỗ trống</Text>
         <Text style={styles.cardDate}>{slot.date}</Text>
         <Text style={styles.cardTime}>
           {slot.startTime} - {slot.endTime}
         </Text>
+
         <Text style={styles.cardPrice}>
           {adultPrice.toLocaleString()}đ/ khách - {childPrice.toLocaleString()}
           đ/ trẻ em
         </Text>
       </View>
-      <Text style={styles.cardQuantity}>{slot.spotsAvailable} chỗ trống</Text>
     </TouchableOpacity>
   );
 };
 
+interface SelectDateModalProps {
+  visible: boolean;
+  title: string;
+  onClose: () => void;
+  navigation: NavigationProp<RootStackParamList>;
+  experienceId: string;
+  adultPrice: number;
+  childPrice: number;
+  tourInfo: {
+    name: string;
+    image: string;
+  };
+}
 const SelectDateModal = (props: SelectDateModalProps) => {
   const {
     visible,
@@ -102,25 +102,13 @@ const SelectDateModal = (props: SelectDateModalProps) => {
     });
   };
 
-  const checkLogin = async () => {
-    const { isLoggedIn, isUserRole } = await checkLoginAndRole();
-    if (!isLoggedIn || !isUserRole) {
-      props.onClose();
-      props.navigation.navigate('login', {
-        redirect: 'homeTab',
-        params: { screen: 'tourDetail' },
-        message: 'Bạn cần đăng nhập để đặt tour',
-      });
-      return false;
-    }
-    return true;
-  };
   useEffect(() => {
     loadSlots();
   }, [date]);
 
   const toYMD = (d: Date) => d.toISOString().split('T')[0];
   const loadSlots = async () => {
+    setSlots(null);
     const startDate = toYMD(date);
     const endDate = toYMD(new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000));
     const slots = await getExperienceAvailability(
@@ -133,14 +121,13 @@ const SelectDateModal = (props: SelectDateModalProps) => {
 
   const handlePayment = async () => {
     {
-      const allow = await checkLogin();
-      if (!allow) return;
       if (selectedSlot) {
         const total =
           childPrice * quantity.children + adultPrice * quantity.adult;
         props.navigation.navigate('paymentScreen', {
+          experienceId: experienceId,
           tourName: props.tourInfo.name,
-          image: props.tourInfo.image,
+          image: { uri: props.tourInfo.image },
           slot: selectedSlot,
           adultPrice: adultPrice,
           childPrice: childPrice,
@@ -267,43 +254,60 @@ const styles = StyleSheet.create({
   modalBox: {
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 16,
+    padding: 20,
     width: '100%',
-    maxHeight: '80%',
+    maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#222',
+    flex: 1,
+    flexWrap: 'wrap',
   },
   closeBtn: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#999',
+    padding: 4,
   },
   editQuantity: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 10,
+    paddingVertical: 4,
   },
   chooseDate: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 10,
+    paddingVertical: 4,
   },
   subTitle: {
     fontWeight: '600',
     fontSize: 16,
+    color: '#007AFF',
+    lineHeight: 22,
   },
   subText: {
     color: '#666',
     fontSize: 14,
+    lineHeight: 18,
+    flexWrap: 'wrap',
   },
   sectionLabel: {
     marginVertical: 8,
@@ -313,62 +317,87 @@ const styles = StyleSheet.create({
   selectCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 12,
-    marginVertical: 6,
-    borderRadius: 12,
+    padding: 14,
+    marginVertical: 7,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#eee',
-    backgroundColor: '#fafafa',
+    backgroundColor: '#f7faff',
+    minHeight: 70,
+    alignItems: 'center',
   },
   selectedCard: {
     borderColor: '#007AFF',
-    backgroundColor: '#E6F0FF',
+    backgroundColor: '#eaf6ff',
   },
   cardDate: {
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 17,
+    color: '#222',
+    marginBottom: 2,
   },
   cardTime: {
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 15,
+    color: '#555',
+    marginBottom: 2,
   },
   cardPrice: {
-    color: '#555',
-    marginTop: 4,
+    color: '#007AFF',
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: '500',
   },
   cardQuantity: {
     alignSelf: 'center',
     color: '#007AFF',
     fontWeight: '500',
+    fontSize: 13,
+    marginLeft: 8,
+    minWidth: 65,
+    textAlign: 'right',
   },
   payment: {
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 12,
-    marginTop: 12,
+    paddingVertical: 14,
+    marginTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#eee',
+    gap: 12,
   },
   paymentText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   payButton: {
     backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 22,
+    paddingVertical: 12,
     borderRadius: 10,
+    shadowColor: '#007AFF',
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+    minWidth: 150,
+    alignItems: 'center',
   },
   payButtonText: {
     color: '#fff',
     fontWeight: '600',
+    fontSize: 15,
+    letterSpacing: 0.2,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
+    marginTop: 40,
     paddingHorizontal: 20,
+    minHeight: 80,
   },
   emptyText: {
     fontSize: 16,

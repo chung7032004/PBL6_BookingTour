@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
 
   /** Profile Card **/
   profileContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,

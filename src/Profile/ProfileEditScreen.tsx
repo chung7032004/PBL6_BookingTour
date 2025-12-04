@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Image,
@@ -11,28 +11,28 @@ import {
   View,
 } from 'react-native';
 import images from '../../images';
-import DescriptionModal from './modals/Description.modal';
 import EditNameModal from './modals/EditName.modal';
 import EditAvatarModal from './modals/EditAvatar.modal';
 import EditGenderModal from './modals/EditGender.modal';
 import BirthdayPicker from './BirthdayPicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useAuthGuard } from '../hooks/useAuthGuard';
-import LoadingView from '../components/LoadingView';
-import ErrorView from '../components/ErrorView';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import { getMyProfile, updateMyProfile } from '../api/experiences/host';
 import { userProfile } from '../../types/host';
 import Notification from '../components/Notification';
+import ErrorView from '../components/ErrorView';
+import LoadingView from '../components/LoadingView';
 
 const ProfileEditScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [infoState, setInfoState] = useState(true);
   const [phone, setPhone] = useState('');
   const [phoneState, setPhoneState] = useState(true);
-  const [showModalDesc, setShowModalDesc] = useState(false);
-  // const [description, setDescription] = useState('Chúng tôi biết về bạn');
 
   const [showModalEditAvatar, setShowModalEditAvatar] = useState(false);
   const [avatar, setAvatar] = useState<ImageSourcePropType>(images.account);
@@ -46,114 +46,211 @@ const ProfileEditScreen = () => {
   const [birthday, setBirthday] = useState<Date>(new Date(2000, 0, 1));
   const [country, setCountry] = useState('');
   const [showNotification, setShowNotification] = useState<string | null>(null);
+  const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
+    'success',
+  );
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [errorProfile, setErrorProfile] = useState<string | null>(null);
+  const [errorLogin, setErrorLogin] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  // Chỉ thêm 1 state nhỏ này thôi
+  const [newAvatarUri, setNewAvatarUri] = useState<string | null>(null);
+
+  const handleLogin = () => {
+    navigation.navigate('login', {
+      redirect: 'profileTab',
+      params: { screen: 'profileDetail' },
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, []),
+  );
+
   const loadProfile = async () => {
-    const myProfile = await getMyProfile();
-    if (!myProfile) return; // xử lý lỗi sau
-    setName(myProfile.fullName ?? 'Tên của bạn');
-    setBirthday(
-      myProfile.dateOfBirth
-        ? new Date(myProfile.dateOfBirth)
-        : new Date(2000, 0, 1),
-    );
-    SetGender(myProfile.gender);
-    setCountry(myProfile.country ?? 'Chưa cập nhật');
-    setPhone(myProfile.phoneNumber ?? 'Chưa cập nhật');
-    if (myProfile.avatarUrl) setAvatar({ uri: myProfile.avatarUrl });
+    setLoadingProfile(true);
+    setErrorProfile(null);
+    setErrorLogin(null);
+    try {
+      const myProfile = await getMyProfile();
+      if (!myProfile) {
+        setErrorLogin('Vui lòng đăng nhập để xem thông tin');
+        return;
+      }
+      setName(myProfile.fullName ?? 'Tên của bạn');
+      setBirthday(
+        myProfile.dateOfBirth
+          ? new Date(myProfile.dateOfBirth)
+          : new Date(2000, 0, 1),
+      );
+      SetGender(myProfile.gender);
+      setCountry(myProfile.country ?? '');
+      setPhone(
+        myProfile.phoneNumber
+          ? ensureInternational(myProfile.phoneNumber) ?? ''
+          : '',
+      );
+      if (myProfile.avatarUrl) {
+        setAvatar({ uri: myProfile.avatarUrl });
+      } else {
+        setAvatar(images.account);
+      }
+      setNewAvatarUri(null); // reset khi load lại profile
+    } catch (error: any) {
+      setErrorProfile(error.message || 'Không tải được hồ sơ');
+    } finally {
+      setLoadingProfile(false);
+    }
   };
 
   const formatDateForBackend = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`; // → "1999-12-31"
+    return `${year}-${month}-${day}`;
   };
-  const handleSaveInfo = async () => {
-    const result = await updateMyProfile({
-      FullName: name,
+
+  function ensureInternational(phone: string): string | null {
+    if (!phone) return null;
+    const raw = phone.trim();
+    const digits = raw.replace(/[^0-9]/g, '');
+
+    if (!digits) return null;
+
+    if (raw.startsWith('+')) {
+      const d = raw.replace(/[^0-9]/g, '');
+      if (d.startsWith('84')) return '+' + d;
+      return '+' + d;
+    }
+
+    if (digits.length === 10 && digits.startsWith('0')) {
+      return '+84' + digits.slice(1);
+    }
+
+    if (digits.length === 9) {
+      return '+84' + digits;
+    }
+
+    if (digits.startsWith('84')) return '+' + digits;
+
+    return '+' + digits;
+  }
+
+  // Hàm tạo payload chung (đảm bảo backend luôn nhận đủ field)
+  const buildPayload = () => {
+    const phoneRequest = phone ? ensureInternational(phone) : '';
+
+    const payload: any = {
+      FullName: name.trim() || 'Người dùng',
       DateOfBirth: formatDateForBackend(birthday),
       Gender: gender,
-      Country: country,
-      PhoneNumber: phone,
-      Avatar: avatar,
-    });
+      Country: country || '',
+      PhoneNumber: phoneRequest || '',
+      Avatar: '', // giữ nguyên ảnh cũ
+    };
 
-    if (result) {
-      setInfoState(true);
-      setShowNotification('Cập nhật thành công');
-    }
+    return payload;
   };
-  const handleSavePhone = async () => {
-    let phoneNumber = phone.replace(/\D/g, '');
 
-    if (phoneNumber.startsWith('0')) {
-      phoneNumber = '+84' + phoneNumber.slice(1);
-    } else if (!phoneNumber.startsWith('+84') && phoneNumber.length >= 9) {
-      phoneNumber = '+84' + phoneNumber;
-    } else if (!phoneNumber) {
-      setPhoneState(true);
+  const handleSaveInfo = async () => {
+    if (phone && ensureInternational(phone) === null) {
+      setInfoState(true);
+      setTypeNotification('error');
+      setShowNotification('Số điện thoại không hợp lệ');
       return;
     }
 
-    const result = await updateMyProfile({
-      FullName: name.trim() || 'Người dùng',
-      PhoneNumber: phoneNumber,
-      DateOfBirth: formatDateForBackend(birthday),
-      Gender: gender,
-      Country: country,
-      Avatar: avatar,
-    });
+    const result = await updateMyProfile(buildPayload());
 
     if (result) {
-      setPhone(phoneNumber); // hoặc setPhone('0' + phoneNumber.slice(3)) nếu muốn hiển thị 0...
-      setPhoneState(true);
-      setShowNotification('Lưu số điện thoại thành công');
+      setInfoState(true);
+      setTypeNotification('success');
+      setShowNotification('Cập nhật thành công');
+    } else {
+      setInfoState(true);
+      setTypeNotification('error');
+      setShowNotification('Cập nhật thất bại');
     }
   };
+
+  const handleSavePhone = async () => {
+    const phoneRequest = ensureInternational(phone);
+    if (phoneRequest === null) {
+      setPhoneState(true);
+      setTypeNotification('error');
+      setShowNotification('Số điện thoại không hợp lệ');
+      return;
+    }
+
+    const result = await updateMyProfile(buildPayload());
+
+    if (result) {
+      setPhoneState(true);
+      setTypeNotification('success');
+      setShowNotification('Lưu số điện thoại thành công');
+    } else {
+      setPhoneState(true);
+      setTypeNotification('error');
+      setShowNotification('Cập nhật thất bại');
+    }
+  };
+
   const handleSaveAvatar = async (uri: string) => {
+    setAvatar({ uri }); // cập nhật giao diện ngay
+
     const avatarFile = {
       uri,
       name: 'avatar.jpg',
       type: 'image/jpeg',
     } as any;
 
-    const result = await updateMyProfile({
-      FullName: name,
+    const payload: any = {
+      FullName: name.trim() || 'Người dùng',
       DateOfBirth: formatDateForBackend(birthday),
       Gender: gender,
-      Country: country,
-      PhoneNumber: phone,
+      Country: country || '',
+      PhoneNumber: phone ? ensureInternational(phone) || '' : '',
       Avatar: avatarFile,
-    });
+    };
+
+    const result = await updateMyProfile(payload);
 
     if (result) {
-      setAvatar({ uri });
+      setNewAvatarUri(null);
+      setTypeNotification('success');
       setShowNotification('Cập nhật ảnh đại diện thành công');
+      setShowModalEditAvatar(false);
+    } else {
+      loadProfile();
+      setTypeNotification('error');
+      setShowNotification('Cập nhật thất bại');
     }
   };
-  const { loading, error } = useAuthGuard();
-  const handleLogin = () => {
-    navigation.navigate('login', {
-      redirect: 'homeTab',
-      params: 'paymentScreen',
-    });
-  };
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  if (error)
+
+  if (loadingProfile) return <LoadingView message="Đang tải dữ liệu ..." />;
+  if (errorProfile)
     return (
       <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
-        onPress={handleLogin}
+        message={errorProfile}
+        onPress={loadProfile}
+        textButton="Tải lại trang"
       />
     );
+  if (errorLogin)
+    return (
+      <ErrorView
+        message={errorLogin}
+        onPress={handleLogin}
+        textButton="Đăng nhập"
+      />
+    );
+
   return (
     <ScrollView style={styles.container}>
       {/* Header Profile */}
       <View style={styles.profileSection}>
-        {/* Avatar */}
         <View style={styles.avatarWrapper}>
           <Image style={styles.avatarImage} source={avatar} />
           <TouchableOpacity
@@ -164,7 +261,6 @@ const ProfileEditScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* User name */}
         <View style={styles.userNameRow}>
           <Text style={styles.userName}>{name}</Text>
           <TouchableOpacity
@@ -174,15 +270,6 @@ const ProfileEditScreen = () => {
             <Icon name="edit" size={20} color="#007bff" />
           </TouchableOpacity>
         </View>
-
-        {/* Description 
-        <TouchableOpacity
-          style={styles.input}
-          onPress={() => setShowModalDesc(true)}
-        >
-          <Text style={{ color: '#aaa' }}>{description}</Text>
-        </TouchableOpacity>
-        */}
       </View>
 
       {/* Dữ liệu cá nhân */}
@@ -231,8 +318,11 @@ const ProfileEditScreen = () => {
               }}
             >
               <Text style={styles.genderText}>
-                {' '}
-                {gender === 'Male' ? 'Nam' : 'Nữ'}
+                {gender === 'Male'
+                  ? 'Nam'
+                  : gender === 'Female'
+                  ? 'Nữ'
+                  : 'Khác'}
               </Text>
               <Icon name="keyboard-arrow-down" size={20} color="#666" />
             </TouchableOpacity>
@@ -275,10 +365,16 @@ const ProfileEditScreen = () => {
           style={styles.input}
           value={phone}
           onChangeText={setPhone}
+          keyboardType="phone-pad"
+          maxLength={15}
           placeholder="Số điện thoại của bạn"
           placeholderTextColor="#aaa"
           onFocus={() => setPhoneState(false)}
-          onBlur={() => setPhoneState(true)}
+          onBlur={() => {
+            const intl = ensureInternational(phone);
+            setPhone(intl ?? '');
+            setPhoneState(true);
+          }}
         />
 
         {!phoneState && (
@@ -287,6 +383,7 @@ const ProfileEditScreen = () => {
           </TouchableOpacity>
         )}
       </View>
+
       <EditAvatarModal
         title={'Chọn ảnh đại diện'}
         visible={showModalEditAvatar}
@@ -300,15 +397,6 @@ const ProfileEditScreen = () => {
         title="Chỉnh sửa tên người dùng"
         initialValue={name}
       />
-      {/* 
-      <DescriptionModal
-        visible={showModalDesc}
-        onClose={() => setShowModalDesc(false)}
-        onSave={text => setDescription(text)}
-        title="Chỉnh sửa tiểu sử"
-        initialValue={description}
-      />
-      */}
       <EditGenderModal
         visible={showModalEditGender}
         onClose={() => setShowModalEditGender(false)}
@@ -320,7 +408,7 @@ const ProfileEditScreen = () => {
         <Notification
           message={showNotification}
           onClose={() => setShowNotification(null)}
-          type={'success'}
+          type={typeNotification}
           autoClose
           position="bottom"
           duration={3000}
@@ -332,8 +420,6 @@ const ProfileEditScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-
-  // Header
   profileSection: {
     alignItems: 'center',
     paddingVertical: 20,
@@ -363,7 +449,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-
   userNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -380,8 +465,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 6,
   },
-
-  // Card style
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -393,7 +476,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
-
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -404,7 +486,6 @@ const styles = StyleSheet.create({
     color: '#000',
     backgroundColor: '#fafafa',
   },
-
   title: {
     fontSize: 16,
     fontWeight: '600',
@@ -415,20 +496,17 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 6,
   },
-
   updateContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 8,
   },
   flexItem: { flex: 1, marginRight: 10 },
-
   buttonAdd: {
     color: '#007bff',
     fontWeight: '500',
@@ -437,7 +515,6 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: '500',
   },
-
   saveButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,

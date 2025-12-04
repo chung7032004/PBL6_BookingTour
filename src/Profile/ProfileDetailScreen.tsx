@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PostsScreen from './PostsScreen';
 import CommentsScreen from './CommentsScreen';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import images from '../../images';
 import CustomTabs from '../components/CustomTabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
-import { useAuthGuard } from '../hooks/useAuthGuard';
 import { userProfile } from '../../types/host';
 import { getMyProfile } from '../api/experiences/host';
 
@@ -20,26 +23,29 @@ const ProfileDetailScreen = () => {
     { key: 'posts', label: 'Thông tin' },
     { key: 'comments', label: 'Đánh giá' },
   ];
-  const { loading, error } = useAuthGuard();
   const [myProfile, setMyProfile] = useState<userProfile | null>();
   const avatarSource = myProfile?.avatarUrl
     ? { uri: myProfile.avatarUrl } // Nếu có URL, sử dụng ảnh từ API
     : images.account; // Nếu không có, sử dụng ảnh mặc định
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [errorProfile, setErrorProfile] = useState<string | null>(null);
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  const [errorLogin, setErrorLogin] = useState<string | null>(null);
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, []),
+  );
   const loadProfile = async () => {
     try {
       setLoadingProfile(true);
       const myProfile = await getMyProfile();
       if (!myProfile) {
-        setErrorProfile('Không tìm thấy my profile');
+        setErrorLogin('Vui lòng đăng nhập để xem thông tin');
+        return;
       }
       setMyProfile(myProfile);
-    } catch (error) {
-      setErrorProfile('Lỗi không xác định: ' + error);
+    } catch (error: any) {
+      setErrorProfile(error.message || 'Không tải được hồ sơ');
       return;
     } finally {
       setLoadingProfile(false);
@@ -49,6 +55,7 @@ const ProfileDetailScreen = () => {
     navigation.navigate('login', {
       redirect: 'homeTab',
       params: 'paymentScreen',
+      message: errorLogin ? errorLogin : '',
     });
   };
   if (loadingProfile) return <LoadingView message="Đang tải dữ liệu ..." />;
@@ -60,15 +67,14 @@ const ProfileDetailScreen = () => {
         textButton="Tải lại trang"
       />
     );
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  if (error)
+  if (errorLogin)
     return (
       <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        message={errorLogin}
         onPress={handleLogin}
+        textButton="Đăng nhập"
       />
     );
-
   return (
     <View style={styles.container}>
       {/* Header profile */}

@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
-import { checkEmailExists } from '../api/fakeAuth';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { signup } from '../api/auth/signup';
 

@@ -16,7 +16,7 @@ const BookingStack = () => {
         name="bookingListScreen"
         component={BookingListScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />
@@ -24,7 +24,7 @@ const BookingStack = () => {
         name="bookingDetail"
         component={BookingDetailScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />
@@ -32,7 +32,7 @@ const BookingStack = () => {
         name="reviewScreen"
         component={ReviewScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />
@@ -40,7 +40,7 @@ const BookingStack = () => {
         name="tourDetail"
         component={TourDetailScreen}
         options={{
-          headerRight: () => <HeaderNotificationIcon count={count} />,
+          // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
         }}
       />

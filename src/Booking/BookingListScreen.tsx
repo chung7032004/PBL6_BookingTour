@@ -31,20 +31,20 @@ const BookingListScreen = () => {
       params: { screen: 'bookingListScreen' },
     });
   };
-  if (loading) {
-    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  }
-  if (error) {
-    return (
-      <ErrorView
-        textButton="Đăng nhập"
-        message={error}
-        onPress={() => {
-          handleLogin();
-        }}
-      />
-    );
-  }
+  // if (loading) {
+  //   return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  // }
+  // if (error) {
+  //   return (
+  //     <ErrorView
+  //       textButton="Đăng nhập"
+  //       message={error}
+  //       onPress={() => {
+  //         handleLogin();
+  //       }}
+  //     />
+  //   );
+  // }
   // === Dữ liệu demo ===
   // const bookings: any[] = []; // danh sách rỗng để hiển thị "Không có booking nào"
   const bookings = [

@@ -138,13 +138,13 @@ export async function getExperienceAvailability(
       3000,
     );
     if (!res.ok) {
-      console.error('Có lỗi xảy ra:' + res.status);
+      console.log('Có lỗi xảy ra:' + res.status);
       return null;
     }
     const slots: Slot[] = await res.json();
     return slots;
   } catch (error) {
-    console.error('Network Error: ' + error);
+    console.log('Network Error: ' + error);
     return null;
   }
 }
