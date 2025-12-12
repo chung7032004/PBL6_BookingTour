@@ -7,94 +7,67 @@ import {
   StyleSheet,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {
-  NavigationProp,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import BookingCard from './BookingCard';
-import images from '../../images';
-import { checkLoginAndRole } from '../api/auth/login';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
-import { useAuthGuard } from '../hooks/useAuthGuard';
 import { RootStackParamList } from '../../types/route';
+import { Booking } from '../../types/booking';
+import { getMyBooking } from '../api/experiences/booking';
 
 const BookingListScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const [filter, setFilter] = useState('Tất cả');
-
-  const { loading, error } = useAuthGuard();
+  const [filter, setFilter] = useState('All');
+  const [bookings, setBooking] = useState<Booking[]>([]);
   const handleLogin = () => {
     navigation.navigate('login', {
       redirect: 'bookingTab',
       params: { screen: 'bookingListScreen' },
     });
   };
-  // if (loading) {
-  //   return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
-  // }
-  // if (error) {
-  //   return (
-  //     <ErrorView
-  //       textButton="Đăng nhập"
-  //       message={error}
-  //       onPress={() => {
-  //         handleLogin();
-  //       }}
-  //     />
-  //   );
-  // }
-  // === Dữ liệu demo ===
-  // const bookings: any[] = []; // danh sách rỗng để hiển thị "Không có booking nào"
-  const bookings = [
-    {
-      id: 1,
-      nameTour: 'Khám phá phố cổ Hội An',
-      image: images.banner1,
-      date: new Date(2025, 9, 10),
-      quantity: { adult: 2, children: 1, total: 3 },
-      total: 1800000,
-      status: 'Đã xác nhận',
-    },
-    {
-      id: 2,
-      nameTour: 'Trải nghiệm Bà Nà Hills',
-      image: images.banner2,
-      date: new Date(2025, 9, 20),
-      quantity: { adult: 1, children: 0, total: 1 },
-      total: 1200000,
-      status: 'Đang xử lý',
-    },
-    {
-      id: 3,
-      nameTour: 'Tour khám phá Đà Lạt',
-      image: images.banner3,
-      date: new Date(2025, 8, 15),
-      quantity: { adult: 2, children: 2, total: 4 },
-      total: 3500000,
-      status: 'Đã hủy',
-    },
-    {
-      id: 4,
-      nameTour: 'Tour khám phá Đà Lạt',
-      image: images.banner3,
-      date: new Date(2025, 8, 15),
-      quantity: { adult: 2, children: 2, total: 4 },
-      total: 3500000,
-      status: 'Hoàn thành',
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [errorType, setErrorType] = useState<
+    'NOT_LOGGED_IN' | 'FETCH_FAILED' | null
+  >(null);
 
-  const filters = [
-    'Tất cả',
-    'Đã xác nhận',
-    'Đang xử lý',
-    'Đã hủy',
-    'Hoàn thành',
-  ];
+  useEffect(() => {
+    loadBooking();
+  }, []);
+  const loadBooking = async () => {
+    setLoading(true);
+    const res = await getMyBooking();
+    if (!res.bookingResponse && res.errorType) {
+      setErrorType(res.errorType);
+      setErrorMsg(res.message);
+    } else {
+      setBooking(res.bookingResponse.data);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    loadBooking();
+  }, []);
+  if (loading) {
+    return <LoadingView message="Đang tải dữ liệu ..." />;
+  }
+  if (errorType === 'FETCH_FAILED') {
+    return (
+      <ErrorView
+        message={errorMsg}
+        onPress={loadBooking}
+        textButton="Reload page"
+      />
+    );
+  }
+  if (errorType === 'NOT_LOGGED_IN') {
+    return (
+      <ErrorView message={errorMsg} onPress={handleLogin} textButton="Login" />
+    );
+  }
+  const filters = ['All', 'Pending', 'Confirmed', 'Cancelled', 'Completed'];
   const filteredBookings =
-    filter === 'Tất cả' ? bookings : bookings.filter(b => b.status === filter);
+    filter === 'All' ? bookings : bookings.filter(b => b.status === filter);
 
   return (
     <View style={styles.container}>
@@ -130,22 +103,10 @@ const BookingListScreen = () => {
               key={b.id}
               activeOpacity={0.85}
               onPress={() =>
-                navigation.navigate('bookingDetail', {
-                  booking: {
-                    ...b,
-                    date: b.date.toISOString(),
-                  },
-                })
+                navigation.navigate('bookingDetail', { bookingId: b.id })
               }
             >
-              <BookingCard
-                nameTour={b.nameTour}
-                image={b.image}
-                date={b.date}
-                quantity={b.quantity}
-                total={b.total}
-                status={b.status}
-              />
+              <BookingCard {...b} />
             </TouchableOpacity>
           ))
         ) : (

@@ -1,51 +1,76 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Quantity } from '../Home/quantity';
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Booking } from '../../types/booking';
 
-interface BookingCardProps {
-  nameTour: string;
-  image: any;
-  date: Date;
-  quantity: Quantity;
-  total: number;
-  status: string;
-}
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('vi-VN');
+};
 
-const BookingCard = (props: BookingCardProps) => {
-  const { nameTour, image, date, quantity, total, status } = props;
-  const getStatusColor = () => {
-    switch (status.toLowerCase()) {
-      case 'đã xác nhận':
-        return '#4CAF50';
-      case 'đang xử lý':
-        return '#FFA000';
-      case 'đã hủy':
-        return '#F44336';
-      case 'hoàn thành':
-        return '#00BCD4';
-      default:
-        return '#757575';
-    }
+const formatTime = (time: string) => time.slice(0, 5);
+
+const BookingCard: React.FC<Booking> = props => {
+  const {
+    experienceTitle,
+    imageUrl,
+    bookingCode,
+    date,
+    startTime,
+    endTime,
+    adults,
+    children,
+    totalPrice,
+    status,
+  } = props;
+
+  const statusColor = {
+    Pending: '#FFA000',
+    Confirmed: '#4CAF50',
+    Cancelled: '#F44336',
+    Completed: '#2196F3',
   };
+
+  const color = statusColor[status] || '#757575';
 
   return (
     <View style={styles.card}>
-      <Image source={image} style={styles.image} resizeMode="cover" />
+      <Image
+        source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl}
+        style={styles.image}
+        resizeMode="cover"
+      />
 
       <View style={styles.content}>
-        <Text style={styles.tourName}>{nameTour}</Text>
-        <Text style={styles.date}> {date.toLocaleDateString('vi-VN')}</Text>
+        {/* Tên tour + mã đặt */}
+        <Text style={styles.tourName}>{experienceTitle}</Text>
+        <Text style={styles.bookingCode}>Mã đặt: #{bookingCode}</Text>
 
-        <View style={styles.quantityContainer}>
-          <Text style={styles.quantityText}> Người lớn: {quantity.adult}</Text>
-          <Text style={styles.quantityText}> Trẻ em: {quantity.children}</Text>
-          <Text style={styles.quantityText}> Tổng cộng: {quantity.total}</Text>
+        {/* Ngày giờ */}
+        <View style={styles.row}>
+          <Icon name="event" size={18} color="#666" />
+          <Text style={styles.date}>
+            {formatDate(date)} • {formatTime(startTime)} - {formatTime(endTime)}
+          </Text>
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.price}> {total.toLocaleString('vi-VN')}₫</Text>
-          <Text style={[styles.status, { color: getStatusColor() }]}>
-            {status}
+        {/* Số lượng */}
+        <View style={styles.row}>
+          <Icon name="group" size={18} color="#666" />
+          <Text style={styles.date}>
+            {adults} người lớn • {children} trẻ em
           </Text>
+        </View>
+
+        {/* Giá & trạng thái dưới cùng */}
+        <View style={styles.footer}>
+          <Text style={styles.price}>
+            {totalPrice.toLocaleString('vi-VN')}₫
+          </Text>
+
+          <View style={[styles.statusBadge, { backgroundColor: color + '22' }]}>
+            <Text style={[styles.statusText, { color }]}>{status}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -58,51 +83,57 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    marginVertical: 10,
+    marginVertical: 12,
     marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
+    overflow: 'hidden',
+    elevation: 5,
   },
   image: {
     width: '100%',
-    height: 180,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    height: 170,
   },
   content: {
-    padding: 12,
+    padding: 14,
   },
   tourName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111',
+  },
+  bookingCode: {
+    fontSize: 13,
+    color: '#777',
+    marginTop: 2,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 6,
   },
   date: {
-    color: '#666',
-    marginBottom: 8,
-  },
-  quantityContainer: {
-    marginBottom: 10,
-  },
-  quantityText: {
+    fontSize: 14,
     color: '#444',
-    marginVertical: 1,
   },
   footer: {
+    marginTop: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#e63946',
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#E63946',
   },
-  status: {
-    fontWeight: 'bold',
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  statusText: {
+    textTransform: 'capitalize',
+    fontWeight: '700',
+    fontSize: 12,
   },
 });

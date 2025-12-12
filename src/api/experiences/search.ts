@@ -6,14 +6,24 @@ export async function search(
   keyword: string,
   page: number = 1,
   pageSize: number = 10,
+  categoryIds: string[] = [],
 ): Promise<{
   experiences: TourCardProps[];
   totalCount?: number;
   message: string | null;
 }> {
-  console.log(keyword);
   try {
-    const fullUrl = `${url}/api/experiences?searchTerm=${keyword}&minDuration=&maxDuration=&pageNumber=${page}&pageSize=${pageSize}`;
+    let fullUrl = '';
+    if (categoryIds.length > 0) {
+      const categoryQuery = categoryIds
+        .map(id => `&CategoryIds=${id}`)
+        .join('');
+      fullUrl =
+        `${url}/api/experiences?searchTerm=${keyword}&minDuration=&maxDuration=&pageNumber=${page}&pageSize=${pageSize}` +
+        categoryQuery;
+    } else {
+      fullUrl = `${url}/api/experiences?searchTerm=${keyword}&minDuration=&maxDuration=&pageNumber=${page}&pageSize=${pageSize}`;
+    }
     const res = await fetchWithTimeout(
       fullUrl,
       {

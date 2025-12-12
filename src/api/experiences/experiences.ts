@@ -1,4 +1,5 @@
 import {
+  Category,
   Experience,
   ExperiencesResponse,
   Slot,
@@ -27,10 +28,34 @@ export function formatDuration(minutes: number): string {
     const roundedM = Math.round(m / 15) * 15;
     if (roundedM === 0) return `${h}h`;
     if (roundedM === 60) return `${h + 1}h`;
-    return `${h}h${roundedM}'`;
+    return `${h} hours${roundedM}'`;
   }
 }
 
+export async function getCategories(): Promise<Category[] | null> {
+  try {
+    const fullUrl = `${url}/api/categories`;
+    const res = await fetchWithTimeout(
+      fullUrl,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      7000,
+    );
+    if (!res.ok) {
+      console.log('Có lỗi xảy ra:' + res.status);
+      return null;
+    }
+    const categories: Category[] = await res.json();
+    return categories;
+  } catch (error) {
+    console.log('Network Error: ' + error);
+    return null;
+  }
+}
 export async function getExperiences(
   page: number = 1,
   pageSize: number = 10,

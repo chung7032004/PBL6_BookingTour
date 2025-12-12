@@ -1,7 +1,12 @@
-import { useNavigation } from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 import { Image, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { TourCardProps } from '../../types/experience';
+import { RootStackParamList } from '../../types/route';
 
 const SearchCard = (props: TourCardProps) => {
   const {
@@ -18,12 +23,34 @@ const SearchCard = (props: TourCardProps) => {
     totalReviews,
     media,
   } = props;
-  const navigation = useNavigation<any>();
+  console.log(id);
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const imageUrl = media?.[0]?.url || 'https://placehold.co/600x400';
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('tourDetail', { id })}
+      onPress={() =>
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'homeTab',
+                state: {
+                  routes: [
+                    { name: 'home' },
+                    {
+                      name: 'tourDetail',
+                      params: { id: id },
+                    },
+                  ],
+                  index: 1,
+                },
+              },
+            ],
+          }),
+        )
+      }
     >
       <Image source={{ uri: imageUrl }} style={styles.thumbnail} />
 

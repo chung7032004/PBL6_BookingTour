@@ -92,7 +92,7 @@ const WishListModal = (props: WishListProps) => {
                 <TouchableOpacity
                   onPress={() => handleSave(item.id)}
                   key={item.id}
-                  style={{ width: CARD_WIDTH, paddingHorizontal: 5 }}
+                  style={{ width: CARD_WIDTH, marginRight: 10 }}
                 >
                   <WishListCard
                     title={item.name}

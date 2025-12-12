@@ -1,4 +1,3 @@
-import { Quantity } from '../src/Home/quantity';
 import { Slot } from './experience';
 import { HostDetail, userProfile } from './host';
 
@@ -23,7 +22,7 @@ export type RootStackParamList = {
     adultPrice: number;
     childPrice: number;
     quantity: {
-      adult: number;
+      àdult: number;
       children: number;
       total: number;
     };
@@ -48,15 +47,7 @@ export type RootStackParamList = {
   booking: undefined;
   bookingList: { refresh: Boolean };
   bookingDetail: {
-    booking: {
-      id: number;
-      nameTour: string;
-      image: any;
-      date: string;
-      quantity: Quantity;
-      total: number;
-      status: string;
-    };
+    bookingId: string;
   };
   reviewScreen: { bookingId: string };
 
@@ -79,7 +70,7 @@ export type RootStackParamList = {
   };
   comment: undefined;
 
-  search: undefined;
+  search: { categoryId?: string };
   searchTab: undefined;
 
   wishListTab: undefined;

@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  BookingDetail,
+  BookingResponse,
   CreateBookingRequest,
   CreateBookingResponse,
 } from '../../../types/booking';
@@ -50,15 +52,26 @@ export async function createBooking(
 export async function cancelBooking(
   reason: string,
   bookingId: string,
-): Promise<boolean> {
+): Promise<{
+  status: boolean;
+  message: string;
+  errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
+}> {
   const endpoint = `/api/bookings/${bookingId}/cancel`;
   try {
     const res = await apiFetch.post(endpoint, {
       reason,
       isCancelledByHost: false,
     });
+    if (res.status === 401) {
+      return {
+        status: false,
+        message: 'You are not logged in or your session has expired.',
+        errorType: 'NOT_LOGGED_IN',
+      };
+    }
     if (!res.ok) {
-      let message = 'Hủy booking thất bại';
+      let message = 'Failed to cancel booking';
       try {
         const text = await res.text();
         if (text) {
@@ -68,33 +81,66 @@ export async function cancelBooking(
       } catch {
         // ignore parse error
       }
-      throw new Error(`${message} (${res.status})`);
+      return {
+        status: false,
+        message: `${message}(${res.status})`,
+        errorType: 'FETCH_FAILED',
+      };
     }
     const text = await res.text();
-    if (!text) return false;
+    if (!text) {
+      return {
+        status: false,
+        message: 'The response data is empty.',
+        errorType: 'FETCH_FAILED',
+      };
+    }
     const response = JSON.parse(text); // chưa dùng đến
-    return true;
+    return {
+      status: response,
+      message: 'Cancel booking is successfully.',
+    };
   } catch (error: any) {
     if (
       error.name === 'TypeError' ||
       error.message.includes('fetch') ||
       error.message === 'REQUEST_TIMEOUT'
     ) {
-      throw new Error('Không có kết nối mạng');
+      return {
+        status: false,
+        message: 'No network connection. Please check your connection.',
+        errorType: 'FETCH_FAILED',
+      };
     }
-    throw error;
+    return {
+      status: false,
+      message: 'An unknown error occurred. Please try again.',
+      errorType: 'FETCH_FAILED',
+    };
   }
 }
 
-export async function getMyBooking(userId: string): Promise<any[] | null> {
-  const endpoint = `/api/bookings/user/${userId}`;
+export async function getMyBooking(): Promise<{
+  bookingResponse: BookingResponse;
+  message: string;
+  errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
+}> {
+  const endpoint = `/api/bookings`;
+  const responseFailed = {
+    data: [],
+    success: false,
+  };
   try {
     const res = await apiFetch.get(endpoint);
     if (res.status === 401) {
-      return null;
+      return {
+        bookingResponse: responseFailed,
+        message: 'You are not logged in or your session has expired.',
+        errorType: 'NOT_LOGGED_IN',
+      };
     }
     if (!res.ok) {
-      let message = 'Lấy danh sách booking thất bại';
+      let message = 'Failed to fetch booking information';
       try {
         const text = await res.text();
         if (text) {
@@ -104,33 +150,65 @@ export async function getMyBooking(userId: string): Promise<any[] | null> {
       } catch {
         // ignore parse error
       }
-      throw new Error(`${message} (${res.status})`);
+      return {
+        bookingResponse: responseFailed,
+        message: `${message}(${res.status}).`,
+        errorType: 'FETCH_FAILED',
+      };
     }
     const text = await res.text();
-    if (!text) return null;
+    if (!text)
+      return {
+        bookingResponse: responseFailed,
+        message: 'The response data is empty.',
+        errorType: 'FETCH_FAILED',
+      };
     const bookings = JSON.parse(text);
-    return bookings;
+    console.log(bookings);
+    return {
+      bookingResponse: {
+        data: bookings.data,
+        success: true,
+      },
+      message: "Booking information successfully retrieved',",
+    };
   } catch (error: any) {
     if (
       error.name === 'TypeError' ||
       error.message.includes('fetch') ||
       error.message === 'REQUEST_TIMEOUT'
     ) {
-      throw new Error('Không có kết nối mạng');
+      return {
+        bookingResponse: responseFailed,
+        message: 'No network connection. Please check your connection.',
+        errorType: 'FETCH_FAILED',
+      };
     }
-    throw error;
+    return {
+      bookingResponse: responseFailed,
+      message: error.message || 'An unknown error occurred. Please try again',
+      errorType: 'FETCH_FAILED',
+    };
   }
 }
 
-export async function getBookingById(booking: string): Promise<any | null> {
-  const endpoint = `/api/bookings/${booking}`;
+export async function getBookingById(bookingId: string): Promise<{
+  bookingDetail: BookingDetail | null;
+  message: string;
+  errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
+}> {
+  const endpoint = `/api/bookings/${bookingId}`;
   try {
     const res = await apiFetch.get(endpoint);
     if (res.status === 401) {
-      return null;
+      return {
+        bookingDetail: null,
+        message: 'You are not logged in or your session has expired ',
+        errorType: 'NOT_LOGGED_IN',
+      };
     }
     if (!res.ok) {
-      let message = 'Lấy thông tin booking thất bại';
+      let message = 'Failed to fetch booking detail';
       try {
         const text = await res.text();
         if (text) {
@@ -140,20 +218,42 @@ export async function getBookingById(booking: string): Promise<any | null> {
       } catch {
         // ignore parse error
       }
-      throw new Error(`${message} (${res.status})`);
+      return {
+        bookingDetail: null,
+        message: `${message}(${res.status})`,
+        errorType: 'FETCH_FAILED',
+      };
     }
     const text = await res.text();
-    if (!text) return null;
+    if (!text) {
+      return {
+        bookingDetail: null,
+        message: 'The response data is empty  ',
+        errorType: 'FETCH_FAILED',
+      };
+    }
     const bookingData = JSON.parse(text);
-    return bookingData;
+    console.log(bookingData);
+    return {
+      bookingDetail: bookingData,
+      message: 'Booking detail successfully retrieved',
+    };
   } catch (error: any) {
     if (
       error.name === 'TypeError' ||
       error.message.includes('fetch') ||
       error.message === 'REQUEST_TIMEOUT'
     ) {
-      throw new Error('Không có kết nối mạng');
+      return {
+        bookingDetail: null,
+        message: 'No network connection. Please check your connection',
+        errorType: 'FETCH_FAILED',
+      };
     }
-    throw error;
+    return {
+      bookingDetail: null,
+      message: error.message || 'An unknown error occurred. Please try again ',
+      errorType: 'FETCH_FAILED',
+    };
   }
 }

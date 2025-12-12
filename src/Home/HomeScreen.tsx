@@ -7,23 +7,33 @@ import {
   ActivityIndicator,
   FlatList,
   Button,
+  Touchable,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import TourCard from './TourCard';
-import { TourCardProps } from '../../types/experience';
-import { getExperiences } from '../api/experiences/experiences';
+import { Category, TourCardProps } from '../../types/experience';
+import { getCategories, getExperiences } from '../api/experiences/experiences';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { getMyWishLists } from '../api/experiences/wishlist';
 import { MyWishListResponse } from '../../types/wishlist';
 import WishListCard from '../WishList/WishListCard';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import images from '../../images';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { categoryIcons } from '../constants/categoryIcons';
 
 const { width } = Dimensions.get('window');
 
 const HomeScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const [category, setCategory] = useState<Category[] | null>(null);
   const [suggest, setSuggest] = useState<TourCardProps[]>([]);
   const [pageSuggest, setPageSuggest] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -31,10 +41,17 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [wishLists, setWishLists] = useState<MyWishListResponse[]>([]);
+
   useEffect(() => {
+    loadCategories();
     loadSuggest();
     loadWishLists();
   }, []);
+  const loadCategories = async () => {
+    const res = await getCategories();
+    if (!res) return;
+    setCategory(res);
+  };
   const loadWishLists = async () => {
     const res = await getMyWishLists();
     if (res?.message) {
@@ -42,6 +59,7 @@ const HomeScreen = () => {
     }
     setWishLists(res?.myWishList ? res.myWishList : []);
   };
+
   const loadSuggest = async () => {
     try {
       setLoading(true);
@@ -88,26 +106,6 @@ const HomeScreen = () => {
             loadSuggest();
           }}
         />
-        <Button
-          title="thanh toan"
-          onPress={() => {
-            navigation.navigate('paymentScreen', {
-              experienceId: '64b8f3f9677f4b001c3e4f5a',
-              tourName: 'chung',
-              image: images.banner1,
-              slot: {
-                date: '2023-10-01',
-                startTime: '10:00',
-                endTime: '12:00',
-                spotsAvailable: 5,
-              },
-              adultPrice: 100,
-              childPrice: 500,
-              quantity: { adult: 2, children: 3, total: 5 },
-              total: 1700,
-            });
-          }}
-        />
       </>
     );
   }
@@ -126,6 +124,53 @@ const HomeScreen = () => {
             {suggest.map(tour => (
               <TourCard key={tour.id} {...tour} />
             ))}
+          </ScrollView>
+          {/* === DANH MỤC  === */}
+          <Text style={styles.sectionTitle}>Danh mục</Text>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContainer}
+          >
+            {category?.map(item => {
+              const iconName = categoryIcons[item.name] || 'explore';
+
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  activeOpacity={0.7}
+                  style={styles.categoryItem}
+                  onPress={() => {
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [
+                          {
+                            name: 'searchTab',
+                            state: {
+                              routes: [
+                                {
+                                  name: 'search',
+                                  params: { categoryId: item.id },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                      }),
+                    );
+                  }}
+                >
+                  <View style={styles.iconCircle}>
+                    <Icon name={iconName} size={36} color="#2563eb" />
+                  </View>
+                  <Text style={styles.categoryText} numberOfLines={2}>
+                    {item.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
 
           {/*  Đánh giá cao */}
@@ -153,21 +198,45 @@ const HomeScreen = () => {
             keyExtractor={item => item.id}
             onEndReached={loadMoreSuggest}
             onEndReachedThreshold={0.2}
+            contentContainerStyle={styles.cardRow}
           />
           {loadingMore && <ActivityIndicator style={{ marginLeft: 10 }} />}
-          <Text style={styles.sectionTitle}>Danh sách yêu thích</Text>
+          {wishLists && wishLists.length > 0 && (
+            <Text style={styles.sectionTitle}>Danh sách yêu thích</Text>
+          )}
           <FlatList
             data={wishLists}
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <WishListCard
-                title={item.name}
-                saved={item.experienceCount}
-                onPress={() =>
-                  navigation.navigate('wishListDetail', { wishListId: item.id })
-                }
-              />
+              <TouchableOpacity style={styles.wishListCard}>
+                <WishListCard
+                  title={item.name}
+                  saved={item.experienceCount}
+                  onPress={() => {
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [
+                          {
+                            name: 'wishListTab',
+                            state: {
+                              routes: [
+                                { name: 'wishList' },
+                                {
+                                  name: 'wishListDetail',
+                                  params: { wishListId: item.id },
+                                },
+                              ],
+                              index: 1,
+                            },
+                          },
+                        ],
+                      }),
+                    );
+                  }}
+                />
+              </TouchableOpacity>
             )}
             keyExtractor={item => item.id}
           />
@@ -179,7 +248,6 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -187,47 +255,56 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   scrollContent: {
-    paddingBottom: 80,
+    paddingBottom: 10,
     paddingHorizontal: 10,
   },
+
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
-    color: '#000',
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 24,
+    marginBottom: 12,
+    marginLeft: 10,
+    color: '#1a1a1a',
   },
-  bannerContainer: {
-    paddingRight: 10,
-    paddingBottom: 10,
-  },
-  banner: {
-    width: width * 0.8,
-    height: 150,
-    borderRadius: 15,
-    marginRight: 10,
-  },
+
   categoriesContainer: {
-    paddingRight: 10,
-    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingVertical: 12,
   },
-  category: {
+
+  categoryItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 15,
+    width: 70,
+    marginRight: 18,
   },
-  categoryIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: 5,
-    borderRadius: 30,
+
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#ebf4ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 4,
   },
-  categoryName: {
-    fontSize: 13,
-    color: '#333',
+
+  categoryText: {
+    fontSize: 13.5,
+    color: '#1f2937',
+    textAlign: 'center',
+    lineHeight: 18,
+    fontWeight: '500',
   },
   cardRow: {
     paddingRight: 10,
     paddingBottom: 15,
   },
+  wishListCard: { marginRight: 10 },
 });

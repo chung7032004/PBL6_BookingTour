@@ -34,7 +34,6 @@ import { CreateBookingRequest } from '../../types/booking';
 import { createBooking } from '../api/experiences/booking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingOverlay from '../components/LoadingOverlay';
-import images from '../../images';
 
 const COLORS = {
   background: '#F8FAFC',

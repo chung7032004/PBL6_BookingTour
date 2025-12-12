@@ -42,7 +42,9 @@ const WishListCard = (props: WishListCardProps) => {
 
       {/* Nội dung */}
       <View style={styles.infoContainer}>
-        <Text style={styles.title}>{title}</Text>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
+          {title}
+        </Text>
         <Text style={styles.saved}>{saved} đã lưu</Text>
       </View>
     </TouchableOpacity>
@@ -54,7 +56,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     marginBottom: 16,
-    width: '100%',
+    width: 150,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -63,7 +65,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    aspectRatio: 1,
+    height: 140,
     overflow: 'hidden',
   },
   gridContainer: {
