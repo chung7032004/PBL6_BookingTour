@@ -6,6 +6,9 @@ import ReviewScreen from '../Booking/ReviewScreen';
 import TourDetailScreen from '../Home/TourDetailScreen';
 import HeaderNotificationIcon from '../components/HeaderNotificationIcon';
 import { useState } from 'react';
+import ReviewSuccessScreen from '../Booking/ReviewSuccessScreen';
+import CancelBookingScreen from '../Booking/CancelBoookingScreen';
+import CancelBookingSuccessScreen from '../Booking/CancelBookingSuccess';
 
 const BookingStack = () => {
   const [count, setCount] = useState(10);
@@ -13,7 +16,7 @@ const BookingStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="bookingListScreen"
+        name="bookingList"
         component={BookingListScreen}
         options={{
           // headerRight: () => <HeaderNotificationIcon count={count} />,
@@ -42,6 +45,25 @@ const BookingStack = () => {
         options={{
           // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,
+        }}
+      />
+      <Stack.Screen
+        name="reviewSuccess"
+        component={ReviewSuccessScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="cancelBooking"
+        component={CancelBookingScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="cancelBookingSuccess"
+        component={CancelBookingSuccessScreen}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

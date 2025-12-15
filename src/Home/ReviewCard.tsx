@@ -1,22 +1,31 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import images from '../../images';
+import {
+  formatDate,
+  formatENDate,
+  formatENTime,
+} from '../components/FormatDate';
 
 interface ReviewCardProps {
-  name: string;
-  avatar: any;
+  id: string;
+  userId: string;
+  experienceId: string;
+  fullName: string;
+  userAvatar: any;
   rating: number;
-  time: string;
-  content: string;
+  createdAt: string;
+  description: string;
   width?: number;
 }
 
 const ReviewCard = ({
-  name,
-  avatar,
+  fullName,
+  userAvatar,
   rating,
-  time,
-  content,
+  createdAt,
+  description,
   width = 260,
 }: ReviewCardProps) => {
   const stars = Array.from({ length: rating }, (_, i) => i);
@@ -25,10 +34,15 @@ const ReviewCard = ({
     <View style={[styles.card, { width }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Image source={avatar} style={styles.avatar} />
+        <Image
+          source={userAvatar ? { uri: userAvatar } : images.account}
+          style={styles.avatar}
+        />
         <View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.time}>{time}</Text>
+          <Text style={styles.name}>{fullName}</Text>
+          <Text style={styles.time}>
+            {formatDate(createdAt)} - {formatENTime(createdAt)}
+          </Text>
         </View>
       </View>
 
@@ -46,7 +60,7 @@ const ReviewCard = ({
       </View>
 
       {/* Content */}
-      <Text style={styles.content}>{content}</Text>
+      <Text style={styles.content}>{description}</Text>
     </View>
   );
 };

@@ -6,7 +6,6 @@ import SignUpScreen from '../Auth/SignUpScreen';
 import ForgotPasswordScreen from '../Auth/ForgotPasswordScreen';
 import { createNavigationContainerRef } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
-import VerifyCodeScreen from '../Auth/VerifyCodeScreen';
 import ResetPasswordScreen from '../Auth/ResetPasswordScreen';
 import NoticeScreen from '../Home/NoticeScreen';
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
@@ -29,11 +28,6 @@ const RootNavigator = () => (
     <Root.Screen
       name="forgotPassword"
       component={ForgotPasswordScreen}
-      options={{ headerShown: false }}
-    />
-    <Root.Screen
-      name="verifyCode"
-      component={VerifyCodeScreen}
       options={{ headerShown: false }}
     />
     <Root.Screen

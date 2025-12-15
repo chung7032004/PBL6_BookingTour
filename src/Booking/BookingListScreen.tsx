@@ -94,7 +94,6 @@ const BookingListScreen = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
       {/* Danh sách booking */}
       <ScrollView showsVerticalScrollIndicator={false}>
         {filteredBookings.length > 0 ? (

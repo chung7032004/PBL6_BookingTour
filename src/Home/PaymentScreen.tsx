@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../components/CustomButton';
-import { formatVNDate, formatVNTimeRange } from '../components/FormatDate';
 import EditGuests from './modals/EditGuests.modal';
 import { Quantity } from './quantity';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -34,6 +33,10 @@ import { CreateBookingRequest } from '../../types/booking';
 import { createBooking } from '../api/experiences/booking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingOverlay from '../components/LoadingOverlay';
+import {
+  formatENDate,
+  formatTimeWithoutSeconds,
+} from '../components/FormatDate';
 
 const COLORS = {
   background: '#F8FAFC',
@@ -79,7 +82,7 @@ const PaymentScreen = () => {
     total,
   } = route.params;
   const tabBarHeight = useBottomTabBarHeight();
-  const [phone, setPhone] = useState<string>(''); // giá trị mặc định
+  const [phone, setPhone] = useState<string>(''); // default value
   const [showEditPhoneModal, setShowEditPhoneModal] = useState(false);
   const [showEditGuests, setShowEditGuests] = useState(false);
   const [quantityGuest, setQuantityGuest] = useState<Quantity>(quantity);
@@ -104,15 +107,15 @@ const PaymentScreen = () => {
 
   const handlePayment = async () => {
     if (firstName === '' || lastName === '') {
-      setShowNotif('Vui lòng nhập đầy đủ họ và tên');
+      setShowNotif('Please enter your full name');
       return;
     }
     if (phone === '') {
-      setShowNotif('Vui lòng nhập số điện thoại để tiếp tục');
+      setShowNotif('Please enter your phone number to continue');
       return;
     }
     setLoading(true);
-    // Xử lý thanh toán ở đây
+    // Handle payment here
     try {
       const payload: CreateBookingRequest = {
         experienceId,
@@ -128,11 +131,11 @@ const PaymentScreen = () => {
         notes: note.trim() || undefined,
       };
       const booking = await createBooking(payload);
-      // Lưu tạm để dùng khi MoMo trả về
+      // Save temporarily for use when MoMo returns
       if (!booking) {
-        throw new Error('Đặt chỗ thất bại, vui lòng thử lại');
+        throw new Error('Booking failed, please try again');
       }
-      // LƯU TOÀN BỘ DỮ LIỆU ĐẶT CHỖ ĐỂ DÙNG KHI QUAY LẠI
+      // SAVE ALL BOOKING DATA FOR USE WHEN RETURNING
       await AsyncStorage.setItem(
         'pending_payment_data',
         JSON.stringify({
@@ -150,21 +153,22 @@ const PaymentScreen = () => {
           note,
         }),
       );
-      // MỞ MOMO
+      // OPEN MOMO
       navigation.navigate('paymentProcessingScreen', {
         paymentUrl: booking.paymentUrl,
       });
     } catch (error: any) {
       console.log('Payment error:', error);
       setShowNotif(
-        error.message.includes('mạng')
-          ? 'Không có kết nối mạng'
-          : error.message || 'Đặt chỗ thất bại, vui lòng thử lại',
+        error.message.includes('network')
+          ? 'No network connection'
+          : error.message || 'Booking failed, please try again',
       );
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadDataCheckout();
   }, []);
@@ -174,25 +178,27 @@ const PaymentScreen = () => {
     setQuantityGuest(quantity);
     setPhone(myProfile && myProfile.phoneNumber ? myProfile.phoneNumber : '');
   }, [myProfile]);
+
   const loadDataCheckout = async () => {
-    // Load thông tin cần thiết cho checkout nếu có
+    // Load necessary checkout information if available
     try {
       const myProfile = await getMyProfile();
       if (!myProfile) {
-        setErrorLogin('Vui lòng đăng nhập để xem thông tin');
+        setErrorLogin('Please log in to view information');
       }
       setMyProfile(myProfile);
     } catch (error: any) {
-      setErrorProfile('Không tải được thông tin cá nhân');
+      setErrorProfile('Unable to load personal information');
       return;
     }
   };
+
   if (errorProfile)
     return (
       <ErrorView
         message={errorProfile}
         onPress={loadDataCheckout}
-        textButton="Tải lại trang"
+        textButton="Reload page"
       />
     );
 
@@ -202,14 +208,16 @@ const PaymentScreen = () => {
       params: { screen: 'payment' },
     });
   };
+
   if (errorLogin)
     return (
       <ErrorView
         message={errorLogin}
         onPress={handleLogin}
-        textButton="Đăng nhập"
+        textButton="Log in"
       />
     );
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <ScrollView
@@ -231,7 +239,7 @@ const PaymentScreen = () => {
               <View style={styles.ratingRow}>
                 <MaterialIcons name="star" size={16} color={COLORS.warning} />
                 <Text style={[styles.ratingText, TYPOGRAPHY.caption]}>
-                  5.0 (2.398 đánh giá)
+                  5.0 (2,398 reviews)
                 </Text>
               </View>
             </View>
@@ -241,22 +249,22 @@ const PaymentScreen = () => {
         {/* CONTACT INFO SECTION */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, TYPOGRAPHY.subtitle1]}>
-            Thông tin liên hệ
+            Contact Information
           </Text>
 
           <View style={styles.row}>
             <View style={{ flex: 1, marginRight: SPACING.sm }}>
-              <Text style={[styles.label, TYPOGRAPHY.caption]}>Họ</Text>
+              <Text style={[styles.label, TYPOGRAPHY.caption]}>Last Name</Text>
               <CustomTextInput
-                title="Nhập họ"
+                title="Enter last name"
                 value={firstName}
                 onChangeText={setFirstName}
               />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.label, TYPOGRAPHY.caption]}>Tên</Text>
+              <Text style={[styles.label, TYPOGRAPHY.caption]}>First Name</Text>
               <CustomTextInput
-                title="Nhập tên"
+                title="Enter first name"
                 value={lastName}
                 onChangeText={setLastName}
               />
@@ -268,7 +276,7 @@ const PaymentScreen = () => {
           <View>
             <Text style={[styles.label, TYPOGRAPHY.caption]}>Email</Text>
             <Text style={[styles.value, TYPOGRAPHY.body]}>
-              {myProfile ? myProfile.email : '(Khách)'}
+              {myProfile ? myProfile.email : '(Guest)'}
             </Text>
           </View>
 
@@ -277,7 +285,7 @@ const PaymentScreen = () => {
           <View style={styles.rowBetween}>
             <View style={{ flex: 1 }}>
               <Text style={[styles.label, TYPOGRAPHY.caption]}>
-                Số điện thoại
+                Phone Number
               </Text>
               <Text
                 style={[
@@ -286,7 +294,7 @@ const PaymentScreen = () => {
                   { color: phone ? COLORS.text.primary : COLORS.text.tertiary },
                 ]}
               >
-                {phone || 'Chưa có số điện thoại'}
+                {phone || 'No phone number yet'}
               </Text>
             </View>
             <TouchableOpacity
@@ -299,7 +307,7 @@ const PaymentScreen = () => {
                 color={COLORS.accent}
               />
               <Text style={[styles.actionButtonText, TYPOGRAPHY.caption]}>
-                {phone ? 'Sửa' : 'Thêm'}
+                {phone ? 'Edit' : 'Add'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -308,18 +316,21 @@ const PaymentScreen = () => {
         {/* BOOKING DETAILS SECTION */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, TYPOGRAPHY.subtitle1]}>
-            Chi tiết đặt chỗ
+            Booking Details
           </Text>
 
           <View style={styles.detailRow}>
             <MaterialIcons name="event" size={20} color={COLORS.accent} />
             <View style={{ marginLeft: SPACING.md, flex: 1 }}>
-              <Text style={[styles.label, TYPOGRAPHY.caption]}>Ngày & Giờ</Text>
+              <Text style={[styles.label, TYPOGRAPHY.caption]}>
+                Date & Time
+              </Text>
               <Text style={[styles.value, TYPOGRAPHY.body]}>
-                {formatVNDate(slot.date)}
+                {formatENDate(slot.date)}
               </Text>
               <Text style={[styles.subValue, TYPOGRAPHY.caption]}>
-                {slot.startTime} - {slot.endTime}
+                {formatTimeWithoutSeconds(slot.startTime)} -{' '}
+                {formatTimeWithoutSeconds(slot.endTime)}
               </Text>
             </View>
           </View>
@@ -331,11 +342,11 @@ const PaymentScreen = () => {
               <View style={styles.detailRow}>
                 <MaterialIcons name="people" size={20} color={COLORS.accent} />
                 <View style={{ marginLeft: SPACING.md }}>
-                  <Text style={[styles.label, TYPOGRAPHY.caption]}>Khách</Text>
+                  <Text style={[styles.label, TYPOGRAPHY.caption]}>Guests</Text>
                   <Text style={[styles.value, TYPOGRAPHY.body]}>
-                    {quantityGuest.adult} người lớn
+                    {quantityGuest.adult} adults
                     {quantityGuest.children
-                      ? `, ${quantityGuest.children} trẻ`
+                      ? `, ${quantityGuest.children} children`
                       : ''}
                   </Text>
                 </View>
@@ -347,7 +358,7 @@ const PaymentScreen = () => {
             >
               <MaterialIcons name="edit" size={18} color={COLORS.accent} />
               <Text style={[styles.actionButtonText, TYPOGRAPHY.caption]}>
-                Sửa
+                Edit
               </Text>
             </TouchableOpacity>
           </View>
@@ -355,10 +366,10 @@ const PaymentScreen = () => {
           <Divider />
 
           <Text style={[styles.label, TYPOGRAPHY.caption]}>
-            Ghi chú (tùy chọn)
+            Notes (optional)
           </Text>
           <CustomTextInput
-            title="Thêm ghi chú cho chuyến đi"
+            title="Add notes for your trip"
             multiline
             numberOfLines={3}
             style={styles.noteInput}
@@ -370,76 +381,68 @@ const PaymentScreen = () => {
         {/* PAYMENT METHOD SECTION */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, TYPOGRAPHY.subtitle1]}>
-            Phương thức thanh toán
+            Payment Method
           </Text>
 
           <TouchableOpacity
             style={[
               styles.paymentMethodCard,
               method === 'momo' && styles.paymentMethodCardMomo,
-              // method === 'cash' && styles.paymentMethodCardCash,
             ]}
-            // onPress={() => setModalVisible(true)}
           >
             <View style={styles.paymentMethodLeft}>
               <View
                 style={[
                   styles.paymentMethodIconBox,
                   method === 'momo' && styles.iconBoxMomo,
-                  // method === 'cash' && styles.iconBoxCash,
                 ]}
               >
-                <MaterialIcons name="smartphone" size={32} color="#d63384" />
+                <MaterialIcons name="smartphone" size={32} color="#005BAC" />
               </View>
               <View style={{ marginLeft: SPACING.lg }}>
                 <Text style={[styles.paymentMethodLabel, TYPOGRAPHY.caption]}>
-                  Phương thức
+                  Method
                 </Text>
                 <Text
                   style={[
                     styles.paymentMethodValue,
                     TYPOGRAPHY.subtitle1,
                     {
-                      color: '#d63384',
+                      color: '#005BAC',
                     },
                   ]}
                 >
-                  Ví MoMo
+                  VNPay Wallet
                 </Text>
               </View>
             </View>
-            {/* <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={COLORS.text.tertiary}
-            /> */}
           </TouchableOpacity>
         </View>
 
         {/* PRICE BREAKDOWN SECTION */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, TYPOGRAPHY.subtitle1]}>
-            Chi tiết giá
+            Price Breakdown
           </Text>
 
           <View style={styles.priceRow}>
             <Text style={[styles.priceLabel, TYPOGRAPHY.body]}>
-              {adultPrice.toLocaleString('vi-VN')}₫ × {quantityGuest.adult}{' '}
-              người lớn
+              {adultPrice.toLocaleString('en-US')}₫ × {quantityGuest.adult}{' '}
+              adult(s)
             </Text>
             <Text style={[styles.priceValue, TYPOGRAPHY.body]}>
-              {(quantityGuest.adult * adultPrice).toLocaleString('vi-VN')}₫
+              {(quantityGuest.adult * adultPrice).toLocaleString('en-US')}₫
             </Text>
           </View>
 
           {quantityGuest.children ? (
             <View style={styles.priceRow}>
               <Text style={[styles.priceLabel, TYPOGRAPHY.body]}>
-                {childPrice.toLocaleString('vi-VN')}₫ × {quantityGuest.children}{' '}
-                trẻ em
+                {childPrice.toLocaleString('en-US')}₫ × {quantityGuest.children}{' '}
+                child(ren)
               </Text>
               <Text style={[styles.priceValue, TYPOGRAPHY.body]}>
-                {(quantityGuest.children * childPrice).toLocaleString('vi-VN')}₫
+                {(quantityGuest.children * childPrice).toLocaleString('en-US')}₫
               </Text>
             </View>
           ) : null}
@@ -449,10 +452,10 @@ const PaymentScreen = () => {
           {/* TOTAL AMOUNT */}
           <View style={styles.totalSection}>
             <Text style={[styles.totalLabel, TYPOGRAPHY.body]}>
-              Tổng thanh toán
+              Total Amount
             </Text>
             <Text style={[styles.totalAmount, TYPOGRAPHY.h2]}>
-              {totalPrice.toLocaleString('vi-VN')}₫
+              {totalPrice.toLocaleString('en-US')}₫
             </Text>
           </View>
         </View>
@@ -460,14 +463,14 @@ const PaymentScreen = () => {
         {/* CONFIRM BUTTON */}
         <View>
           <CustomButton
-            title="Xác nhận và thanh toán"
+            title="Confirm and Pay"
             style={styles.payButton}
             textStyle={styles.textPayButton}
             onPress={handlePayment}
           />
         </View>
       </ScrollView>
-      <LoadingOverlay visible={loading} message={'Đang xử lý...'} />
+      <LoadingOverlay visible={loading} message={'Processing...'} />
       {/* MODALS */}
       <EditGuests
         visible={showEditGuests}
@@ -482,10 +485,10 @@ const PaymentScreen = () => {
             );
           } else
             setShowNotif(
-              `Chỉ còn ${slot.spotsAvailable} chỗ trống cho ngày đã chọn`,
+              `Only ${slot.spotsAvailable} spots left for the selected date`,
             );
         }}
-        title="Chỉnh sửa số khách"
+        title="Edit Number of Guests"
       />
       <DiscountCodeModal
         visible={showDiscountCodeModal}
@@ -493,12 +496,6 @@ const PaymentScreen = () => {
         initialValue={discountCode ?? ''}
         onSave={newCode => setDiscountCode(newCode)}
       />
-      {/* <PaymentMethodModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSave={selectedMethod => setMethod(selectedMethod)}
-        initialMethod={method}
-      /> */}
       <EditPhoneModal
         visible={showEditPhoneModal}
         onClose={() => setShowEditPhoneModal(false)}
@@ -673,8 +670,8 @@ const styles = StyleSheet.create({
   },
 
   paymentMethodCardMomo: {
-    backgroundColor: '#fdf2f8',
-    borderColor: '#d63384',
+    backgroundColor: '#EEF6FF',
+    borderColor: '#005BAC',
   },
 
   paymentMethodCardCash: {
@@ -692,13 +689,13 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 12,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#C7DDF3',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   iconBoxMomo: {
-    backgroundColor: '#fce7f3',
+    backgroundColor: '#E6F1FB',
   },
 
   iconBoxCash: {

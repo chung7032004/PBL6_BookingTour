@@ -1,12 +1,14 @@
+import { ReviewResponse } from '../../../types/booking';
 import {
   Category,
   Experience,
+  ExperiencesRecommendation,
   ExperiencesResponse,
   Slot,
   TourCardProps,
 } from '../../../types/experience';
 import { HostDetail, HostInTour } from '../../../types/host';
-import { fetchWithTimeout } from '../auth/fetch';
+import { apiFetch, fetchWithTimeout } from '../auth/fetch';
 import { url } from '../url';
 import { getHostDetail, toHostInTour } from './host';
 
@@ -18,16 +20,16 @@ export function formatDuration(minutes: number): string {
 
   if (h === 0) {
     const rounded = Math.round(m / 15) * 15;
-    if (rounded === 60) return '1h';
+    if (rounded === 60) return '1 hours';
     return `${rounded}'`;
   }
 
   if (m === 0) {
-    return `${h}h`;
+    return `${h} hours`;
   } else {
     const roundedM = Math.round(m / 15) * 15;
-    if (roundedM === 0) return `${h}h`;
-    if (roundedM === 60) return `${h + 1}h`;
+    if (roundedM === 0) return `${h} hours`;
+    if (roundedM === 60) return `${h + 1} hours`;
     return `${h} hours${roundedM}'`;
   }
 }
@@ -171,5 +173,135 @@ export async function getExperienceAvailability(
   } catch (error) {
     console.log('Network Error: ' + error);
     return null;
+  }
+}
+export async function getReviews(
+  experienceId: string,
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<{
+  reviewResponse: ReviewResponse | null;
+  message: string;
+}> {
+  try {
+    const endpoint = `${url}/api/experiences/${experienceId}/reviews?pageNumber=${page}&pageSize=${pageSize}`;
+    const res = await fetchWithTimeout(
+      endpoint,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      7000,
+    );
+
+    if (!res.ok) {
+      let message = 'Failed to fetch reviews';
+      try {
+        const text = await res.text();
+        if (text) {
+          const errorJson = JSON.parse(text);
+          message = errorJson.message || errorJson.error || message;
+        }
+      } catch {
+        // ignore parse error
+      }
+      return {
+        reviewResponse: null,
+        message: `${message}(${res.status})`,
+      };
+    }
+    const text = await res.text();
+    if (!text) {
+      return {
+        reviewResponse: null,
+        message: 'The response data is empty  ',
+      };
+    }
+    const reviews = JSON.parse(text);
+    console.log(reviews);
+    return {
+      reviewResponse: reviews,
+      message: 'Get reviews successfully retrieved',
+    };
+  } catch (error: any) {
+    if (
+      error.name === 'TypeError' ||
+      error.message.includes('fetch') ||
+      error.message === 'REQUEST_TIMEOUT'
+    ) {
+      return {
+        reviewResponse: null,
+        message: 'No network connection. Please check your connection',
+      };
+    }
+    return {
+      reviewResponse: null,
+      message: error.message || 'An unknown error occurred. Please try again ',
+    };
+  }
+}
+
+export async function getRecommendations(): Promise<{
+  experience: ExperiencesRecommendation | null;
+  message: string;
+  errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
+}> {
+  try {
+    const endpoint = '/api/experiences/recommendations?topK=10';
+    const res = await apiFetch.get(endpoint);
+    console.log(res);
+    if (res.status === 401) {
+      return {
+        experience: null,
+        message: 'You are not logged in or your session has expired ',
+        errorType: 'NOT_LOGGED_IN',
+      };
+    }
+    if (!res.ok) {
+      let message = 'Failed to fetch get recommendations';
+      try {
+        const text = await res.text();
+        if (text) {
+          const errorJson = JSON.parse(text);
+          message = errorJson.message || errorJson.error || message;
+        }
+      } catch {
+        // ignore parse error
+      }
+      return {
+        experience: null,
+        message: `${message}(${res.status})`,
+      };
+    }
+    const text = await res.text();
+    if (!text) {
+      return {
+        experience: null,
+        message: 'The response data is empty  ',
+      };
+    }
+    const experiencesRecommendation = JSON.parse(text);
+    console.log(experiencesRecommendation);
+    return {
+      experience: experiencesRecommendation,
+      message: 'Get recommendations successfully retrieved',
+    };
+  } catch (error: any) {
+    if (
+      error.name === 'TypeError' ||
+      error.message.includes('fetch') ||
+      error.message === 'REQUEST_TIMEOUT'
+    ) {
+      return {
+        experience: null,
+        message: 'No network connection. Please check your connection',
+      };
+    }
+    return {
+      experience: null,
+      message: error.message || 'An unknown error occurred. Please try again ',
+    };
   }
 }

@@ -22,43 +22,46 @@ import { useAuthGuard } from '../hooks/useAuthGuard';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { RootStackParamList } from '../../types/route';
+import images from '../../images';
+import Notification from '../components/Notification';
+import { createReview } from '../api/experiences/booking';
+
 type ReviewScreenRouteProp = RouteProp<RootStackParamList, 'reviewScreen'>;
 
 const ReviewScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const route = useRoute<ReviewScreenRouteProp>();
-  const bookingId = route.params.bookingId;
+  const params = route.params;
 
-  // Dữ liệu tour mẫu (thực tế sẽ fetch từ API)
   const booking = {
-    id: bookingId,
-    nameTour: 'Khám phá phố cổ Hội An về đêm',
-    image: require('../../images/banner1.jpg'), // thay bằng ảnh thật của bạn
-    date: new Date(2025, 9, 10),
+    id: params.experienceId,
+    nameTour: params.title,
+    image: params?.image ? { uri: params.image } : images.banner1,
+    date: new Date(params.date),
   };
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [showNotification, setShowNotification] = useState<string | null>(null);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating === 0) {
-      Alert.alert('Oops!', 'Bạn chưa chọn số sao đánh giá nhé', [
-        { text: 'OK' },
-      ]);
+      setShowNotification('You haven’t selected a rating yet.');
       return;
     }
-
-    Alert.alert(
-      'Gửi đánh giá thành công!',
-      'Cảm ơn bạn đã dành thời gian chia sẻ trải nghiệm. Đánh giá của bạn rất quý giá với chúng tôi và cộng đồng du khách khác!',
-      [
-        {
-          text: 'Hoàn thành',
-          onPress: () => navigation.goBack(),
-        },
-      ],
-      { cancelable: false },
-    );
+    if (comment === '') {
+      setShowNotification('Please enter your review.');
+      return;
+    }
+    const res = await createReview({
+      experienceId: booking.id,
+      description: comment,
+      rating: rating,
+    });
+    if (!res.reviewResponse) {
+      setShowNotification(res.message);
+    }
+    navigation.navigate('reviewSuccess');
   };
 
   const Star = ({
@@ -85,25 +88,23 @@ const ReviewScreen = () => {
       params: 'paymentScreen',
     });
   };
-  if (loading) return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+  if (loading) return <LoadingView message="Checking login status..." />;
   if (error)
     return (
       <ErrorView
-        message="Bạn cần đăng nhập để sử dụng tính năng này"
+        message="You need to log in to use this feature"
         onPress={handleLogin}
       />
     );
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header với ảnh + tên tour */}
+        {/* Header */}
         <View style={styles.header}>
           <Image source={booking.image} style={styles.tourImage} />
           <View style={styles.overlay} />
@@ -111,7 +112,7 @@ const ReviewScreen = () => {
             <Text style={styles.tourName}>{booking.nameTour}</Text>
             <Text style={styles.tourDate}>
               <MaterialIcons name="calendar-today" size={16} />{' '}
-              {booking.date.toLocaleDateString('vi-VN', {
+              {booking.date.toLocaleDateString('en-US', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
@@ -121,12 +122,11 @@ const ReviewScreen = () => {
           </View>
         </View>
 
-        {/* Tiêu đề đánh giá */}
+        {/* Rating */}
         <View style={styles.section}>
-          <Text style={styles.title}>Bạn thấy tour này thế nào?</Text>
-          <Text style={styles.subtitle}>Chạm vào sao để đánh giá</Text>
+          <Text style={styles.title}>How was this tour?</Text>
+          <Text style={styles.subtitle}>Tap the stars to rate</Text>
 
-          {/* 5 ngôi sao lớn, đẹp lung linh */}
           <View style={styles.starsContainer}>
             {[1, 2, 3, 4, 5].map(star => (
               <Star
@@ -137,32 +137,31 @@ const ReviewScreen = () => {
             ))}
           </View>
 
-          {/* Hiển thị text tương ứng với số sao */}
           <Text style={styles.ratingText}>
             {rating === 0
-              ? 'Chưa chọn'
+              ? 'Not selected'
               : rating === 1
-              ? 'Rất tệ'
+              ? 'Very bad'
               : rating === 2
-              ? 'Tạm được'
+              ? 'Fair'
               : rating === 3
-              ? 'Bình thường'
+              ? 'Average'
               : rating === 4
-              ? 'Hài lòng'
-              : 'Tuyệt vời!'}
+              ? 'Satisfied'
+              : 'Excellent!'}
           </Text>
         </View>
 
-        {/* Ô nhập nhận xét */}
+        {/* Review Input */}
         <View style={styles.section}>
-          <Text style={styles.title}>Chia sẻ trải nghiệm của bạn</Text>
+          <Text style={styles.title}>Share your experience</Text>
           <Text style={styles.hint}>
-            Bạn thích nhất điều gì? Có góp ý gì để tour tốt hơn không?
+            What did you like the most? Any suggestions for improvement?
           </Text>
 
           <TextInput
             style={styles.textInput}
-            placeholder="Viết đánh giá của bạn ở đây... (tối thiểu 15 ký tự)"
+            placeholder="Write your review here... (minimum 15 characters)"
             multiline
             numberOfLines={6}
             value={comment}
@@ -173,14 +172,24 @@ const ReviewScreen = () => {
           <Text style={styles.charCount}>{comment.length}/1000</Text>
         </View>
 
-        {/* Nút gửi nổi bật cố định dưới */}
+        {/* Submit */}
         <View style={styles.submitContainer}>
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <MaterialIcons name="send" size={22} color="#fff" />
-            <Text style={styles.submitText}>Gửi đánh giá ngay</Text>
+            <Text style={styles.submitText}>Submit Review</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type="error"
+          autoClose
+          position="top"
+          duration={3000}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 };
@@ -284,13 +293,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   submitButton: {
-    backgroundColor: '#E91E63',
+    backgroundColor: '#FFB800',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 18,
     borderRadius: 16,
-    shadowColor: '#E91E63',
+    shadowColor: '#FFB800',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,

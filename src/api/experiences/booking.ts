@@ -2,10 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   BookingDetail,
   BookingResponse,
+  CancelBooking,
   CreateBookingRequest,
   CreateBookingResponse,
+  CreateReviewRequest,
+  Review,
+  ReviewResponse,
 } from '../../../types/booking';
-import { apiFetch } from '../auth/fetch';
+import { apiFetch, fetchWithTimeout } from '../auth/fetch';
+import { url } from '../url';
 
 export async function createBooking(
   request: CreateBookingRequest,
@@ -53,19 +58,21 @@ export async function cancelBooking(
   reason: string,
   bookingId: string,
 ): Promise<{
-  status: boolean;
+  success: boolean;
   message: string;
   errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
 }> {
   const endpoint = `/api/bookings/${bookingId}/cancel`;
+  const cancel: CancelBooking = {
+    reason: reason,
+    isCancelledByHost: false,
+  };
   try {
-    const res = await apiFetch.post(endpoint, {
-      reason,
-      isCancelledByHost: false,
-    });
+    const res = await apiFetch.post(endpoint, cancel);
+    console.log(res);
     if (res.status === 401) {
       return {
-        status: false,
+        success: false,
         message: 'You are not logged in or your session has expired.',
         errorType: 'NOT_LOGGED_IN',
       };
@@ -82,7 +89,7 @@ export async function cancelBooking(
         // ignore parse error
       }
       return {
-        status: false,
+        success: false,
         message: `${message}(${res.status})`,
         errorType: 'FETCH_FAILED',
       };
@@ -90,15 +97,15 @@ export async function cancelBooking(
     const text = await res.text();
     if (!text) {
       return {
-        status: false,
+        success: false,
         message: 'The response data is empty.',
         errorType: 'FETCH_FAILED',
       };
     }
     const response = JSON.parse(text); // chưa dùng đến
     return {
-      status: response,
-      message: 'Cancel booking is successfully.',
+      success: response.success,
+      message: response.message,
     };
   } catch (error: any) {
     if (
@@ -107,13 +114,13 @@ export async function cancelBooking(
       error.message === 'REQUEST_TIMEOUT'
     ) {
       return {
-        status: false,
+        success: false,
         message: 'No network connection. Please check your connection.',
         errorType: 'FETCH_FAILED',
       };
     }
     return {
-      status: false,
+      success: false,
       message: 'An unknown error occurred. Please try again.',
       errorType: 'FETCH_FAILED',
     };
@@ -252,6 +259,75 @@ export async function getBookingById(bookingId: string): Promise<{
     }
     return {
       bookingDetail: null,
+      message: error.message || 'An unknown error occurred. Please try again ',
+      errorType: 'FETCH_FAILED',
+    };
+  }
+}
+
+export async function createReview(request: CreateReviewRequest): Promise<{
+  reviewResponse: Review | null;
+  message: string;
+  errorType?: 'NOT_LOGGED_IN' | 'FETCH_FAILED';
+}> {
+  const endpoint = `/api/experiences/${request.experienceId}/reviews`;
+  try {
+    const res = await apiFetch.post(endpoint, {
+      rating: request.rating,
+      description: request.description,
+    });
+    if (res.status === 401) {
+      return {
+        reviewResponse: null,
+        message: 'You are not logged in or your session has expired ',
+        errorType: 'NOT_LOGGED_IN',
+      };
+    }
+    if (!res.ok) {
+      let message = 'Failed to fetch create review';
+      try {
+        const text = await res.text();
+        if (text) {
+          const errorJson = JSON.parse(text);
+          message = errorJson.message || errorJson.error || message;
+        }
+      } catch {
+        // ignore parse error
+      }
+      return {
+        reviewResponse: null,
+        message: `${message}(${res.status})`,
+        errorType: 'FETCH_FAILED',
+      };
+    }
+    const text = await res.text();
+    if (!text) {
+      return {
+        reviewResponse: null,
+        message: 'The response data is empty  ',
+        errorType: 'FETCH_FAILED',
+      };
+    }
+    const review = JSON.parse(text);
+    console.log(review);
+    return {
+      reviewResponse: review,
+      message: 'Create review successfully',
+    };
+  } catch (error: any) {
+    if (
+      error.name === 'TypeError' ||
+      error.message.includes('fetch') ||
+      error.message === 'REQUEST_TIMEOUT'
+    ) {
+      return {
+        reviewResponse: null,
+        message: 'No network connection. Please check your connection',
+        errorType: 'FETCH_FAILED',
+      };
+    }
+    return {
+      reviewResponse: null,
       message: error.message || 'An unknown error occurred. Please try again ',
       errorType: 'FETCH_FAILED',
     };

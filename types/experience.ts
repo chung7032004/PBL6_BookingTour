@@ -55,6 +55,9 @@ export interface Experience {
   media: Media[];
   itineraries: Itinerary[];
   distance: number | null;
+  isFavorite: boolean;
+  totalReviews: number;
+  averageRating: number;
 }
 
 export interface ExperiencesResponse {
@@ -62,6 +65,16 @@ export interface ExperiencesResponse {
   totalCount: number;
   pageNumber: number;
   pageSize: number;
+}
+
+export interface Recommendation {
+  experience: Experience;
+  score: number;
+  reason: string;
+}
+export interface ExperiencesRecommendation {
+  recommendations: Recommendation[];
+  total: number;
 }
 
 export interface Slot {

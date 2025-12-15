@@ -12,11 +12,15 @@ import EditGuests from './EditGuests.modal';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NavigationProp } from '@react-navigation/native';
-import { formatVNDate } from '../../components/FormatDate';
-import { checkLoginAndRole } from '../../api/auth/login';
 import { Slot } from '../../../types/experience';
 import { getExperienceAvailability } from '../../api/experiences/experiences';
 import { RootStackParamList } from '../../../types/route';
+import {
+  formatDate,
+  formatENDate,
+  formatENTime,
+  formatTimeWithoutSeconds,
+} from '../../components/FormatDate';
 
 const SelectDateCard = ({
   slot,
@@ -38,10 +42,14 @@ const SelectDateCard = ({
     >
       <View>
         <Text style={styles.cardQuantity}>{slot.spotsAvailable} chỗ trống</Text>
-        <Text style={styles.cardDate}>{slot.date}</Text>
-        <Text style={styles.cardTime}>
-          {slot.startTime} - {slot.endTime}
-        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.cardDate}>{formatDate(slot.date)}</Text>
+          <Text style={styles.cardDate}> : </Text>
+          <Text style={styles.cardTime}>
+            {formatTimeWithoutSeconds(slot.startTime)} -{' '}
+            {formatTimeWithoutSeconds(slot.endTime)}
+          </Text>
+        </View>
 
         <Text style={styles.cardPrice}>
           {adultPrice.toLocaleString()}đ/ khách - {childPrice.toLocaleString()}
@@ -172,7 +180,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
           {/* Chọn ngày */}
           <View style={styles.chooseDate}>
             <Text style={styles.subTitle}>
-              {formatVNDate(date.toDateString())}
+              {formatENDate(date.toDateString())}
             </Text>
             <TouchableOpacity onPress={openDatePicker}>
               <Icon name="date-range" size={24} color="#007bff" />

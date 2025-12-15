@@ -61,7 +61,7 @@ const SearchCard = (props: TourCardProps) => {
 
         <View style={styles.ratingRow}>
           <MaterialIcon name="star" size={16} color="#FFD700" />
-          <Text style={styles.rating}>{averageRating}</Text>
+          <Text style={styles.rating}>{averageRating.toFixed(1)}</Text>
           <Text style={styles.count}>({totalReviews})</Text>
         </View>
 

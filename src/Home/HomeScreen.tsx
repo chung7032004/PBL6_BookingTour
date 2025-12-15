@@ -12,8 +12,17 @@ import {
   View,
 } from 'react-native';
 import TourCard from './TourCard';
-import { Category, TourCardProps } from '../../types/experience';
-import { getCategories, getExperiences } from '../api/experiences/experiences';
+import {
+  Category,
+  Experience,
+  Recommendation,
+  TourCardProps,
+} from '../../types/experience';
+import {
+  getCategories,
+  getExperiences,
+  getRecommendations,
+} from '../api/experiences/experiences';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
 import { getMyWishLists } from '../api/experiences/wishlist';
@@ -28,6 +37,8 @@ import { RootStackParamList } from '../../types/route';
 import images from '../../images';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { categoryIcons } from '../constants/categoryIcons';
+import { refreshToken } from '../api/auth/fetch';
+import CustomButton from '../components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
@@ -41,10 +52,14 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [wishLists, setWishLists] = useState<MyWishListResponse[]>([]);
+  const [recommendations, setRecommendations] = useState<
+    Recommendation[] | null
+  >();
 
   useEffect(() => {
-    loadCategories();
+    loadRecommendation();
     loadSuggest();
+    loadCategories();
     loadWishLists();
   }, []);
   const loadCategories = async () => {
@@ -75,6 +90,13 @@ const HomeScreen = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const loadRecommendation = async () => {
+    const res = await getRecommendations();
+    if (res.experience === null) {
+      return;
+    }
+    setRecommendations(res.experience.recommendations);
   };
   const loadMoreSuggest = async () => {
     if (loadingMore) return;
@@ -115,64 +137,72 @@ const HomeScreen = () => {
       showsVerticalScrollIndicator={false}
       renderItem={() => (
         <>
-          <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cardRow}
-          >
-            {suggest.map(tour => (
-              <TourCard key={tour.id} {...tour} />
-            ))}
-          </ScrollView>
+          {recommendations && (
+            <>
+              <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.cardRow}
+              >
+                {recommendations.map(recommendation => (
+                  <TourCard
+                    key={recommendation.experience.id}
+                    {...recommendation.experience}
+                  />
+                ))}
+              </ScrollView>
+            </>
+          )}
           {/* === DANH MỤC  === */}
-          <Text style={styles.sectionTitle}>Danh mục</Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesContainer}
-          >
-            {category?.map(item => {
-              const iconName = categoryIcons[item.name] || 'explore';
-
-              return (
-                <TouchableOpacity
-                  key={item.id}
-                  activeOpacity={0.7}
-                  style={styles.categoryItem}
-                  onPress={() => {
-                    navigation.dispatch(
-                      CommonActions.reset({
-                        index: 0,
-                        routes: [
-                          {
-                            name: 'searchTab',
-                            state: {
-                              routes: [
-                                {
-                                  name: 'search',
-                                  params: { categoryId: item.id },
+          {category && (
+            <>
+              <Text style={styles.sectionTitle}>Danh mục</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.categoriesContainer}
+              >
+                {category?.map(item => {
+                  const iconName = categoryIcons[item.name] || 'explore';
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      activeOpacity={0.7}
+                      style={styles.categoryItem}
+                      onPress={() => {
+                        navigation.dispatch(
+                          CommonActions.reset({
+                            index: 0,
+                            routes: [
+                              {
+                                name: 'searchTab',
+                                state: {
+                                  routes: [
+                                    {
+                                      name: 'search',
+                                      params: { categoryId: item.id },
+                                    },
+                                  ],
                                 },
-                              ],
-                            },
-                          },
-                        ],
-                      }),
-                    );
-                  }}
-                >
-                  <View style={styles.iconCircle}>
-                    <Icon name={iconName} size={36} color="#2563eb" />
-                  </View>
-                  <Text style={styles.categoryText} numberOfLines={2}>
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-
+                              },
+                            ],
+                          }),
+                        );
+                      }}
+                    >
+                      <View style={styles.iconCircle}>
+                        <Icon name={iconName} size={36} color="#2563eb" />
+                      </View>
+                      <Text style={styles.categoryText} numberOfLines={2}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </>
+          )}
           {/*  Đánh giá cao */}
           {topRated.length > 0 && (
             <>

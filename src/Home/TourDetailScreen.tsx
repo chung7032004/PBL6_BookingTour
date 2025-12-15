@@ -28,11 +28,16 @@ import ReviewCard from './ReviewCard';
 import LoadingView from '../components/LoadingView';
 import { Experience } from '../../types/experience';
 import ErrorView from '../components/ErrorView';
-import { getExperiencesById } from '../api/experiences/experiences';
+import {
+  formatDuration,
+  getExperiencesById,
+  getReviews,
+} from '../api/experiences/experiences';
 import WishListModal from './modals/wishList.modal';
 import { HostDetail, HostInTour } from '../../types/host';
 import { checkLoginAndRole } from '../api/auth/login';
 import { addExpToWishList } from '../api/experiences/wishlist';
+import { Review } from '../../types/booking';
 
 const { width } = Dimensions.get('window');
 
@@ -46,12 +51,12 @@ const TourDetailScreen = () => {
 
   const [tour, setTour] = useState<Experience | null>(null);
   const [host, setHost] = useState<HostDetail | null>(null);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [wishList, setWishList] = useState(false);
   const [showNotification, setShowNotification] = useState<string | null>(null);
-  const [quantityReview] = useState<number>(164);
   const [showModalReview, setShowModalReview] = useState(false);
   const [showModalWistList, setShowModalWishList] = useState(false);
   const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
@@ -71,6 +76,17 @@ const TourDetailScreen = () => {
       }
       setTour(res.experience);
       setHost(res.host);
+      if (res.experience === null) {
+        setError('Tải experience thất bại');
+        return;
+      }
+      const resReview = await getReviews(res.experience?.id);
+      if (!resReview.reviewResponse) {
+        setError(resReview.message);
+        return;
+      }
+      console.log(resReview.reviewResponse.data);
+      setReviews(resReview.reviewResponse.data);
     } catch (error) {
       setError('Lỗi không xác định');
     } finally {
@@ -213,7 +229,11 @@ const TourDetailScreen = () => {
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Duration: </Text>
-            <Text style={styles.detailValue}>{tour?.duration}</Text>
+            <Text style={styles.detailValue}>
+              {tour?.duration
+                ? formatDuration(tour.duration)
+                : 'Không xác định'}
+            </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Max Participants: </Text>
@@ -280,19 +300,23 @@ const TourDetailScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/*  Đánh giá 
+        {/* Đánh giá  */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Đánh giá</Text>
 
           <View style={styles.ratingSummary}>
-            <Text style={styles.ratingValue}>{tour?.rating}</Text>
+            <Text style={styles.ratingValue}>
+              {tour?.averageRating.toFixed(1)}
+            </Text>
             <Icon
               name="star"
               size={20}
               color="#FFD700"
               style={styles.starIcon}
             />
-            <Text style={styles.ratingCount}>({quantityReview} đánh giá)</Text>
+            <Text style={styles.ratingCount}>
+              ({tour?.totalReviews} đánh giá)
+            </Text>
           </View>
 
           <ScrollView
@@ -300,16 +324,17 @@ const TourDetailScreen = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.reviewRow}
           >
-            {reviews.slice(0, 4).map(item => (
-              <ReviewCard key={item.id} {...item} />
-            ))}
+            {reviews &&
+              reviews
+                .slice(0, 4)
+                .map(item => <ReviewCard key={item.id} {...item} />)}
           </ScrollView>
 
           <TouchableOpacity onPress={() => setShowModalReview(true)}>
             <Text style={styles.moreText}>Hiển thị thêm</Text>
           </TouchableOpacity>
         </View>
-        */}
+
         <View style={{ height: 80 }}></View>
       </ScrollView>
 
@@ -352,14 +377,14 @@ const TourDetailScreen = () => {
         }}
         itineraries={limitedItineraries}
       />
-      {/* 
-      <ReviewModal
-        reviews={reviews}
-        onClose={() => setShowModalReview(false)}
-        quantityReview={quantityReview}
-        visible={showModalReview}
-      />
-       */}
+      {reviews && (
+        <ReviewModal
+          reviews={reviews}
+          onClose={() => setShowModalReview(false)}
+          quantityReview={tour?.totalReviews ? tour.totalReviews : 0}
+          visible={showModalReview}
+        />
+      )}
 
       <WishListModal
         visible={showModalWistList}

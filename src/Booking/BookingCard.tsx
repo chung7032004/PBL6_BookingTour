@@ -2,13 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Booking } from '../../types/booking';
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('vi-VN');
-};
-
-const formatTime = (time: string) => time.slice(0, 5);
+import { formatDate, formatTimeWithoutSeconds } from '../components/FormatDate';
 
 const BookingCard: React.FC<Booking> = props => {
   const {
@@ -50,7 +44,8 @@ const BookingCard: React.FC<Booking> = props => {
         <View style={styles.row}>
           <Icon name="event" size={18} color="#666" />
           <Text style={styles.date}>
-            {formatDate(date)} • {formatTime(startTime)} - {formatTime(endTime)}
+            {formatDate(date)} • {formatTimeWithoutSeconds(startTime)} -{' '}
+            {formatTimeWithoutSeconds(endTime)}
           </Text>
         </View>
 

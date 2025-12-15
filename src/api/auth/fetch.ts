@@ -22,27 +22,7 @@ export function fetchWithTimeout(
     ),
   ]);
 }
-
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (token: string) => void;
-  reject: (error: any) => void;
-}> = [];
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(p => {
-    error ? p.reject(error) : p.resolve(token!);
-  });
-  failedQueue = [];
-};
-async function refreshToken(): Promise<string | null> {
-  if (isRefreshing) {
-    return new Promise<string>((resolve, reject) => {
-      failedQueue.push({ resolve, reject });
-    });
-  }
-
-  isRefreshing = true;
+export async function refreshToken(): Promise<string | null> {
   try {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     if (!refreshToken) {
@@ -63,19 +43,17 @@ async function refreshToken(): Promise<string | null> {
     if (!text) {
       throw new Error('Refresh response empty');
     }
-
     const data = JSON.parse(text);
-    if (!data?.accessToken) {
-      throw new Error('No accessToken in response');
+    console.log(data);
+    if (!data?.accessToken || !data?.refreshToken) {
+      throw new Error('Missing accessToken or refreshToken in response');
     }
     await AsyncStorage.setItem('accessToken', data.accessToken);
+    await AsyncStorage.setItem('refreshToken', data.refreshToken);
     return data.accessToken;
   } catch (error) {
-    processQueue(error);
-    await logout();
+    // await logout();
     return null;
-  } finally {
-    isRefreshing = false;
   }
 }
 
@@ -115,7 +93,6 @@ export async function fetchWithAuth(
 
     if (!newToken) {
       console.log('Refresh thất bại → đăng xuất');
-      await logout();
       return response; // trả về 401 để app xử lý chuyển sang login
     }
 

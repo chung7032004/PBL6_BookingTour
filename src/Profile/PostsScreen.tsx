@@ -8,17 +8,9 @@ import {
   ScrollView,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useAuthGuard } from '../hooks/useAuthGuard';
 import LoadingView from '../components/LoadingView';
-import ErrorView from '../components/ErrorView';
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import { RootStackParamList } from '../../types/route';
 import { userProfile } from '../../types/host';
+import { formatENDate } from '../components/FormatDate';
 
 interface CardProps {
   nameIcon: string;
@@ -67,7 +59,11 @@ const PostsScreen = (props: PostsScreenProps) => {
       <Card
         nameIcon="date-range"
         title="Ngày sinh"
-        data={myProfile?.dateOfBirth ? myProfile.dateOfBirth : 'Chưa cập nhật'}
+        data={
+          myProfile?.dateOfBirth
+            ? formatENDate(myProfile.dateOfBirth)
+            : 'Chưa cập nhật'
+        }
       />
       <Card
         nameIcon="home"

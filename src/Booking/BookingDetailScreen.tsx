@@ -11,6 +11,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import images from '../../images';
 import ActiveCard from '../Home/ActiveCard';
 import {
+  CommonActions,
   NavigationProp,
   RouteProp,
   useNavigation,
@@ -28,6 +29,8 @@ import {
 import { Experience } from '../../types/experience';
 import { HostDetail } from '../../types/host';
 import ActiveModal from '../Home/modals/Active.modal';
+import Notification from '../components/Notification';
+import { formatDate, formatTimeWithoutSeconds } from '../components/FormatDate';
 
 const BookingDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -47,6 +50,7 @@ const BookingDetailScreen = () => {
     'NOT_LOGGED_IN' | 'FETCH_FAILED' | null
   >(null);
   const [showActiveModal, setShowActiveModal] = useState(false);
+  const [showNotification, setShowNotification] = useState<string | null>(null);
 
   const limitedItineraries = (tour?.itineraries || []).sort(
     (a, b) => a.stepNumber - b.stepNumber,
@@ -62,16 +66,21 @@ const BookingDetailScreen = () => {
       setErrorMsg(res.message);
     } else {
       setBookingDetail(res.bookingDetail);
-      setStatus(bookingDetail ? bookingDetail.status : 'Completed');
-
-      if (!bookingDetail?.experienceId) {
+      setStatus(res.bookingDetail ? res.bookingDetail.status : 'Completed');
+      if (!res.bookingDetail?.experienceId) {
+        setErrorType('FETCH_FAILED');
+        setErrorMsg('ExperienceId invalid');
+        setLoading(false);
         return;
       }
-      const resExp = await getExperiencesById(bookingDetail.experienceId);
+      const resExp = await getExperiencesById(res.bookingDetail.experienceId);
+      console.log('call api thành công ');
       if (resExp.message) {
+        console.log('Tải thất bại');
         setErrorMsg(res.message);
         setErrorType('FETCH_FAILED');
       }
+      console.log('Tải thành công');
       setTour(resExp.experience);
       setHost(resExp.host);
     }
@@ -83,7 +92,40 @@ const BookingDetailScreen = () => {
       params: { screen: 'bookingDetail', booking: bookingId },
     });
   };
-
+  const handleReview = () => {
+    if (!bookingDetail || !tour) {
+      setShowNotification('Booking or experience invalid');
+      return;
+    }
+    navigation.navigate('reviewScreen', {
+      experienceId: bookingDetail?.experienceId,
+      image: tour?.media[0].url,
+      title: tour?.title,
+      date: bookingDetail?.date,
+    });
+  };
+  const handleRebookThisExperience = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'homeTab',
+            state: {
+              routes: [
+                { name: 'home' },
+                {
+                  name: 'tourDetail',
+                  params: { id: bookingDetail?.experienceId },
+                },
+              ],
+              index: 1,
+            },
+          },
+        ],
+      }),
+    );
+  };
   if (loading) {
     return <LoadingView message="Đang tải dữ liệu ..." />;
   }
@@ -251,13 +293,21 @@ const BookingDetailScreen = () => {
             <View style={styles.gridItem}>
               <MaterialIcons name="event" size={18} color="#666" />
               <Text style={styles.gridLabel}>Booking Date</Text>
-              <Text style={styles.gridValue}>{bookingDetail?.date}</Text>
+              <Text style={styles.gridValue}>
+                {formatDate(bookingDetail?.date ? bookingDetail.date : '')}
+              </Text>
             </View>
             <View style={styles.gridItem}>
               <MaterialIcons name="access-time" size={18} color="#666" />
               <Text style={styles.gridLabel}>Time</Text>
               <Text style={styles.gridValue}>
-                {bookingDetail?.startTime}-{bookingDetail?.endTime}
+                {formatTimeWithoutSeconds(
+                  bookingDetail?.startTime ? bookingDetail.startTime : '',
+                )}
+                -
+                {formatTimeWithoutSeconds(
+                  bookingDetail?.endTime ? bookingDetail.endTime : '',
+                )}
               </Text>
             </View>
           </View>
@@ -302,14 +352,6 @@ const BookingDetailScreen = () => {
 
         {/* ================= ACTION BUTTONS – GIỮ NGUYÊN THEO STATUS ================= */}
         <View style={styles.actionSection}>
-          {/* PENDING → Hủy booking */}
-          {status === 'Pending' && (
-            <TouchableOpacity style={styles.cancelBtnV2} activeOpacity={0.8}>
-              <MaterialIcons name="cancel" size={24} color="#FFFFFF" />
-              <Text style={styles.cancelBtnTextV2}>Cancel Booking</Text>
-            </TouchableOpacity>
-          )}
-
           {/* CONFIRMED → Liên hệ hướng dẫn viên */}
           {status === 'Confirmed' && (
             <TouchableOpacity style={styles.primaryBtnV2} activeOpacity={0.8}>
@@ -317,15 +359,27 @@ const BookingDetailScreen = () => {
               <Text style={styles.primaryBtnTextV2}>Contact Guide</Text>
             </TouchableOpacity>
           )}
-
+          {/* PENDING → Hủy booking */}
+          {(status === 'Confirmed' || status === 'Pending') && (
+            <TouchableOpacity
+              style={styles.cancelBtnV2}
+              activeOpacity={0.8}
+              onPress={() => {
+                navigation.navigate('cancelBooking', { bookingId });
+              }}
+            >
+              <MaterialIcons name="cancel" size={24} color="#FFFFFF" />
+              <Text style={styles.cancelBtnTextV2}>Cancel Booking</Text>
+            </TouchableOpacity>
+          )}
           {/* COMPLETED → Viết đánh giá */}
           {status === 'Completed' && (
             <TouchableOpacity
-              style={styles.primaryBtnV2}
+              style={[styles.primaryBtnV2, { backgroundColor: '#FFB300' }]}
               activeOpacity={0.8}
-              onPress={() =>
-                navigation.navigate('reviewScreen', { bookingId: 'chung' })
-              }
+              onPress={() => {
+                handleReview();
+              }}
             >
               <MaterialIcons name="star-rate" size={26} color="#FFFFFF" />
               <Text style={styles.primaryBtnTextV2}>Write a Review</Text>
@@ -334,7 +388,11 @@ const BookingDetailScreen = () => {
 
           {/* CANCELLED → Đặt lại tour */}
           {status === 'Cancelled' && (
-            <TouchableOpacity style={styles.rebookBtnV2} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.rebookBtnV2}
+              activeOpacity={0.8}
+              onPress={() => handleRebookThisExperience()}
+            >
               <MaterialIcons name="refresh" size={24} color="#1E88E5" />
               <Text style={styles.rebookBtnTextV2}>Rebook This Tour</Text>
             </TouchableOpacity>
@@ -348,6 +406,16 @@ const BookingDetailScreen = () => {
         }}
         itineraries={limitedItineraries}
       />
+      {showNotification && (
+        <Notification
+          message={showNotification}
+          onClose={() => setShowNotification(null)}
+          type="error"
+          autoClose
+          position="top"
+          duration={3000}
+        />
+      )}
     </View>
   );
 };
@@ -562,6 +630,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 10,
     shadowColor: '#1E88E5',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,

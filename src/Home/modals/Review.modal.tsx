@@ -10,12 +10,13 @@ import {
 } from 'react-native';
 import ReviewCard from '../ReviewCard';
 import CustomButton from '../../components/CustomButton';
+import { Review } from '../../../types/booking';
 
 interface ReviewModalProps {
   quantityReview: number;
   visible: boolean;
   onClose: () => void;
-  reviews: any[];
+  reviews: Review[];
 }
 const { width } = Dimensions.get('window');
 

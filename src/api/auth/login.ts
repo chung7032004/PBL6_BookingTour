@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { url } from '../url';
 import { jwtDecode } from 'jwt-decode';
-import { fetchWithTimeout } from './fetch';
+import { apiFetch, fetchWithTimeout } from './fetch';
 interface JwtPayload {
   role: string;
   email: string;
@@ -103,11 +103,26 @@ export async function checkLogin(): Promise<boolean> {
   }
 }
 export async function logout() {
+  const refreshToken = await AsyncStorage.getItem('refreshToken');
+  if (!refreshToken) return false;
   try {
+    const endpoint = '/api/auth/logout';
+    const res = await apiFetch.post(endpoint, { refreshToken });
+    if (res.ok) {
+      console.log('Đăng xuất thành công trên server');
+      return true;
+    } else {
+      const errorData = await res.text();
+      console.log('Lỗi server khi đăng xuất.', res.status, 'Body:', errorData);
+      return false;
+    }
+  } catch (error) {
+    console.log('Logout API Error:', error);
+    return false;
+  } finally {
+    // Luôn xóa token cục bộ dù API có thành công hay không
     await AsyncStorage.removeItem('accessToken');
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.removeItem('email');
-  } catch (error) {
-    console.log('Logout API Error:', error);
   }
 }

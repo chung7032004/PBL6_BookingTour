@@ -42,35 +42,6 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
   onPress,
   onLongPress,
 }) => {
-  // const [showModalNote, setShowModalNote] = useState(false);
-  // const [showModalNoteDisplay, setShowModalNoteDisplay] = useState(false);
-  // 🔹 Fake ghi chú để test
-  {
-    /*
-  const [notes, setNotes] = useState<NoteItem[]>([
-    { userId: 'user_1', text: 'Mang theo áo mưa và nước suối.' },
-    { userId: 'user_2', text: 'Kiểm tra lại lịch trình ngày 2.' },
-    { userId: 'user_3', text: 'Đặt thêm bữa trưa cho đoàn 5 người.' },
-  ]);
-
-  const currentUserNote = notes.find(n => n.userId === currentUserId);
-  const noteCount = notes.length;
-
-  const handleSaveNote = (text: string) => {
-    if (text.trim() === '') {
-      setNotes(prev => prev.filter(n => n.userId !== currentUserId));
-    } else if (currentUserNote) {
-      setNotes(prev =>
-        prev.map(n => (n.userId === currentUserId ? { ...n, text } : n)),
-      );
-    } else {
-      setNotes(prev => [...prev, { userId: currentUserId, text }]);
-    }
-    setShowModalNote(false);
-  };
-  */
-  }
-
   return (
     <TouchableOpacity
       style={styles.card}
@@ -88,13 +59,6 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
           </View>
         )}
         {/*
-        <TouchableOpacity
-          style={styles.heartButton}
-          onPress={onLongPress}
-        >
-          <Icon name="favorite" size={28} color={'#ff4d4d'} />
-        </TouchableOpacity>
-        */}
         {/* Chỉ để trang trí */}
         <View style={styles.heartButton}>
           <Icon name="favorite" size={28} color={'#ff4d4d'} />
@@ -119,64 +83,7 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
           <Icon name="star" size={16} color="#FFD700" />
           <Text style={styles.price}> ({reviews})</Text>
         </View>
-
-        {/* Ghi chú */}
-        {/* 
-        {noteCount === 0 ? (
-          <View style={styles.noteSection}>
-            <TouchableOpacity
-              style={styles.noteButton}
-              onPress={() => setShowModalNote(true)}
-            >
-              <Icon name="add" size={18} color="#2c2c2c" />
-              <Text style={styles.noteButtonText}> Thêm ghi chú</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.noteSection}>
-            <TouchableOpacity
-              style={styles.noteButton}
-              onPress={() => setShowModalNoteDisplay(true)}
-            >
-              <Icon
-                name="sticky-note-2"
-                size={18}
-                color="#2c2c2c"
-                style={{ marginRight: 6 }}
-              />
-              <Text style={styles.noteButtonText}>{noteCount} ghi chú</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => setShowModalNote(true)}
-            >
-              <Icon
-                name={currentUserNote ? 'edit' : 'add'}
-                size={18}
-                color="#007BFF"
-              />
-            </TouchableOpacity>
-          </View>
-        )}
-*/}
       </View>
-
-      {/* Modal ghi chú */}
-      {/* 
-      <NoteModal
-        visible={showModalNote}
-        onClose={() => setShowModalNote(false)}
-        onSave={handleSaveNote}
-        title="Ghi chú"
-        initialValue={currentUserNote ? currentUserNote.text : ''}
-      />
-      
-      <NoteDisplayModal
-        visible={showModalNoteDisplay}
-        notes={notes}
-        onClose={() => setShowModalNoteDisplay(false)}
-      />
-      */}
     </TouchableOpacity>
   );
 };

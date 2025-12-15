@@ -22,7 +22,7 @@ export type RootStackParamList = {
     adultPrice: number;
     childPrice: number;
     quantity: {
-      àdult: number;
+      adult: number;
       children: number;
       total: number;
     };
@@ -49,7 +49,15 @@ export type RootStackParamList = {
   bookingDetail: {
     bookingId: string;
   };
-  reviewScreen: { bookingId: string };
+  reviewScreen: {
+    experienceId: string;
+    title: string;
+    image: any;
+    date: string;
+  };
+  reviewSuccess: undefined;
+  cancelBooking: { bookingId: string };
+  cancelBookingSuccess: undefined;
 
   login:
     | { redirect?: keyof RootStackParamList; params?: any; message?: string }

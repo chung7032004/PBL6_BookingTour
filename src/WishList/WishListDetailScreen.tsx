@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import WishListDetailCard from './WishListDetailCard';
 import {
+  CommonActions,
   NavigationProp,
   RouteProp,
   useNavigation,
@@ -122,7 +123,28 @@ const WishListDetailScreen = () => {
           rating="5.0"
           reviews="799 đánh giá"
           image={item.media[0].url}
-          onPress={() => navigation.navigate('tourDetail', { id: item.id })}
+          onPress={() =>
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'homeTab',
+                    state: {
+                      routes: [
+                        { name: 'home' },
+                        {
+                          name: 'tourDetail',
+                          params: { id: item.id },
+                        },
+                      ],
+                      index: 1,
+                    },
+                  },
+                ],
+              }),
+            )
+          }
           onLongPress={() => handleLongPress(item.id)}
         />
       ))}

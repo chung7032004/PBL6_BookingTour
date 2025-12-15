@@ -87,3 +87,33 @@ export interface BookingDetail {
   payment?: Payment | null;
   cancellation?: Cancellation | null;
 }
+
+export interface CreateReviewRequest {
+  experienceId: string;
+  rating: number;
+  description: string;
+}
+export interface Review {
+  id: string;
+  experienceId: string;
+  userId: string;
+  fullName: string;
+  userAvatar: string;
+  rating: number;
+  description: string;
+  isHidden: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface ReviewResponse {
+  data: Review[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface CancelBooking {
+  reason: string;
+  isCancelledByHost: false;
+}
