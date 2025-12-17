@@ -53,7 +53,7 @@ export async function getMyProfile(): Promise<userProfile | null> {
       return null;
     }
     if (!res.ok) {
-      let message = 'Lấy thông tin hồ sơ thất bại';
+      let message = 'The attempt to retrieve the record information failed.';
       try {
         const text = await res.text();
         if (text) {
@@ -75,7 +75,7 @@ export async function getMyProfile(): Promise<userProfile | null> {
       error.message.includes('fetch') ||
       error.message === 'REQUEST_TIMEOUT'
     ) {
-      throw new Error('Không có kết nối mạng');
+      throw new Error('Unable to connect to the server.');
     }
     throw error;
   }

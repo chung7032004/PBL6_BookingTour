@@ -33,7 +33,7 @@ export async function signup(
         message: null,
       };
     } else {
-      let errorMsg = data?.Message || 'Đăng ký thất bại';
+      let errorMsg = data?.Message || 'Sign up failed';
 
       if (data?.Message !== null && data?.Errors) {
         const error = Object.values(data.Errors).flat().join('\n');
@@ -48,7 +48,7 @@ export async function signup(
     console.log('Signup API Error:', error);
     return {
       accountId: null,
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }

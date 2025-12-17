@@ -43,7 +43,7 @@ const ReviewModal = ({
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>{quantityReview} đánh giá</Text>
+            <Text style={styles.title}>{quantityReview} reviews</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
@@ -63,7 +63,7 @@ const ReviewModal = ({
             {/* Nút "Hiển thị thêm" chỉ hiện nếu còn review chưa hiển thị */}
             {visibleCount < reviews.length && (
               <CustomButton
-                title="Hiển thị thêm đánh giá"
+                title="Show more reviews"
                 onPress={handleLoadMore}
                 style={styles.button}
               />

@@ -7,6 +7,11 @@ interface JwtPayload {
   email: string;
   exp: number; // thời gian hết hạn của token
 }
+export const validatePassword = (password: string) => {
+  const regex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+  return regex.test(password);
+};
 export async function login(
   email: string,
   password: string,
@@ -33,17 +38,17 @@ export async function login(
       try {
         decoded = jwtDecode<JwtPayload>(data.accessToken);
       } catch (err) {
-        console.log('Decode token lỗi: ', err);
+        console.log('Token decode error: ', err);
         return {
           success: false,
-          message: 'Token không hợp lệ',
+          message: 'Invalid access token.',
         };
       }
       // Chỉ cho phép User đăng nhập
       if (decoded.role !== 'User') {
         return {
           success: false,
-          message: 'Tài khoảng không được phép đăng nhập vào ứng dựng',
+          message: 'This account is not allowed to log in.',
         };
       }
       // Lưu token
@@ -59,7 +64,7 @@ export async function login(
 
     return {
       success: false,
-      message: data?.Message || 'Đăng nhập thất bại',
+      message: data?.Message || 'Login failed',
     };
   } catch (error: any) {
     console.log('Login API Error:', error);
@@ -67,8 +72,8 @@ export async function login(
       success: false,
       message:
         error.message === 'timeout'
-          ? 'Không thể kết nối đến máy chủ(timeout)'
-          : 'Không thể kết nối đến máy chủ',
+          ? 'Unable to connect to the server (timeout).'
+          : 'Unable to connect to the server.',
     };
   }
 }
@@ -109,11 +114,11 @@ export async function logout() {
     const endpoint = '/api/auth/logout';
     const res = await apiFetch.post(endpoint, { refreshToken });
     if (res.ok) {
-      console.log('Đăng xuất thành công trên server');
+      console.log('Logged out successfully on server.');
       return true;
     } else {
       const errorData = await res.text();
-      console.log('Lỗi server khi đăng xuất.', res.status, 'Body:', errorData);
+      console.log('Server logout error: ', res.status, 'Body:', errorData);
       return false;
     }
   } catch (error) {

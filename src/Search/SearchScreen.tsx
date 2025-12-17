@@ -154,12 +154,14 @@ const SearchScreen = () => {
           filtered.map(item => <SearchCard key={item.id} {...item} />)
         ) : (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Không tìm thấy tour nào</Text>
-            <Text style={styles.emptySubText}>Hãy thử từ khóa khác nhé!</Text>
+            <Text style={styles.emptyText}>Not found experience</Text>
+            <Text style={styles.emptySubText}>
+              Please try a different keyword!
+            </Text>
           </View>
         )}
       </ScrollView>
-      <LoadingOverlay visible={loading} message={'Đang tìm kiếm ...'} />
+      <LoadingOverlay visible={loading} message={'Searching ...'} />
     </View>
   );
 };

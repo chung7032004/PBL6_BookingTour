@@ -15,7 +15,7 @@ interface EditGuestsProps {
 
 const EditGuests = (props: EditGuestsProps) => {
   const {
-    title = 'Chỉnh sửa thông tin khách',
+    title = 'Edit Guest Information',
     visible,
     onClose,
     onSave,
@@ -70,8 +70,8 @@ const EditGuests = (props: EditGuestsProps) => {
           {/* Người lớn */}
           <View style={styles.row}>
             <View style={styles.info}>
-              <Text style={styles.label}>Người lớn</Text>
-              <Text style={styles.desc}>Độ tuổi từ 13 trở lên</Text>
+              <Text style={styles.label}>Adults</Text>
+              <Text style={styles.desc}>Ages 13 and above</Text>
             </View>
             <View style={styles.counter}>
               <TouchableOpacity
@@ -89,8 +89,8 @@ const EditGuests = (props: EditGuestsProps) => {
           {/* Trẻ em */}
           <View style={styles.row}>
             <View style={styles.info}>
-              <Text style={styles.label}>Trẻ em</Text>
-              <Text style={styles.desc}>Độ tuổi từ 2 - 12</Text>
+              <Text style={styles.label}>Children</Text>
+              <Text style={styles.desc}>Ages 2 - 12</Text>
             </View>
             <View style={styles.counter}>
               <TouchableOpacity
@@ -108,12 +108,12 @@ const EditGuests = (props: EditGuestsProps) => {
           {children > 0 && (
             <View style={styles.notice}>
               <Text style={styles.noticeTitle}>
-                Xác nhận của người giám hộ hợp pháp
+                Legal Guardian Confirmation
               </Text>
               <Text style={styles.noticeText}>
-                Tôi là người giám hộ hợp pháp của tất cả trẻ vị thành niên và sẽ
-                có mặt trong suốt trải nghiệm này. Trẻ vị thành niên đáp ứng yêu
-                cầu của host về độ tuổi.
+                I confirm that I am the legal guardian of all minors and will be
+                present throughout the experience. All minors meet the host’s
+                age requirements.
               </Text>
               <View style={styles.checkboxRow}>
                 <CustomCheckbox
@@ -125,7 +125,7 @@ const EditGuests = (props: EditGuestsProps) => {
                 />
                 {error && (
                   <Text style={styles.errorText}>
-                    Vui lòng xem kỹ và xác nhận.
+                    Please review and confirm to continue.
                   </Text>
                 )}
               </View>
@@ -134,8 +134,8 @@ const EditGuests = (props: EditGuestsProps) => {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.total}>{total} khách</Text>
-            <CustomButton title="Lưu" onPress={handleSave} />
+            <Text style={styles.total}>{total} guests</Text>
+            <CustomButton title="Save" onPress={handleSave} />
           </View>
         </View>
       </View>

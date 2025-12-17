@@ -41,7 +41,7 @@ const CreateListModal = ({
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Tạo danh sách mới</Text>
+            <Text style={styles.title}>Create new wishlist</Text>
             <TouchableOpacity onPress={onClose}>
               <MaterialIcons name="close" size={28} color="#666" />
             </TouchableOpacity>
@@ -49,10 +49,11 @@ const CreateListModal = ({
 
           {/* Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tên danh sách của bạn</Text>
+            <Text style={styles.label}>Your list name</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="Nhập tên danh sách"
+              placeholder="Enter name wish list"
+              placeholderTextColor={'#ccc'}
               multiline
               numberOfLines={3}
               value={content}
@@ -65,7 +66,7 @@ const CreateListModal = ({
 
           {/* Button */}
           <CustomButton
-            title="Tạo ngay"
+            title="Create now"
             style={styles.button}
             onPress={handleCreate}
           />

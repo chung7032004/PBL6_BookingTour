@@ -38,7 +38,7 @@ const RootNavigator = () => (
     <Root.Screen
       name="notice"
       component={NoticeScreen}
-      options={{ title: 'Thông báo', headerShown: true }}
+      options={{ title: 'Notification', headerShown: true }}
     />
   </Root.Navigator>
 );

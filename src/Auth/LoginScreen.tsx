@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { login } from '../api/auth/login';
+import { login, validatePassword } from '../api/auth/login';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Notification from '../components/Notification';
 
@@ -42,67 +42,58 @@ const LoginScreen = () => {
   }, [route.params]);
 
   const handleLogin = async () => {
-    if (email.length === 0) {
-      setError('Không được để trống email');
+    if (!email.trim()) {
+      setError('Email is required');
       return;
-    } else if (password.length === 0) {
-      setError('Mật khẩu không được để trống');
+    }
+
+    if (!password) {
+      setError('Password is required');
       return;
-    } else if (password.length < 8) {
-      setError('Mật khẩu phải dài ít nhất 8 ký tự');
+    }
+
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be at least 8 characters long and include a letter, a number, and a special character',
+      );
       return;
     }
 
     setLoading(true);
     setError('');
+
     const result = await login(email, password);
+
     setLoading(false);
 
-    if (result != null) {
-      if (!result.success) {
-        // if (result.message === 'Invalid email or password') {
-        // setError('Email hoặc mật khẩu không đúng!');
-        // return;
-        // } else if (result.message === 'Email is not confirmed') {
-        // setError('Email chưa được xác thực!');
-        // return;
-        // } else {
-        // setError('Máy chủ không phản hồi. Vui lòng thử lại sau!');
-        // return;
-        // }
-        if (result.message !== null) {
-          setError(result.message);
-          return;
-        }
-      }
-      const redirect = route.params?.redirect;
-      const nestedParams = route.params?.params as any;
-      if (redirect) {
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
+    if (result && !result.success) {
+      setError(result.message || 'Login failed');
+      return;
+    }
+
+    const redirect = route.params?.redirect;
+    const nestedParams = route.params?.params as any;
+
+    navigation.reset({
+      index: 0,
+      routes: [
+        redirect
+          ? {
               name: 'AppTabs',
               params: {
                 screen: redirect,
                 params: nestedParams,
               },
-            },
-          ],
-        });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'AppTabs' }],
-        });
-      }
-    }
+            }
+          : { name: 'AppTabs' },
+      ],
+    });
   };
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Đăng nhập</Text>
+          <Text style={styles.title}>Login</Text>
         </View>
         {/* Email */}
         <Text style={styles.text}>Email</Text>
@@ -112,8 +103,9 @@ const LoginScreen = () => {
             value={email}
             onChangeText={setEmail}
             style={styles.input}
-            placeholder="Email của bạn"
+            placeholder="Your email"
             placeholderTextColor="#999"
+            autoCapitalize="none"
             keyboardType="email-address"
             testID="login-input-email"
           />
@@ -126,9 +118,10 @@ const LoginScreen = () => {
             value={password}
             onChangeText={setPassword}
             style={styles.input}
-            placeholder="Nhập mật khẩu"
+            placeholder="Enter your password"
             placeholderTextColor="#999"
             secureTextEntry={!passwordVisible}
+            autoCapitalize="none"
             testID="login-input-password"
           />
           <TouchableOpacity
@@ -154,24 +147,24 @@ const LoginScreen = () => {
           onPress={() => handleLogin()}
           testID="login-btn-submit"
         >
-          <Text style={styles.buttonText}>Đăng nhập</Text>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
         <View style={styles.loginRow}>
-          <Text>Quên mật khẩu?</Text>
+          <Text>Forgot Password?</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('forgotPassword')}
           >
-            <Text style={styles.loginLink}> Đặt lại mật khẩu</Text>
+            <Text style={styles.loginLink}> Reset Password</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.loginRow}>
-          <Text>Không có tài khoảng</Text>
+          <Text>Don't have an account?</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('signup')}
             testID="signup-link"
           >
-            <Text style={styles.loginLink}> Đăng kí</Text>
+            <Text style={styles.loginLink}> Sign up</Text>
           </TouchableOpacity>
         </View>
       </View>

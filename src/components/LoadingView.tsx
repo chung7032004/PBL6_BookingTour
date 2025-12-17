@@ -5,7 +5,7 @@ interface LoadingViewProps {
 }
 
 const LoadingView = (props: LoadingViewProps) => {
-  const { message = 'Đang tải dữ liệu...' } = props;
+  const { message = 'Loading data...' } = props;
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#ff4d4f" />

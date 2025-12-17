@@ -45,7 +45,7 @@ const WishListCard = (props: WishListCardProps) => {
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
           {title}
         </Text>
-        <Text style={styles.saved}>{saved} đã lưu</Text>
+        <Text style={styles.saved}>{saved} Saved</Text>
       </View>
     </TouchableOpacity>
   );

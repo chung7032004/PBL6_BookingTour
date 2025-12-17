@@ -19,7 +19,7 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({
           <>
             {safeText}{' '}
             <Text style={styles.seeMore} onPress={() => setExpanded(false)}>
-              Thu gọn
+              Show less
             </Text>
           </>
         ) : (
@@ -29,7 +29,7 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({
               <>
                 ...{' '}
                 <Text style={styles.seeMore} onPress={() => setExpanded(true)}>
-                  Xem thêm
+                  Show more
                 </Text>
               </>
             )}

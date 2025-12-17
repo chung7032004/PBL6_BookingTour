@@ -74,14 +74,14 @@ const WishListDetailCard: React.FC<TourCardProps> = ({
           {subtitle}
         </Text>
 
-        <View style={styles.ratingRow}>
-          <Text style={styles.price}>
-            Chỉ từ {price.toLocaleString('vi-VN')}₫ /khách{' '}
-          </Text>
-          <Text style={styles.dot}>·</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.priceLabel}>From </Text>
+          <Text style={styles.mainPrice}>{price.toLocaleString('vi-VN')}</Text>
+          <Text style={styles.priceUnit}> VND/Guest</Text>
+          {/* <Text style={styles.dot}>·</Text>
           <Text style={styles.price}> {rating} </Text>
           <Icon name="star" size={16} color="#FFD700" />
-          <Text style={styles.price}> ({reviews})</Text>
+          <Text style={styles.price}> ({reviews})</Text> */}
         </View>
       </View>
     </TouchableOpacity>
@@ -149,6 +149,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6f0ff',
     padding: 8,
     borderRadius: 10,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline', // Căn chỉnh các phần tử theo đường cơ sở chữ
+    marginTop: 6,
+  },
+  priceLabel: {
+    fontSize: 13,
+    color: '#777', // Màu xám nhẹ cho chữ 'From'
+    fontWeight: '400',
+  },
+  mainPrice: {
+    fontSize: 18, // Kích thước lớn hơn
+    fontWeight: '700', // In đậm hơn
+    color: '#e63946', // Màu đen nổi bật
+    marginHorizontal: 2,
+  },
+  priceUnit: {
+    fontSize: 13,
+    color: '#777', // Màu xám nhẹ cho đơn vị
+    fontWeight: '400',
   },
 });
 

@@ -76,6 +76,10 @@ export interface ExperiencesRecommendation {
   recommendations: Recommendation[];
   total: number;
 }
+export interface ExperiencesPopular {
+  popularExperiences: Recommendation[];
+  total: number;
+}
 
 export interface Slot {
   date: string;

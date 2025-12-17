@@ -18,6 +18,7 @@ import { RootStackParamList } from '../../types/route';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Notification from '../components/Notification';
 import { resetPassword } from '../api/auth/forgotPassword';
+import { validatePassword } from '../api/auth/login';
 
 const ResetPasswordScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -41,17 +42,19 @@ const ResetPasswordScreen = () => {
 
   const handleReset = async () => {
     if (code.length !== 6) {
-      setError('Vui lòng nhập mã xác nhận 6 số');
+      setError('Please enter the 6-digit verification code');
       return;
     }
 
-    if (password.length < 8) {
-      setError('Mật khẩu phải dài ít nhất 8 ký tự');
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be at least 8 characters long and include a letter, a number, and a special character',
+      );
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp');
+      setError('Password do not match');
       return;
     }
 
@@ -60,12 +63,12 @@ const ResetPasswordScreen = () => {
     setLoading(false);
 
     if (!res.success) {
-      setError(res.message || 'Đổi mật khẩu thất bại');
+      setError(res.message || 'Password reset failed');
       return;
     }
 
     navigation.navigate('login', {
-      message: 'Đổi mật khẩu thành công, hãy đăng nhập lại',
+      message: 'Password reset successfully. Please sign in again',
     });
   };
 
@@ -73,7 +76,7 @@ const ResetPasswordScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Tạo mật khẩu mới</Text>
+          <Text style={styles.title}>Create New Password</Text>
         </View>
 
         {/* Email hiển thị */}
@@ -88,7 +91,7 @@ const ResetPasswordScreen = () => {
         </View>
 
         {/* Nhập mã xác nhận */}
-        <Text style={styles.text}>Mã xác nhận</Text>
+        <Text style={styles.text}>Verification Code</Text>
 
         <TextInput
           style={styles.codeInput}
@@ -102,12 +105,12 @@ const ResetPasswordScreen = () => {
         />
 
         {/* Mật khẩu */}
-        <Text style={styles.text}>Mật khẩu mới</Text>
+        <Text style={styles.text}>New Password</Text>
         <View style={styles.inputWrapper}>
           <Icon name="lock" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder="Nhập mật khẩu mới"
+            placeholder="Enter new password"
             placeholderTextColor="#999"
             secureTextEntry={!visible}
             value={password}
@@ -126,7 +129,7 @@ const ResetPasswordScreen = () => {
         </View>
 
         {/* Xác nhận mật khẩu */}
-        <Text style={styles.text}>Xác nhận mật khẩu</Text>
+        <Text style={styles.text}>Confirm Password</Text>
         <View style={styles.inputWrapper}>
           <Icon
             name="lock-outline"
@@ -136,7 +139,7 @@ const ResetPasswordScreen = () => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Nhập lại mật khẩu"
+            placeholder="Re-enter password"
             placeholderTextColor="#999"
             secureTextEntry={!visibleConfirm}
             value={confirmPassword}
@@ -157,18 +160,18 @@ const ResetPasswordScreen = () => {
         {error.length > 0 && <Text style={styles.error}>{error}</Text>}
 
         <TouchableOpacity style={styles.button} onPress={handleReset}>
-          <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+          <Text style={styles.buttonText}>Reset Password</Text>
         </TouchableOpacity>
 
         <View style={styles.loginRow}>
           <Text>Bạn muốn quay lại?</Text>
           <TouchableOpacity onPress={() => navigation.navigate('login')}>
-            <Text style={styles.loginLink}> Đăng nhập</Text>
+            <Text style={styles.loginLink}> Sync In</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <LoadingOverlay visible={loading} message={'Đang xử lý ...'} />
+      <LoadingOverlay visible={loading} message={'Processing...'} />
       {showNotification && (
         <Notification
           message={showNotification}

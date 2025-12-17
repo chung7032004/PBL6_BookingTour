@@ -13,7 +13,7 @@ const AppHeader = () => {
         onPress={() => navigation.navigate('searchTab')}
       >
         <Icon name="search" size={24} style={styles.icon} />
-        <Text style={styles.input}>Bạn muốn đi đâu...</Text>
+        <Text style={styles.input}>Where do you want to go...</Text>
       </TouchableOpacity>
     </View>
   );

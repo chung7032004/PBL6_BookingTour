@@ -60,6 +60,7 @@ const ReviewScreen = () => {
     });
     if (!res.reviewResponse) {
       setShowNotification(res.message);
+      return;
     }
     navigation.navigate('reviewSuccess');
   };

@@ -28,7 +28,7 @@ const SearchHeader = ({ onSearch }: Props) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Đà Nẵng, Phú Quốc, Hà Nội..."
+          placeholder="Where do you want to go..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={text => {

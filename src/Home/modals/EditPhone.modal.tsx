@@ -77,13 +77,13 @@ const EditPhoneModal = (props: EditPhoneProps) => {
           </TouchableOpacity>
 
           {/* Tiêu đề */}
-          <Text style={styles.title}>Chỉnh sửa số điện thoại</Text>
+          <Text style={styles.title}>Edit phone number</Text>
           <Text style={styles.desc}>
-            Nhập số điện thoại mà bạn muốn host có thể liên hệ khi cần.
+            Enter a phone number where the host can contact you if needed.
           </Text>
 
           <CustomTextInput
-            title="Số điện thoại"
+            title="Phone number"
             value={phone}
             onChangeText={handleChangePhone}
             keyboardType="phone-pad"
@@ -94,12 +94,14 @@ const EditPhoneModal = (props: EditPhoneProps) => {
           {showError && (
             <View style={styles.errorContainer}>
               <MaterialIcons name="error-outline" size={16} color="red" />
-              <Text style={styles.error}>Số điện thoại chỉ gồm số</Text>
+              <Text style={styles.error}>
+                Phone number must be in +84 format and contain 9 digits.
+              </Text>
             </View>
           )}
 
           <CustomButton
-            title="Lưu"
+            title="Save"
             onPress={handleSave}
             disabled={phone.trim() === ''}
           />

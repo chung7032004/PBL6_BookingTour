@@ -19,6 +19,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
+import { formatDate } from '../components/FormatDate';
 
 const ProviderScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -85,12 +86,12 @@ const ProviderScreen = () => {
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
             <Text style={styles.infoValue}>{hostDetail?.totalReviews}</Text>
-            <Text style={styles.infoLabel}>Đánh giá</Text>
+            <Text style={styles.infoLabel}>Review</Text>
           </View>
           <View style={styles.infoItem}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.infoValue}>
-                {hostDetail?.ratingAvg ?? 'Chưa có'}
+                {hostDetail?.ratingAvg ?? 'N/A'}
               </Text>
               <Icon
                 name="star"
@@ -99,11 +100,11 @@ const ProviderScreen = () => {
                 style={styles.starIcon}
               />
             </View>
-            <Text style={styles.infoLabel}>Xếp hạng</Text>
+            <Text style={styles.infoLabel}>Rating</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoValue}>{years}</Text>
-            <Text style={styles.infoLabel}>năm kinh nghiệm</Text>
+            <Text style={styles.infoLabel}>Years of experience</Text>
           </View>
         </View>
         {/* Extra Stats */}
@@ -122,9 +123,9 @@ const ProviderScreen = () => {
 
           <View style={styles.statItem}>
             <Text style={styles.statValue}>
-              {hostDetail?.responseTime ?? 'Không rõ'}
+              {hostDetail?.responseTime ?? 'Unknown'}
             </Text>
-            <Text style={styles.statLabel}>Thời gian trả lời</Text>
+            <Text style={styles.statLabel}>Response time</Text>
           </View>
         </View>
       </View>
@@ -136,7 +137,7 @@ const ProviderScreen = () => {
         {hostDetail?.isVerified && (
           <View style={styles.verifiedRow}>
             <Icon name="verified" size={22} color="#4CAF50" />
-            <Text style={styles.verifiedText}>Đã xác minh danh tính</Text>
+            <Text style={styles.verifiedText}>Identity verified</Text>
           </View>
         )}
         {/*Điện thoại*/}
@@ -166,6 +167,14 @@ const ProviderScreen = () => {
             <Text style={styles.infoText}>{hostDetail.gender}</Text>
           </View>
         )}
+        {hostDetail?.dateOfBirth && (
+          <View style={styles.infoRowNew}>
+            <Icon name={'cake'} size={20} color="#666" />
+            <Text style={styles.infoText}>
+              {formatDate(hostDetail.dateOfBirth)}
+            </Text>
+          </View>
+        )}
         {/* Ngôn ngữ */}
         {hostDetail?.spokenLanguages &&
           hostDetail.spokenLanguages.length > 0 && (
@@ -173,7 +182,7 @@ const ProviderScreen = () => {
               <Icon name="language" size={20} color="#666" />
               <Text style={styles.infoText}>
                 {hostDetail.spokenLanguages.filter(Boolean).join(' • ') ||
-                  'Tiếng Việt'}
+                  'Vietnamese'}
               </Text>
             </View>
           )}
@@ -226,7 +235,6 @@ const ProviderScreen = () => {
           <View style={styles.infoRowNew}>
             <Icon name="people" size={20} color="#666" />
             <Text style={styles.infoText}>
-              <Text style={{ fontWeight: '600' }}>Phong cách: </Text>
               {hostDetail.desiredHostingStyle}
             </Text>
           </View>
@@ -237,7 +245,7 @@ const ProviderScreen = () => {
           hostDetail?.instagramUrl ||
           hostDetail?.linkedInUrl) && (
           <View style={styles.socialContainer}>
-            <Text style={styles.socialLabel}>Kết nối với tôi</Text>
+            <Text style={styles.socialLabel}>Connect with me</Text>
             <View style={styles.socialIcons}>
               {hostDetail.facebookUrl && (
                 <Icon
@@ -272,7 +280,7 @@ const ProviderScreen = () => {
       </View>
 
       {/* Reviews Section */}
-      <Text style={styles.sectionTitle}>Đánh giá của khách</Text>
+      {/* <Text style={styles.sectionTitle}>Đánh giá của khách</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -287,7 +295,7 @@ const ProviderScreen = () => {
         style={styles.button}
         textStyle={{ fontSize: 16 }}
         onPress={() => setShowModalReview(true)}
-      />
+      /> */}
 
       {/* Tours Section 
       <Text style={styles.sectionTitle}>Trải nghiệm của Trần Hải Nam</Text>
@@ -302,12 +310,12 @@ const ProviderScreen = () => {
         
       </ScrollView>
         */}
-      <ReviewModal
+      {/* <ReviewModal
         reviews={reviews}
         onClose={() => setShowModalReview(false)}
         quantityReview={quantityReview}
         visible={showModalReview}
-      />
+      /> */}
     </ScrollView>
   );
 };

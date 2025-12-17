@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -18,11 +18,11 @@ interface CardProps {
   data: string;
 }
 
-const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
+const InfoCard: React.FC<CardProps> = ({ nameIcon, title, data }) => {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.iconWrapper}>
-        <MaterialIcons name={nameIcon as string} size={24} color="#333" />
+        <MaterialIcons name={nameIcon} size={24} color="#333" />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.titleText}>{title}</Text>
@@ -31,54 +31,65 @@ const Card: React.FC<CardProps> = ({ nameIcon, title, data }) => {
     </View>
   );
 };
+
 interface PostsScreenProps {
   myProfile: userProfile | null | undefined;
 }
-const PostsScreen = (props: PostsScreenProps) => {
-  const myProfile = props.myProfile;
-  if (!myProfile)
-    return <LoadingView message="Không tìm thấy dữ liệu hồ sơ." />;
+
+const PostsScreen = ({ myProfile }: PostsScreenProps) => {
+  if (!myProfile) {
+    return <LoadingView message="Profile data not found." />;
+  }
+
   return (
     <ScrollView style={styles.container}>
-      <Card
+      <InfoCard
         nameIcon="person-outline"
-        title="Tên đầy đủ"
+        title="Full Name"
         data={myProfile.fullName}
       />
-      <Card nameIcon="email" title="Địa chỉ Email" data={myProfile.email} />
-      <Card
+
+      <InfoCard nameIcon="email" title="Email Address" data={myProfile.email} />
+
+      <InfoCard
         nameIcon="phone-iphone"
-        title="Số điện thoại"
-        data={myProfile?.phoneNumber ? myProfile.phoneNumber : 'Chưa cập nhật'}
+        title="Phone Number"
+        data={myProfile.phoneNumber || 'Not provided'}
       />
-      <Card
+
+      <InfoCard
         nameIcon="transgender"
-        title="Giới tính"
-        data={myProfile?.gender ? myProfile.gender : 'Chưa cập nhật'}
+        title="Gender"
+        data={myProfile.gender || 'Not provided'}
       />
-      <Card
+
+      <InfoCard
         nameIcon="date-range"
-        title="Ngày sinh"
+        title="Date of Birth"
         data={
-          myProfile?.dateOfBirth
+          myProfile.dateOfBirth
             ? formatENDate(myProfile.dateOfBirth)
-            : 'Chưa cập nhật'
+            : 'Not provided'
         }
       />
-      <Card
+
+      <InfoCard
         nameIcon="home"
-        title="Quốc gia"
-        data={myProfile?.country ? myProfile.country : 'Chưa cập nhật'}
+        title="Country"
+        data={myProfile.country || 'Not provided'}
       />
     </ScrollView>
   );
 };
+
+export default PostsScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
   },
+
   cardContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -122,4 +133,3 @@ const styles = StyleSheet.create({
     color: '#333',
   } as TextStyle,
 });
-export default PostsScreen;

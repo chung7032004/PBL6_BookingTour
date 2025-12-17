@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   ScrollView,
@@ -18,7 +18,6 @@ import { RootStackParamList } from '../../../types/route';
 import {
   formatDate,
   formatENDate,
-  formatENTime,
   formatTimeWithoutSeconds,
 } from '../../components/FormatDate';
 
@@ -76,7 +75,7 @@ interface SelectDateModalProps {
 const SelectDateModal = (props: SelectDateModalProps) => {
   const {
     visible,
-    title = 'Chọn thời gian',
+    title = 'Select date & time',
     onClose,
     adultPrice,
     childPrice,
@@ -167,9 +166,9 @@ const SelectDateModal = (props: SelectDateModalProps) => {
           {/* Thông tin khách */}
           <View style={styles.editQuantity}>
             <View>
-              <Text style={styles.subTitle}>{quantity.total} khách</Text>
+              <Text style={styles.subTitle}>{quantity.total} Guest</Text>
               <Text style={styles.subText}>
-                {quantity.adult} người lớn, {quantity.children} trẻ em
+                {quantity.adult} adult, {quantity.children} child
               </Text>
             </View>
             <TouchableOpacity onPress={() => setShowEditGuests(true)}>
@@ -194,7 +193,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
             {/* </Text> */}
             {!slots ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>Chưa có khung giờ</Text>
+                <Text style={styles.emptyText}>No available time slots</Text>
               </View>
             ) : (
               slots.map((slot, index) => (
@@ -215,7 +214,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
             <View style={styles.payment}>
               {quantity.total > selectedSlot.spotsAvailable ? (
                 <Text style={[styles.paymentText, { color: 'red' }]}>
-                  Không có đủ chỗ cho khung giờ này
+                  Not enough spots available for this time slot
                 </Text>
               ) : (
                 <>
@@ -224,13 +223,13 @@ const SelectDateModal = (props: SelectDateModalProps) => {
                       adultPrice * quantity.adult +
                       childPrice * quantity.children
                     ).toLocaleString()}{' '}
-                    đ cho {quantity.total} khách
+                    VND for {quantity.total} guests
                   </Text>
                   <TouchableOpacity
                     style={styles.payButton}
                     onPress={() => handlePayment()}
                   >
-                    <Text style={styles.payButtonText}>Thanh toán</Text>
+                    <Text style={styles.payButtonText}>Proceed to payment</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -243,7 +242,7 @@ const SelectDateModal = (props: SelectDateModalProps) => {
         onClose={() => setShowEditGuests(false)}
         initialValue={quantity}
         onSave={newQuantity => setQuantity(newQuantity)}
-        title="Chỉnh sửa số khách"
+        title="Edit guests"
       />
     </Modal>
   );

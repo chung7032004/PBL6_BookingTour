@@ -62,15 +62,15 @@ const SearchCard = (props: TourCardProps) => {
         <View style={styles.ratingRow}>
           <MaterialIcon name="star" size={16} color="#FFD700" />
           <Text style={styles.rating}>{averageRating.toFixed(1)}</Text>
-          <Text style={styles.count}>({totalReviews})</Text>
+          <Text style={styles.count}>({totalReviews} reviews)</Text>
         </View>
 
         <Text style={styles.price}>
-          Chỉ từ{' '}
+          From{' '}
           <Text style={styles.priceValue}>
-            {adultPrice.toLocaleString('vi-VN')}₫
+            {adultPrice.toLocaleString('vi-VN')} VND
           </Text>{' '}
-          / khách
+          / Guests
         </Text>
       </View>
     </TouchableOpacity>

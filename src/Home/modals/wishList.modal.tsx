@@ -81,7 +81,7 @@ const WishListModal = (props: WishListProps) => {
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Lưu vào danh sách yêu thích</Text>
+            <Text style={styles.title}>Save to wishlist</Text>
             <TouchableOpacity onPress={onClose}>
               <MaterialIcons name="close" size={28} color="#666" />
             </TouchableOpacity>
@@ -105,7 +105,7 @@ const WishListModal = (props: WishListProps) => {
           </ScrollView>
           {/* Button */}
           <CustomButton
-            title="Tạo danh sách mong muốn mới"
+            title="Create a new wishlist"
             style={styles.button}
             onPress={() => setShowCreateListModal(true)}
           />

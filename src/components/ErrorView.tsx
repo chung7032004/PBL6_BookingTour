@@ -7,7 +7,7 @@ interface ErrorViewProps {
   textButton?: string;
 }
 const ErrorView = (props: ErrorViewProps) => {
-  const { message, onPress, textButton = 'Thử lại' } = props;
+  const { message, onPress, textButton = 'Try again' } = props;
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{message}</Text>

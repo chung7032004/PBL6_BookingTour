@@ -3,47 +3,47 @@ import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ContactScreen = () => {
-  const [name] = useState('Nguyen Chung');
+  const [name] = useState('You');
   const [phone] = useState('+84 02 3334 5556');
 
   return (
     <View style={styles.container}>
       {/* Greeting section */}
       <View style={styles.section}>
-        <Text style={styles.title}>Xin chào {name},</Text>
-        <Text style={styles.subTitle}>Chúng tôi có thể giúp gì cho bạn?</Text>
+        <Text style={styles.title}>Hi {name},</Text>
+        <Text style={styles.subTitle}>How can we help you?</Text>
       </View>
 
       {/* Working hours card */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Icon name="warning" size={26} color="#D9534F" />
-          <Text style={styles.cardTitle}>Giờ hoạt động của trung tâm CSKH</Text>
+          <Text style={styles.cardTitle}>Customer Support Hours</Text>
         </View>
 
         <Text style={styles.text}>
-          Tổng đài hoạt động: Thứ Hai - Chủ Nhật (08:00 - 22:00)
+          Hotline available: Monday – Sunday (08:00 – 22:00)
         </Text>
         <Text style={styles.phone}>{phone}</Text>
-        <Text style={styles.text}>Tin nhắn: Hoạt động 24/7</Text>
+        <Text style={styles.text}>Messaging support: Available 24/7</Text>
       </View>
 
       {/* Support center */}
       <View style={styles.supportContainer}>
-        <Text style={styles.supportTitle}>Bạn đang tìm thông tin khác?</Text>
+        <Text style={styles.supportTitle}>Looking for something else?</Text>
 
         <View style={styles.supportRow}>
           <Icon name="help-outline" size={30} color="#000" />
           <View style={{ marginLeft: 10 }}>
-            <Text style={styles.supportHeader}>Trung tâm hỗ trợ</Text>
+            <Text style={styles.supportHeader}>Help Center</Text>
             <Text style={styles.text}>
-              Trả lời nhanh các câu hỏi bạn đang quan tâm
+              Quick answers to your most common questions
             </Text>
           </View>
         </View>
 
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Bắt đầu</Text>
+          <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -74,13 +74,10 @@ const BookingDetailScreen = () => {
         return;
       }
       const resExp = await getExperiencesById(res.bookingDetail.experienceId);
-      console.log('call api thành công ');
       if (resExp.message) {
-        console.log('Tải thất bại');
         setErrorMsg(res.message);
         setErrorType('FETCH_FAILED');
       }
-      console.log('Tải thành công');
       setTour(resExp.experience);
       setHost(resExp.host);
     }
@@ -127,7 +124,7 @@ const BookingDetailScreen = () => {
     );
   };
   if (loading) {
-    return <LoadingView message="Đang tải dữ liệu ..." />;
+    return <LoadingView message="Loading data..." />;
   }
   if (!bookingDetail) {
     if (errorType === 'FETCH_FAILED') {
@@ -205,16 +202,16 @@ const BookingDetailScreen = () => {
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Experience cost</Text>
             <Text style={styles.priceValue}>
-              {bookingDetail?.totalPrice.toLocaleString('VN')}₫
+              {bookingDetail?.totalPrice.toLocaleString('VN')} VND
             </Text>
           </View>
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Platform fee</Text>
-            <Text style={styles.priceValue}>0₫</Text>
+            <Text style={styles.priceValue}>0 VND</Text>
           </View>
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Discount</Text>
-            <Text style={styles.priceValue}>0₫</Text>
+            <Text style={styles.priceValue}>0 VND</Text>
           </View>
 
           <View style={styles.divider} />
@@ -222,7 +219,7 @@ const BookingDetailScreen = () => {
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>TOTAL</Text>
             <Text style={styles.totalAmount}>
-              {bookingDetail?.totalPrice.toLocaleString('VN')}₫
+              {bookingDetail?.totalPrice.toLocaleString('VN')} VND
             </Text>
           </View>
 

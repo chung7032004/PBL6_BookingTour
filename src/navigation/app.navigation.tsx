@@ -25,7 +25,7 @@ const AppNavigation = () => {
         name="homeTab"
         component={HomeStack}
         options={{
-          title: 'Trang chủ',
+          title: 'Home',
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="home" size={size} color={color} />
           ),
@@ -35,7 +35,7 @@ const AppNavigation = () => {
         name="searchTab"
         component={SearchStack}
         options={{
-          title: 'Tìm kiếm',
+          title: 'Search',
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="search" size={size} color={color} />
           ),
@@ -55,7 +55,7 @@ const AppNavigation = () => {
         name="wishListTab"
         component={WishListStack}
         options={{
-          title: 'Yêu thích',
+          title: 'WishList',
           unmountOnBlur: true,
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="favorite-outline" size={size} color={color} />
@@ -66,7 +66,7 @@ const AppNavigation = () => {
         name="profileTab"
         component={ProfileStack}
         options={{
-          title: 'Tài khoản',
+          title: 'Account',
           tabBarIcon: ({ size, color }) => (
             <MaterialIcons name="person" size={size} color={color} />
           ),

@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ProfileScreen from '../Profile/ProfileScreen';
 import ProfileDetailScreen from '../Profile/ProfileDetailScreen';
 import ProfileEditScreen from '../Profile/ProfileEditScreen';
-import HeaderNotificationIcon from '../components/HeaderNotificationIcon';
 import ContactScreen from '../Profile/ContactScreen';
 
 export default function ProfileStack() {
@@ -19,7 +18,7 @@ export default function ProfileStack() {
         name="profileDetail"
         component={ProfileDetailScreen}
         options={{
-          title: 'Trang cá nhân',
+          title: 'Personal Page',
           // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />
@@ -27,7 +26,7 @@ export default function ProfileStack() {
         name="profileEdit"
         component={ProfileEditScreen}
         options={{
-          title: 'Thông tin tài khoản',
+          title: 'Account Information',
           // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />
@@ -35,7 +34,7 @@ export default function ProfileStack() {
         name="contact"
         component={ContactScreen}
         options={{
-          title: 'Liên hệ chúng tôi',
+          title: 'Contact Us',
           // headerRight: () => <HeaderNotificationIcon count={10} />,
         }}
       />

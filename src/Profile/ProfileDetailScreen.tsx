@@ -18,66 +18,82 @@ import { getMyProfile } from '../api/experiences/host';
 
 const ProfileDetailScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
+
   const tabs = [
-    { key: 'posts', label: 'Thông tin' },
-    { key: 'comments', label: 'Đánh giá' },
+    { key: 'posts', label: 'Information' },
+    { key: 'comments', label: 'Reviews' },
   ];
+
   const [myProfile, setMyProfile] = useState<userProfile | null>();
-  const avatarSource = myProfile?.avatarUrl
-    ? { uri: myProfile.avatarUrl } // Nếu có URL, sử dụng ảnh từ API
-    : images.account; // Nếu không có, sử dụng ảnh mặc định
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [errorProfile, setErrorProfile] = useState<string | null>(null);
   const [errorLogin, setErrorLogin] = useState<string | null>(null);
+
+  const avatarSource = myProfile?.avatarUrl
+    ? { uri: myProfile.avatarUrl }
+    : images.account;
+
   useFocusEffect(
     useCallback(() => {
       loadProfile();
     }, []),
   );
+
   const loadProfile = async () => {
     try {
       setLoadingProfile(true);
-      const myProfile = await getMyProfile();
-      if (!myProfile) {
-        setErrorLogin('Vui lòng đăng nhập để xem thông tin');
+      const profile = await getMyProfile();
+
+      if (!profile) {
+        setErrorLogin('Please log in to view your profile');
         return;
       }
-      setMyProfile(myProfile);
+
+      setMyProfile(profile);
     } catch (error: any) {
-      setErrorProfile(error.message || 'Không tải được hồ sơ');
-      return;
+      setErrorProfile(error.message || 'Failed to load profile');
     } finally {
       setLoadingProfile(false);
     }
   };
+
   const handleLogin = () => {
     navigation.navigate('login', {
       redirect: 'homeTab',
       params: 'paymentScreen',
-      message: errorLogin ? errorLogin : '',
+      message: errorLogin ?? '',
     });
   };
-  if (loadingProfile) return <LoadingView message="Đang tải dữ liệu ..." />;
-  if (errorProfile)
+
+  if (loadingProfile) {
+    return <LoadingView message="Loading profile data..." />;
+  }
+
+  if (errorProfile) {
     return (
       <ErrorView
         message={errorProfile}
         onPress={loadProfile}
-        textButton="Tải lại trang"
+        textButton="Reload"
       />
     );
-  if (errorLogin)
+  }
+
+  if (errorLogin) {
     return (
       <ErrorView
         message={errorLogin}
         onPress={handleLogin}
-        textButton="Đăng nhập"
+        textButton="Log in"
       />
     );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Header profile */}
+      {/* Profile header */}
       <View style={styles.profileSection}>
         <TouchableOpacity>
           <Image
@@ -95,11 +111,11 @@ const ProfileDetailScreen = () => {
           onPress={() => navigation.navigate('profileEdit')}
         >
           <Icon name="edit" size={20} color="#007bff" style={styles.editIcon} />
-          <Text style={styles.editText}>Chỉnh sửa hồ sơ</Text>
+          <Text style={styles.editText}>Edit profile</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Custom Tabs */}
+      {/* Tabs */}
       <CustomTabs
         tabs={tabs}
         activeTab={activeTab}
@@ -117,8 +133,13 @@ const ProfileDetailScreen = () => {
   );
 };
 
+export default ProfileDetailScreen;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   profileSection: {
     alignItems: 'center',
     paddingTop: 5,
@@ -131,7 +152,12 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     marginBottom: 5,
   },
-  userName: { fontSize: 20, fontWeight: '600', color: '#000', marginBottom: 8 },
+  userName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 8,
+  },
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,9 +167,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 10,
   },
-  editIcon: { marginRight: 6 },
-  editText: { fontSize: 14, color: '#007bff', fontWeight: '500' },
-  userInfo: { fontSize: 14, color: '#666' },
+  editIcon: {
+    marginRight: 6,
+  },
+  editText: {
+    fontSize: 14,
+    color: '#007bff',
+    fontWeight: '500',
+  },
 });
-
-export default ProfileDetailScreen;

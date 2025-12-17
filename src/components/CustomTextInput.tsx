@@ -10,7 +10,7 @@ interface CustomTextInputProps extends RNTextInputProps {
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
-  title = 'Nhập...',
+  title = 'Enter...',
   placeholderTextColor = '#aaa',
   ...rest
 }) => {

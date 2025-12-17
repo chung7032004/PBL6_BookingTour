@@ -77,7 +77,7 @@ const TourDetailScreen = () => {
       setTour(res.experience);
       setHost(res.host);
       if (res.experience === null) {
-        setError('Tải experience thất bại');
+        setError('Failed to load experience');
         return;
       }
       const resReview = await getReviews(res.experience?.id);
@@ -88,7 +88,7 @@ const TourDetailScreen = () => {
       console.log(resReview.reviewResponse.data);
       setReviews(resReview.reviewResponse.data);
     } catch (error) {
-      setError('Lỗi không xác định');
+      setError('Unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -114,7 +114,7 @@ const TourDetailScreen = () => {
       navigation.navigate('login', {
         redirect: 'homeTab',
         params: { screen: 'tourDetail', params: { id: tour?.id } },
-        message: 'Bạn cần đăng nhập để dùng tính năng này',
+        message: 'Please log in to use this feature',
       });
       return false;
     }
@@ -197,7 +197,7 @@ const TourDetailScreen = () => {
         {/*  Mô tả & giá */}
         <View style={styles.section}>
           <View style={styles.header}>
-            <Text style={styles.title} numberOfLines={2}>
+            <Text style={styles.title} numberOfLines={3}>
               {tour?.title}
             </Text>
             <TouchableOpacity style={styles.favorite} onPress={handleFavorite}>
@@ -213,16 +213,16 @@ const TourDetailScreen = () => {
                   !wishList && styles.unfavoriteText,
                 ]}
               >
-                Yêu thích
+                Favorite
               </Text>
             </TouchableOpacity>
           </View>
           <ExpandableText text={tour?.description} limit={100} />
           <View style={styles.headerInfo}>
-            <Text style={styles.textHeader}>Thông tin chuyến đi</Text>
+            <Text style={styles.textHeader}>Trip Information</Text>
           </View>
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Địa chỉ: </Text>
+            <Text style={styles.detailLabel}>Address: </Text>
             <Text style={styles.detailValue}>
               {tour?.address}, {tour?.distance}, {tour?.city}, {tour?.country}
             </Text>
@@ -230,9 +230,7 @@ const TourDetailScreen = () => {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Duration: </Text>
             <Text style={styles.detailValue}>
-              {tour?.duration
-                ? formatDuration(tour.duration)
-                : 'Không xác định'}
+              {tour?.duration ? formatDuration(tour.duration) : 'Not specified'}
             </Text>
           </View>
           <View style={styles.detailRow}>
@@ -259,7 +257,7 @@ const TourDetailScreen = () => {
 
         {/* Hoạt động nổi bật */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Những hoạt động nổi bật</Text>
+          <Text style={styles.sectionTitle}>What you’ll do</Text>
           <TouchableOpacity onPress={() => setShowActiveModal(true)}>
             {limitedItineraries.slice(0, 3).map((iti, index) => (
               <ActiveCard
@@ -272,13 +270,13 @@ const TourDetailScreen = () => {
             ))}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowActiveModal(true)}>
-            <Text style={styles.moreText}>Xem tất cả hoạt động</Text>
+            <Text style={styles.moreText}>View all activities</Text>
           </TouchableOpacity>
         </View>
 
         {/* Thông tin Host */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Thông tin Host</Text>
+          <Text style={styles.sectionTitle}>Host Information</Text>
           <TouchableOpacity
             style={styles.hostContainer}
             onPress={() =>
@@ -295,14 +293,16 @@ const TourDetailScreen = () => {
             />
             <View style={{ flex: 1, flexShrink: 1 }}>
               <Text style={styles.hostName}>{host?.fullName}</Text>
-              <Text style={styles.hostDesc}>{host?.bio}</Text>
+              <Text numberOfLines={3} style={styles.hostDesc}>
+                {host?.bio}
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
 
         {/* Đánh giá  */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Đánh giá</Text>
+          <Text style={styles.sectionTitle}>Review</Text>
 
           <View style={styles.ratingSummary}>
             <Text style={styles.ratingValue}>
@@ -315,7 +315,7 @@ const TourDetailScreen = () => {
               style={styles.starIcon}
             />
             <Text style={styles.ratingCount}>
-              ({tour?.totalReviews} đánh giá)
+              ({tour?.totalReviews} reviews)
             </Text>
           </View>
 
@@ -331,7 +331,7 @@ const TourDetailScreen = () => {
           </ScrollView>
 
           <TouchableOpacity onPress={() => setShowModalReview(true)}>
-            <Text style={styles.moreText}>Hiển thị thêm</Text>
+            <Text style={styles.moreText}>Show more</Text>
           </TouchableOpacity>
         </View>
 
@@ -342,14 +342,14 @@ const TourDetailScreen = () => {
       <View style={styles.stickyFooter}>
         <View style={styles.priceRowFooter}>
           <Text style={styles.priceTextFooter}>
-            Giá từ:
+            From:
             <Text style={styles.priceHighlightFooter}>
               {' '}
-              {tour?.adultPrice.toLocaleString('vi-VN')}₫
+              {tour?.adultPrice.toLocaleString('vi-VN')} VND
             </Text>
           </Text>
           <CustomButton
-            title="Chọn ngày"
+            title="Select date"
             onPress={() => setShowSelectModal(true)}
             style={styles.footerButton}
             textStyle={styles.footerButtonText}
@@ -360,7 +360,7 @@ const TourDetailScreen = () => {
       <SelectDateModal
         visible={showSelectModal}
         onClose={() => setShowSelectModal(false)}
-        title="Chọn thời gian"
+        title="Select date"
         navigation={navigation}
         tourInfo={{
           name: tour?.title || 'Tour',

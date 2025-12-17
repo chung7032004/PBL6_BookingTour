@@ -38,7 +38,7 @@ const BookingCard: React.FC<Booking> = props => {
       <View style={styles.content}>
         {/* Tên tour + mã đặt */}
         <Text style={styles.tourName}>{experienceTitle}</Text>
-        <Text style={styles.bookingCode}>Mã đặt: #{bookingCode}</Text>
+        <Text style={styles.bookingCode}>Booking Code: #{bookingCode}</Text>
 
         {/* Ngày giờ */}
         <View style={styles.row}>
@@ -53,14 +53,15 @@ const BookingCard: React.FC<Booking> = props => {
         <View style={styles.row}>
           <Icon name="group" size={18} color="#666" />
           <Text style={styles.date}>
-            {adults} người lớn • {children} trẻ em
+            {adults} {adults === 1 ? 'adult' : 'adults'} • {children}{' '}
+            {children === 1 ? 'child' : 'children'}
           </Text>
         </View>
 
         {/* Giá & trạng thái dưới cùng */}
         <View style={styles.footer}>
           <Text style={styles.price}>
-            {totalPrice.toLocaleString('vi-VN')}₫
+            {totalPrice.toLocaleString('vi-VN')} VND
           </Text>
 
           <View style={[styles.statusBadge, { backgroundColor: color + '22' }]}>

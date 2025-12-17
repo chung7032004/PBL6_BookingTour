@@ -2,12 +2,13 @@ import { ReviewResponse } from '../../../types/booking';
 import {
   Category,
   Experience,
+  ExperiencesPopular,
   ExperiencesRecommendation,
   ExperiencesResponse,
   Slot,
   TourCardProps,
 } from '../../../types/experience';
-import { HostDetail, HostInTour } from '../../../types/host';
+import { HostDetail } from '../../../types/host';
 import { apiFetch, fetchWithTimeout } from '../auth/fetch';
 import { url } from '../url';
 import { getHostDetail, toHostInTour } from './host';
@@ -64,6 +65,7 @@ export async function getExperiences(
 ): Promise<{
   experiences: TourCardProps[];
   totalCount?: number;
+  pageNumber?: number;
   messages: string | null;
 }> {
   const param = {
@@ -87,17 +89,19 @@ export async function getExperiences(
       throw Error('Network error');
     }
     const data = await res.json();
+    console.log('experience', data);
     const apiResponse = data as ExperiencesResponse;
     return {
       experiences: apiResponse.data,
       totalCount: apiResponse.totalCount,
+      pageNumber: apiResponse.pageNumber,
       messages: null,
     };
   } catch (error) {
     console.log('getExperience API Error:', error);
     return {
       experiences: [],
-      messages: 'Không thể kết nối đến máy chủ',
+      messages: 'Unable to connect to the server.',
     };
   }
 }
@@ -124,7 +128,7 @@ export async function getExperiencesById(experienceId: string): Promise<{
         return {
           experience: null,
           host: null,
-          message: 'Không tìm thấy trải nghiệm',
+          message: 'Not found experience',
         };
       }
       throw new Error(`HTTP ${res.status}`);
@@ -143,7 +147,7 @@ export async function getExperiencesById(experienceId: string): Promise<{
     return {
       experience: null,
       host: null,
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }
@@ -251,7 +255,6 @@ export async function getRecommendations(): Promise<{
   try {
     const endpoint = '/api/experiences/recommendations?topK=10';
     const res = await apiFetch.get(endpoint);
-    console.log(res);
     if (res.status === 401) {
       return {
         experience: null,
@@ -286,6 +289,70 @@ export async function getRecommendations(): Promise<{
     console.log(experiencesRecommendation);
     return {
       experience: experiencesRecommendation,
+      message: 'Get recommendations successfully retrieved',
+    };
+  } catch (error: any) {
+    if (
+      error.name === 'TypeError' ||
+      error.message.includes('fetch') ||
+      error.message === 'REQUEST_TIMEOUT'
+    ) {
+      return {
+        experience: null,
+        message: 'No network connection. Please check your connection',
+      };
+    }
+    return {
+      experience: null,
+      message: error.message || 'An unknown error occurred. Please try again ',
+    };
+  }
+}
+
+export async function getPopular(): Promise<{
+  experience: ExperiencesPopular | null;
+  message: string;
+}> {
+  try {
+    const endpoint = `${url}/api/experiences/popular?topK=10`;
+    const res = await fetchWithTimeout(
+      endpoint,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      7000,
+    );
+    console.log('popular', res);
+    if (!res.ok) {
+      let message = 'Failed to fetch get recommendations';
+      try {
+        const text = await res.text();
+        if (text) {
+          const errorJson = JSON.parse(text);
+          message = errorJson.message || errorJson.error || message;
+        }
+      } catch {
+        // ignore parse error
+      }
+      return {
+        experience: null,
+        message: `${message}(${res.status})`,
+      };
+    }
+    const text = await res.text();
+    if (!text) {
+      return {
+        experience: null,
+        message: 'The response data is empty  ',
+      };
+    }
+    const experiencesPopular = JSON.parse(text);
+    console.log(experiencesPopular);
+    return {
+      experience: experiencesPopular,
       message: 'Get recommendations successfully retrieved',
     };
   } catch (error: any) {

@@ -7,6 +7,7 @@ import WishListDetailScreen from '../WishList/WishListDetailScreen';
 import TourDetailScreen from '../Home/TourDetailScreen';
 import HeaderNotificationIcon from '../components/HeaderNotificationIcon';
 import { useState } from 'react';
+import WishListScreen from '../WishList/WishListScreen';
 
 const WishListStack = () => {
   const Stack = createNativeStackNavigator();
@@ -14,8 +15,8 @@ const WishListStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="wishList"
-        component={WishList}
+        name="wishListScreen"
+        component={WishListScreen}
         options={{
           // headerRight: () => <HeaderNotificationIcon count={count} />,
           headerTitle: () => <AppHeader />,

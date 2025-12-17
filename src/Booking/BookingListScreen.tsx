@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -7,7 +7,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import BookingCard from './BookingCard';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
@@ -30,10 +34,11 @@ const BookingListScreen = () => {
   const [errorType, setErrorType] = useState<
     'NOT_LOGGED_IN' | 'FETCH_FAILED' | null
   >(null);
-
-  useEffect(() => {
-    loadBooking();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadBooking();
+    }, []),
+  );
   const loadBooking = async () => {
     setLoading(true);
     const res = await getMyBooking();
@@ -45,11 +50,8 @@ const BookingListScreen = () => {
     }
     setLoading(false);
   };
-  useEffect(() => {
-    loadBooking();
-  }, []);
   if (loading) {
-    return <LoadingView message="Đang tải dữ liệu ..." />;
+    return <LoadingView message="Loading list booking..." />;
   }
   if (errorType === 'FETCH_FAILED') {
     return (
@@ -111,7 +113,7 @@ const BookingListScreen = () => {
         ) : (
           <View style={styles.emptyContainer}>
             <MaterialIcons name="hourglass-empty" size={50} color="#aaa" />
-            <Text style={styles.emptyText}>Không có booking nào.</Text>
+            <Text style={styles.emptyText}>No bookings found.</Text>
           </View>
         )}
       </ScrollView>

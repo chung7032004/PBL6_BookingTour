@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -21,6 +21,7 @@ import {
 import {
   getCategories,
   getExperiences,
+  getPopular,
   getRecommendations,
 } from '../api/experiences/experiences';
 import LoadingView from '../components/LoadingView';
@@ -34,11 +35,8 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
-import images from '../../images';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { categoryIcons } from '../constants/categoryIcons';
-import { refreshToken } from '../api/auth/fetch';
-import CustomButton from '../components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
@@ -55,13 +53,24 @@ const HomeScreen = () => {
   const [recommendations, setRecommendations] = useState<
     Recommendation[] | null
   >();
+  const [totalRecommendation, setTotalRecommendation] = useState(0);
+  const [totalPopular, setTotalPopular] = useState(0);
+  const [popular, setPopular] = useState<Recommendation[] | null>();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const skipEndReachedRef = useRef(false);
 
   useEffect(() => {
-    loadRecommendation();
-    loadSuggest();
-    loadCategories();
-    loadWishLists();
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    await Promise.all([
+      loadRecommendation(),
+      loadSuggest(),
+      loadCategories(),
+      loadWishLists(),
+    ]);
+  };
   const loadCategories = async () => {
     const res = await getCategories();
     if (!res) return;
@@ -78,15 +87,16 @@ const HomeScreen = () => {
   const loadSuggest = async () => {
     try {
       setLoading(true);
-      const res = await getExperiences(pageSuggest, 10);
+      setPageSuggest(1);
+      skipEndReachedRef.current = true;
+      const res = await getExperiences(1, 10);
       if (res.messages) {
         setError(res.messages);
         return;
       }
-      const tours = res.experiences;
-      setSuggest(tours);
+      setSuggest(res.experiences);
     } catch (error) {
-      setError('Lỗi không xác định');
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -94,26 +104,59 @@ const HomeScreen = () => {
   const loadRecommendation = async () => {
     const res = await getRecommendations();
     if (res.experience === null) {
+      if (totalPopular === 0) {
+        await loadPopular();
+      }
       return;
     }
+    setTotalRecommendation(res.experience.total);
     setRecommendations(res.experience.recommendations);
   };
+  const loadPopular = async () => {
+    const res = await getPopular();
+    if (res.experience === null) {
+      return;
+    }
+    setTotalPopular(res.experience.total);
+    setPopular(res.experience.popularExperiences);
+  };
+
   const loadMoreSuggest = async () => {
     if (loadingMore) return;
+    if (skipEndReachedRef.current) {
+      skipEndReachedRef.current = false; // ✅ chỉ skip 1 lần
+      return;
+    }
     setLoadingMore(true);
     try {
       const nextPage = pageSuggest + 1;
       const res = await getExperiences(nextPage, 10);
-      if (res.messages) {
+      if (!res.experiences) {
         return;
       }
       setSuggest(prev => [...prev, ...res.experiences]);
-      setPageSuggest(nextPage);
+      setPageSuggest(res?.pageNumber ? res.pageNumber : 1);
     } catch (error) {
       console.log('Load more suggest error:', error);
     } finally {
       setLoadingMore(false);
     }
+  };
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+
+    setIsRefreshing(true);
+    setError(null);
+    setPageSuggest(1);
+    setSuggest([]);
+
+    await Promise.all([
+      loadRecommendation(),
+      loadSuggest(),
+      loadCategories(),
+      loadWishLists(),
+    ]);
+    setIsRefreshing(false);
   };
   if (loading) {
     return <LoadingView />;
@@ -135,11 +178,13 @@ const HomeScreen = () => {
     <FlatList
       data={[1]}
       showsVerticalScrollIndicator={false}
+      refreshing={isRefreshing}
+      onRefresh={handleRefresh}
       renderItem={() => (
         <>
-          {recommendations && (
+          {recommendations && totalRecommendation > 0 && (
             <>
-              <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
+              <Text style={styles.sectionTitle}>Recommended for you</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -154,10 +199,24 @@ const HomeScreen = () => {
               </ScrollView>
             </>
           )}
+          {popular && totalPopular > 0 && totalRecommendation === 0 && (
+            <>
+              <Text style={styles.sectionTitle}>Popular</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.cardRow}
+              >
+                {popular.map(p => (
+                  <TourCard key={p.experience.id} {...p.experience} />
+                ))}
+              </ScrollView>
+            </>
+          )}
           {/* === DANH MỤC  === */}
           {category && (
             <>
-              <Text style={styles.sectionTitle}>Danh mục</Text>
+              <Text style={styles.sectionTitle}>Categories</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -219,7 +278,7 @@ const HomeScreen = () => {
             </>
           )}
 
-          <Text style={styles.sectionTitle}>Trải nghiệm nổi bật</Text>
+          <Text style={styles.sectionTitle}>Featured experiences</Text>
           <FlatList
             data={suggest}
             horizontal
@@ -232,7 +291,7 @@ const HomeScreen = () => {
           />
           {loadingMore && <ActivityIndicator style={{ marginLeft: 10 }} />}
           {wishLists && wishLists.length > 0 && (
-            <Text style={styles.sectionTitle}>Danh sách yêu thích</Text>
+            <Text style={styles.sectionTitle}>Wishlists</Text>
           )}
           <FlatList
             data={wishLists}

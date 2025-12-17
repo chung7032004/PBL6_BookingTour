@@ -11,9 +11,9 @@ import {
 interface DescriptionModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (text: string) => void; // callback gửi dữ liệu ra ngoài
+  onSave: (text: string) => void; // callback to return data
   title?: string;
-  initialValue?: string; // để load giá trị cũ nếu có
+  initialValue?: string; // load existing value if available
 }
 
 function DescriptionModal(props: DescriptionModalProps) {
@@ -21,19 +21,21 @@ function DescriptionModal(props: DescriptionModalProps) {
     visible,
     onClose,
     onSave,
-    title = 'Cập nhật mô tả',
+    title = 'Update description',
     initialValue = '',
   } = props;
+
   const [description, setDescription] = useState(initialValue);
 
   const handleSave = () => {
-    onSave(description); // gửi dữ liệu về cha
-    onClose(); // đóng modal
+    onSave(description);
+    onClose();
   };
+
   return (
     <Modal
       animationType="fade"
-      transparent={true}
+      transparent
       visible={visible}
       onRequestClose={onClose}
     >
@@ -43,10 +45,10 @@ function DescriptionModal(props: DescriptionModalProps) {
           <Text style={styles.title}>{title}</Text>
 
           {/* Input */}
-          <Text style={styles.label}>Tiểu sử</Text>
+          <Text style={styles.label}>Bio</Text>
           <TextInput
             style={styles.input}
-            placeholder="Nhập mô tả về bạn..."
+            placeholder="Tell us about yourself..."
             placeholderTextColor="#999"
             multiline
             value={description}
@@ -59,13 +61,13 @@ function DescriptionModal(props: DescriptionModalProps) {
               style={[styles.button, styles.cancelButton]}
               onPress={onClose}
             >
-              <Text style={styles.cancelText}>Hủy</Text>
+              <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.saveButton]}
               onPress={handleSave}
             >
-              <Text style={styles.saveText}>Lưu</Text>
+              <Text style={styles.saveText}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>

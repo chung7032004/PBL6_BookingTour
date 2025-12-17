@@ -10,12 +10,12 @@ export const useAuthGuard = () => {
     try {
       const { isLoggedIn, isUserRole } = await checkLoginAndRole();
       if (!isLoggedIn || !isUserRole) {
-        setError('Bạn cần đăng nhập để sử dụng tính năng này');
+        setError('You need to log in to use this feature.');
         return;
       }
       setError(null);
     } catch (e) {
-      setError('Lỗi không xác định: ' + e);
+      setError('Unknown error: ' + e);
     } finally {
       setLoading(false);
     }

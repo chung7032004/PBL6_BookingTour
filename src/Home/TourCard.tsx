@@ -71,7 +71,7 @@ const TourCard = (props: TourCardProps) => {
       {/* Nội dung */}
       <View style={styles.content}>
         {/* Category */}
-        <Text style={styles.category}>{category?.name || 'Khám phá'}</Text>
+        <Text style={styles.category}>{category?.name || 'Explore'}</Text>
 
         {/* Tiêu đề */}
         <Text style={styles.title} numberOfLines={2}>
@@ -89,18 +89,18 @@ const TourCard = (props: TourCardProps) => {
         {/* Giá + số chỗ còn lại (nếu có) */}
         <View style={styles.bottomRow}>
           <View>
-            <Text style={styles.priceLabel}>Chỉ từ</Text>
+            <Text style={styles.priceLabel}>From</Text>
             <Text style={styles.price}>
-              {adultPrice.toLocaleString('vi-VN')}₫
+              {adultPrice.toLocaleString('vi-VN')} VND
             </Text>
-            <Text style={styles.perPerson}>/người lớn</Text>
+            <Text style={styles.perPerson}>/adult</Text>
           </View>
 
           {/* Số chỗ còn lại (tuỳ chọn) */}
           {maxParticipants && maxParticipants <= 10 && (
             <View style={styles.seatsLeft}>
               <Text style={styles.seatsLeftText}>
-                Chỉ còn {maxParticipants} chỗ
+                Only {maxParticipants} spots left
               </Text>
             </View>
           )}
@@ -108,7 +108,7 @@ const TourCard = (props: TourCardProps) => {
 
         {/* Tổng review nhỏ dưới cùng */}
         {totalReviews > 0 && (
-          <Text style={styles.reviewText}>{totalReviews} đánh giá</Text>
+          <Text style={styles.reviewText}>{totalReviews} reviews</Text>
         )}
       </View>
     </TouchableOpacity>

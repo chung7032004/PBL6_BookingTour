@@ -7,10 +7,8 @@ import {
   CreateBookingResponse,
   CreateReviewRequest,
   Review,
-  ReviewResponse,
 } from '../../../types/booking';
-import { apiFetch, fetchWithTimeout } from '../auth/fetch';
-import { url } from '../url';
+import { apiFetch } from '../auth/fetch';
 
 export async function createBooking(
   request: CreateBookingRequest,
@@ -24,7 +22,7 @@ export async function createBooking(
       return null;
     }
     if (!res.ok) {
-      let message = 'Tạo đặt chỗ thất bại';
+      let message = 'Failed to create booking';
       try {
         const text = await res.text();
         if (text) {
@@ -48,7 +46,7 @@ export async function createBooking(
       error.message.includes('fetch') ||
       error.message === 'REQUEST_TIMEOUT'
     ) {
-      throw new Error('Không có kết nối mạng');
+      throw new Error('Unable to connect to the server.');
     }
     throw error;
   }

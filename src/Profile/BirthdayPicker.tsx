@@ -10,7 +10,6 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import images from '../../images';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface BirthdayPickerProps {

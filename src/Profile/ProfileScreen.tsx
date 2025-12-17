@@ -24,6 +24,7 @@ import ErrorView from '../components/ErrorView';
 const ProfileScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
+  // undefined = loading, null = guest, object = logged in
   const [myProfile, setMyProfile] = useState<userProfile | null | undefined>(
     undefined,
   );
@@ -36,29 +37,25 @@ const ProfileScreen = () => {
 
   const loadProfile = useCallback(async () => {
     try {
-      if (myProfile === undefined) {
-        setLoadingProfile(true);
-      }
-
+      setLoadingProfile(true);
       setErrorProfile(null);
 
       const res = await getMyProfile();
 
       if (!res) {
-        setMyProfile(null); // trạng thái khách
+        setMyProfile(null); // guest
         return;
       }
 
       setMyProfile(res);
-    } catch (error) {
-      setErrorProfile('Không tải được hồ sơ. Vui lòng thử lại.');
+    } catch {
+      setErrorProfile('Failed to load profile. Please try again.');
       setMyProfile(null);
     } finally {
       setLoadingProfile(false);
     }
   }, []);
 
-  // 🔥 FIX 2 — useFocusEffect phải gọi hàm loadProfile(), không phải truyền reference
   useFocusEffect(
     useCallback(() => {
       loadProfile();
@@ -68,6 +65,10 @@ const ProfileScreen = () => {
   const handleLogout = async () => {
     await logout();
     setMyProfile(null);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'profile' }],
+    });
   };
 
   const handleLogin = () => {
@@ -78,7 +79,7 @@ const ProfileScreen = () => {
   };
 
   if (loadingProfile && myProfile === undefined) {
-    return <LoadingView message="Đang tải dữ liệu ..." />;
+    return <LoadingView message="Loading profile..." />;
   }
 
   if (errorProfile && myProfile === undefined) {
@@ -86,21 +87,30 @@ const ProfileScreen = () => {
       <ErrorView
         message={errorProfile}
         onPress={loadProfile}
-        textButton="Tải lại trang"
+        textButton="Reload"
       />
     );
   }
 
   return (
     <ScrollView style={styles.container}>
+      {/* PROFILE HEADER */}
       <View style={styles.profileContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('profileDetail')}>
+        <TouchableOpacity
+          onPress={() => {
+            if (!myProfile) {
+              handleLogin();
+              return;
+            }
+            navigation.navigate('profileDetail');
+          }}
+        >
           <Image style={styles.avatarImage} source={avatarSource} />
         </TouchableOpacity>
 
         <View style={{ flex: 1 }}>
           <Text style={styles.userName}>
-            {myProfile ? myProfile.fullName : 'Khách'}
+            {myProfile ? myProfile.fullName : 'Guest'}
           </Text>
 
           {myProfile && <Text style={styles.userInfo}>{myProfile.email}</Text>}
@@ -119,7 +129,7 @@ const ProfileScreen = () => {
           <TouchableOpacity style={styles.touch} onPress={handleLogin}>
             <Icon name="login" size={24} color="#000" style={styles.icon} />
             <View style={styles.textContainer}>
-              <Text style={styles.title}>Đăng nhập / Đăng kí</Text>
+              <Text style={styles.title}>Login / Register</Text>
             </View>
             <Icon name="chevron-right" size={24} color="#666" />
           </TouchableOpacity>
@@ -127,13 +137,19 @@ const ProfileScreen = () => {
 
         <TouchableOpacity
           style={styles.touch}
-          onPress={() => navigation.navigate('profileDetail')}
+          onPress={() => {
+            if (!myProfile) {
+              handleLogin();
+              return;
+            }
+            navigation.navigate('profileDetail');
+          }}
         >
           <Icon name="person" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Xem hồ sơ</Text>
+            <Text style={styles.title}>View Profile</Text>
             <Text style={styles.subtitle}>
-              Xem và chỉnh sửa thông tin cá nhân của bạn
+              View and edit your personal information
             </Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
@@ -142,9 +158,9 @@ const ProfileScreen = () => {
         <TouchableOpacity style={styles.touch}>
           <Icon name="credit-card" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Thanh toán</Text>
+            <Text style={styles.title}>Payments</Text>
             <Text style={styles.subtitle}>
-              Thêm hoặc quản lý các thẻ đã lưu
+              Manage your saved payment methods
             </Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
@@ -158,9 +174,9 @@ const ProfileScreen = () => {
             style={styles.icon}
           />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Hoàn tiền</Text>
+            <Text style={styles.title}>Refunds</Text>
             <Text style={styles.subtitle}>
-              Theo dõi hoàn tiền và quản lý chi tiết ngân hàng
+              Track refunds and manage bank details
             </Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
@@ -174,8 +190,8 @@ const ProfileScreen = () => {
             style={styles.icon}
           />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Trung tâm hỗ trợ</Text>
-            <Text style={styles.subtitle}>Giải đáp mọi thắc mắc của bạn</Text>
+            <Text style={styles.title}>Help Center</Text>
+            <Text style={styles.subtitle}>Get answers to your questions</Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -186,10 +202,8 @@ const ProfileScreen = () => {
         >
           <Icon name="call" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Liên hệ chúng tôi</Text>
-            <Text style={styles.subtitle}>
-              Yêu cầu hỗ trợ từ dịch vụ khách hàng
-            </Text>
+            <Text style={styles.title}>Contact Us</Text>
+            <Text style={styles.subtitle}>Reach out to customer support</Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -197,8 +211,8 @@ const ProfileScreen = () => {
         <TouchableOpacity style={styles.touch}>
           <Icon name="settings" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Cài đặt</Text>
-            <Text style={styles.subtitle}>Tùy chỉnh cài đặt tài khoản</Text>
+            <Text style={styles.title}>Settings</Text>
+            <Text style={styles.subtitle}>Customize your account settings</Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -207,7 +221,7 @@ const ProfileScreen = () => {
           <TouchableOpacity style={styles.touch} onPress={handleLogout}>
             <Icon name="logout" size={24} color="#000" style={styles.icon} />
             <View style={styles.textContainer}>
-              <Text style={styles.title}>Đăng xuất</Text>
+              <Text style={styles.title}>Logout</Text>
             </View>
           </TouchableOpacity>
         )}

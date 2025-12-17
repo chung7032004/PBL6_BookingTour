@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../../types/route';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { signup } from '../api/auth/signup';
+import { validatePassword } from '../api/auth/login';
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -26,13 +27,8 @@ const SignUpScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const handleEmailBlur = async () => {
-    // const check = await checkEmailExists(email);
-    // if (check) {
-    // setError('Email đã tồn tại');
-    // setDisable(true);
-    // } else
     if (!isValidEmail(email)) {
-      setError('Email không hợp lệ');
+      setError('Invalid email address');
       setDisable(true);
     } else {
       setError('');
@@ -47,16 +43,19 @@ const SignUpScreen = () => {
 
   const handleSignUp = async () => {
     if (email.length === 0) {
-      setError('Email không được để trống');
+      setError('Email is required');
       return;
     } else if (fullName.length > 0 && fullName.length < 2) {
-      setError('Họ và tên phải dài ít nhất 2 ký tự');
+      setError('Full name must be at least 2 characters long');
       return;
-    } else if (password.length < 8) {
-      setError('Mật khẩu phải dài ít nhất 8 ký tự');
+    }
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be at least 8 characters long and include a letter, a number, and a special character',
+      );
       return;
     } else if (password !== confirmPassword) {
-      setError('Mật khẩu không khớp');
+      setError('Password do not match');
       return;
     }
 
@@ -68,10 +67,10 @@ const SignUpScreen = () => {
     if (result != null) {
       if (result.accountId) {
         navigation.navigate('login', {
-          message: 'Đăng ký thành công, vui lòng đăng nhập',
+          message: 'Sign up successful. Please sign in.',
         });
       } else {
-        setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại!');
+        setError(result.message || ' Sign up failed. Please try again.');
       }
     }
   };
@@ -81,7 +80,7 @@ const SignUpScreen = () => {
       <View style={styles.card}>
         <View style={styles.titleContainer}>
           <Text style={styles.title} testID="signup-title">
-            Tạo tài khoản
+            Create Account
           </Text>
         </View>
 
@@ -93,7 +92,7 @@ const SignUpScreen = () => {
             value={email}
             onChangeText={setEmail}
             style={styles.input}
-            placeholder="Email của bạn"
+            placeholder="Your email"
             placeholderTextColor="#999"
             keyboardType="email-address"
             onBlur={handleEmailBlur}
@@ -109,21 +108,21 @@ const SignUpScreen = () => {
             value={fullName}
             onChangeText={setFullName}
             style={styles.input}
-            placeholder="Họ và tên của bạn"
+            placeholder="Full name"
             placeholderTextColor="#999"
             testID="signup-input-name"
           />
         </View>
 
         {/* Password */}
-        <Text style={styles.text}>Mật khẩu</Text>
+        <Text style={styles.text}>Password</Text>
         <View style={styles.inputWrapper}>
           <Icon name="lock" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             value={password}
             onChangeText={setPassword}
             style={styles.input}
-            placeholder="Nhập mật khẩu"
+            placeholder="Enter password"
             placeholderTextColor="#999"
             secureTextEntry={!passwordVisible}
             testID="signup-input-password"
@@ -141,7 +140,7 @@ const SignUpScreen = () => {
         </View>
 
         {/* Confirm Password */}
-        <Text style={styles.text}>Xác nhận mật khẩu</Text>
+        <Text style={styles.text}>Confirm Password</Text>
         <View style={styles.inputWrapper}>
           <Icon
             name="lock-outline"
@@ -153,7 +152,7 @@ const SignUpScreen = () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             style={styles.input}
-            placeholder="Nhập lại mật khẩu"
+            placeholder="Re-enter password"
             placeholderTextColor="#999"
             secureTextEntry={!confirmPasswordVisible}
             testID="signup-input-confirm-password"
@@ -183,18 +182,18 @@ const SignUpScreen = () => {
           disabled={disable}
           testID="signup-btn-submit"
         >
-          <Text style={styles.buttonText}>Đăng ký</Text>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
 
         {/* Login link */}
         <View style={styles.loginRow}>
-          <Text>Đã có tài khoản?</Text>
+          <Text>Already have an account?</Text>
           <TouchableOpacity onPress={() => navigation.navigate('login')}>
-            <Text style={styles.loginLink}> Đăng nhập</Text>
+            <Text style={styles.loginLink}> Sign In</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <LoadingOverlay visible={loading} message="Đang xử lý..." />
+      <LoadingOverlay visible={loading} message="Processing..." />
     </ScrollView>
   );
 };

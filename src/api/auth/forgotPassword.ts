@@ -22,10 +22,11 @@ export async function forgotPassword(
     if (res.ok) {
       return {
         success: data.success || true,
-        message: data.message || 'Mã đã được gửi đến Email.',
+        message:
+          data.message || 'A verification code has been sent to your email.',
       };
     } else {
-      let errorMessage = 'Email không hợp lệ, vui lòng thử lại,';
+      let errorMessage = 'Invalid email. Please try again.';
       if (data && data?.Message) {
         errorMessage = data.Message;
       }
@@ -38,7 +39,7 @@ export async function forgotPassword(
     console.log('Forgot Password API Error:', error);
     return {
       success: false,
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }
@@ -69,10 +70,10 @@ export async function resetPassword(
     if (res.ok) {
       return {
         success: data.success || true,
-        message: data.message || 'Cập nhật mật khẩu thành công',
+        message: data.message || 'Password updated successfully.',
       };
     } else {
-      let errorMessage = 'Mã code không hợp lệ.';
+      let errorMessage = 'Invalid verification code.';
       if (data && data?.Message) {
         errorMessage = data.Message;
       }
@@ -85,7 +86,7 @@ export async function resetPassword(
     console.log('Reset Password API Error:', error);
     return {
       success: false,
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }
@@ -115,10 +116,10 @@ export async function changePassword(
     if (res.ok) {
       return {
         success: data.success || true,
-        message: data.message || 'Cập nhật mật khẩu thành công',
+        message: data.message || 'Password changed successfully.',
       };
     } else {
-      let errorMessage = 'Mã code không hợp lệ.';
+      let errorMessage = 'Unable to change password.';
       if (data && data?.Message) {
         errorMessage = data.Message;
       }
@@ -131,7 +132,7 @@ export async function changePassword(
     console.log('Reset Password API Error:', error);
     return {
       success: false,
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }

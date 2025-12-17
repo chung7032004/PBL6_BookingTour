@@ -9,7 +9,7 @@ const PaymentProcessingScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* WebView mở link MoMo → đảm bảo hoạt động trên mọi thiết bị */}
+      {/* WebView mở link VNPay → đảm bảo hoạt động trên mọi thiết bị */}
       <WebView
         source={{ uri: paymentUrl }}
         startInLoadingState
@@ -18,8 +18,8 @@ const PaymentProcessingScreen = () => {
         userAgent="Mozilla/5.0 (Linux; Android 10)"
         renderLoading={() => (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#E31E7C" />
-            <Text style={styles.loadingText}>Đang mở MoMo...</Text>
+            <ActivityIndicator size="large" color="#005BAC" />
+            <Text style={styles.loadingText}>Opening VNPay...</Text>
           </View>
         )}
       />
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 20,
     fontSize: 16,
-    color: '#C8197E',
+    color: '#005BAC',
     fontWeight: '600',
   },
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ConfirmModalProps {
+  title?: string;
   visible: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -9,6 +10,7 @@ interface ConfirmModalProps {
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  title = 'Confirm',
   visible,
   onClose,
   onConfirm,
@@ -23,7 +25,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.title}>Xác nhận</Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
 
           <View style={styles.buttonContainer}>
@@ -31,14 +33,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               style={[styles.button, styles.cancelButton]}
               onPress={onClose}
             >
-              <Text style={styles.cancelText}>Hủy</Text>
+              <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.button, styles.confirmButton]}
               onPress={onConfirm}
             >
-              <Text style={styles.confirmText}>Xác nhận</Text>
+              <Text style={styles.confirmText}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>

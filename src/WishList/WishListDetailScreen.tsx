@@ -73,9 +73,9 @@ const WishListDetailScreen = () => {
               }
             : prev,
         );
-        setShowNotification('Đã xóa khỏi danh sách yêu thích');
+        setShowNotification('Removed from wishlist');
       } else {
-        setShowNotification(res?.message || 'Xóa thất bại, vui lòng thử lại');
+        setShowNotification(res?.message || 'Delete failed, Please try again');
       }
       setShowDeleteConfirm(false);
     } catch (error) {
@@ -91,7 +91,7 @@ const WishListDetailScreen = () => {
       {/* Tiêu đề + avatar thêm người */}
       <View style={styles.headerRow}>
         <Text style={styles.headerText} numberOfLines={2}>
-          {wishListDetail?.name || 'Danh sách yêu thích'}
+          {wishListDetail?.name || 'Your wishlist'}
         </Text>
 
         <View style={styles.countBadge}>
@@ -104,13 +104,13 @@ const WishListDetailScreen = () => {
       {wishListDetail?.experiences.length === 0 && (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
-            Danh sách này chưa có trải nghiệm nào
+            This list has no experiences yet.
           </Text>
           <TouchableOpacity
             style={styles.emptyButton}
             onPress={() => navigation.navigate('homeTab')}
           >
-            <Text style={styles.emptyButtonText}>Khám phá trải nghiệm</Text>
+            <Text style={styles.emptyButtonText}>Explore experiences</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -160,9 +160,10 @@ const WishListDetailScreen = () => {
       )}
       {showDeleteConfirm && (
         <ConfirmModal
+          title="Confirm delete experience"
           key={showDeleteConfirm ? 'delete-visible' : 'delete-hidden'}
           visible={showDeleteConfirm}
-          message="Bạn có chắc muốn xóa trải nghiệm này khỏi danh sách?"
+          message="Are you sure you want to remove this experience from the list?"
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={handleDelete}
         />

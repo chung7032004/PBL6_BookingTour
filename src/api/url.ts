@@ -1,1 +1,1 @@
-export const url = 'http://connecting-experience.japanwest.cloudapp.azure.com';
+export const url = 'https://connecting-experience.japanwest.cloudapp.azure.com';

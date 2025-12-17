@@ -10,7 +10,7 @@ interface EditAvatarProps {
 }
 
 const EditAvatarModal = (props: EditAvatarProps) => {
-  const { visible, onClose, onSave, title = 'Chọn ảnh đại diện' } = props;
+  const { visible, onClose, onSave, title = 'Choose profile picture' } = props;
 
   // mở camera
   const handleCamera = async () => {
@@ -45,12 +45,15 @@ const EditAvatarModal = (props: EditAvatarProps) => {
 
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>
-            Bạn có thể chụp ảnh mới hoặc chọn ảnh có sẵn
+            You can take a new photo or choose one from your library
           </Text>
 
-          <CustomButton title="Chụp ảnh bằng camera" onPress={handleCamera} />
+          <CustomButton title="Take photo with camera" onPress={handleCamera} />
           <View style={{ height: 12 }} />
-          <CustomButton title="Tải ảnh từ thư viện" onPress={handleLibrary} />
+          <CustomButton
+            title="Choose from photo library"
+            onPress={handleLibrary}
+          />
         </View>
       </View>
     </Modal>

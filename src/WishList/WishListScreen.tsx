@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import { Text } from 'react-native-gesture-handler';
 import WishListCard from './WishListCard';
 import images from '../../images';
 import {
@@ -27,7 +28,6 @@ import {
   getMyWishLists,
 } from '../api/experiences/wishlist';
 import Notification from '../components/Notification';
-import { Text } from 'react-native-gesture-handler';
 import ConfirmModal from '../components/Confirm.modal';
 
 const { width } = Dimensions.get('window');
@@ -37,84 +37,94 @@ const WishListScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const { loading, error } = useAuthGuard();
   const isFocused = useIsFocused();
-  const [showCreateListModal, setShowCreateListModal] = useState(false);
-  const handleAdd = () => {
-    setShowCreateListModal(true);
-  };
+
   const [wishLists, setWishLists] = useState<MyWishListResponse[]>([]);
+  const [showCreateListModal, setShowCreateListModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const [showNotification, setShowNotification] = useState<string | null>(null);
   const [typeNotification, setTypeNotification] = useState<'success' | 'error'>(
     'success',
   );
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       loadWishLists();
     }, []),
   );
+
   const loadWishLists = async () => {
+    setLoadingWishlist(true);
     const res = await getMyWishLists();
     if (res?.message) {
       setTypeNotification('error');
-      setShowNotification(res?.message);
+      setShowNotification(res.message);
+      setLoadingWishlist(true);
       return;
     }
-    setWishLists(res?.myWishList ? res.myWishList : []);
+    setWishLists(res?.myWishList ?? []);
+    setLoadingWishlist(false);
   };
-  const handleCreate = async (content: string) => {
-    if (!content.trim()) {
+
+  const handleCreate = async (name: string) => {
+    if (!name.trim()) {
       setTypeNotification('error');
-      setShowNotification('Please enter the list name');
+      setShowNotification('Please enter a wishlist name');
       return;
     }
-    const res = await createWishList(content);
+
+    const res = await createWishList(name);
+
     if (res?.isSuccess) {
       setTypeNotification('success');
       await loadWishLists();
     } else {
       setTypeNotification('error');
     }
-    setShowNotification(res?.message);
+
+    setShowNotification(res?.message ?? 'Something went wrong');
     setShowCreateListModal(false);
   };
+
   const handleDelete = async () => {
     if (!selectedId) {
       setTypeNotification('error');
-      setShowNotification('Undefined Id WishList');
+      setShowNotification('Wishlist ID is undefined');
       setShowDeleteConfirm(false);
       return;
     }
+
     const res = await deleteWishList(selectedId);
+
     if (res?.isSuccess) {
-      setWishLists(prev =>
-        prev ? prev.filter(item => item.id !== selectedId) : prev,
-      );
+      setWishLists(prev => prev.filter(item => item.id !== selectedId));
       setTypeNotification('success');
     } else {
       setTypeNotification('error');
     }
-    setShowNotification(res?.message);
+
+    setShowNotification(res?.message ?? 'Delete failed');
     setShowDeleteConfirm(false);
   };
+
   const handleLogin = () => {
     navigation.navigate('login', {
       redirect: 'bookingTab',
       params: { screen: 'bookingListScreen' },
     });
   };
+
   if (loading) {
-    return <LoadingView message="Đang kiểm tra đăng nhập ..." />;
+    return <LoadingView message="Checking login status..." />;
+  }
+  if (loadingWishlist) {
+    return <LoadingView message="Loading wishlist..." />;
   }
   if (error) {
     return (
-      <ErrorView
-        textButton="Đăng nhập"
-        message={error}
-        onPress={() => {
-          handleLogin();
-        }}
-      />
+      <ErrorView textButton="Login" message={error} onPress={handleLogin} />
     );
   }
 
@@ -122,11 +132,9 @@ const WishListScreen = () => {
     <View style={styles.container}>
       {wishLists.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>
-            Bạn chưa có danh sách yêu thích nào
-          </Text>
+          <Text style={styles.emptyText}>You don’t have any wishlists yet</Text>
           <Text style={styles.emptySubText}>
-            Nhấn nút + để tạo danh sách đầu tiên
+            Tap the + button to create your first wishlist
           </Text>
         </View>
       ) : (
@@ -140,7 +148,9 @@ const WishListScreen = () => {
                 title={item.name}
                 saved={item.experienceCount}
                 onPress={() =>
-                  navigation.navigate('wishListDetail', { wishListId: item.id })
+                  navigation.navigate('wishListDetail', {
+                    wishListId: item.id,
+                  })
                 }
                 onLongPress={() => {
                   setSelectedId(item.id);
@@ -153,10 +163,12 @@ const WishListScreen = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* FAB */}
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.85}
-        onPress={handleAdd}
+        onPress={() => setShowCreateListModal(true)}
       >
         <MaterialIcons name="add" size={32} color="#fff" />
       </TouchableOpacity>
@@ -166,15 +178,18 @@ const WishListScreen = () => {
         onClose={() => setShowCreateListModal(false)}
         onCreate={handleCreate}
       />
+
       <ConfirmModal
+        title="Delete wishlist"
         visible={showDeleteConfirm}
-        message="Bạn có chắc muốn xóa danh wishlist này không?"
+        message="Are you sure you want to delete this wishlist?"
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
       />
+
       {showNotification && isFocused && (
         <Notification
-          key={showDeleteConfirm ? 'confirm-visible' : 'confirm-hidden'}
+          key={showDeleteConfirm ? 'confirm-open' : 'confirm-close'}
           message={showNotification}
           onClose={() => setShowNotification(null)}
           type={typeNotification}
@@ -225,4 +240,5 @@ const styles = StyleSheet.create({
     elevation: 14,
   },
 });
+
 export default WishListScreen;

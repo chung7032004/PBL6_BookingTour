@@ -15,7 +15,7 @@ const EditNameModal = (props: EditNameProps) => {
     visible,
     onClose,
     onSave,
-    title = 'Chỉnh sửa tên người dùng',
+    title = 'Edit name',
     initialValue = '',
   } = props;
 
@@ -54,14 +54,14 @@ const EditNameModal = (props: EditNameProps) => {
 
           {/* Input */}
           <CustomTextInput
-            title="Nhập tên của bạn"
+            title="Enter your name"
             value={name}
             onChangeText={setName}
           />
 
           {/* Save button (luôn hiện, nhưng disable nếu không thay đổi) */}
           <CustomButton
-            title="Lưu"
+            title="Save"
             onPress={handleSave}
             disabled={name === initialValue}
           />

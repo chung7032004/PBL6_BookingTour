@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import ActiveCard from '../ActiveCard';
-import images from '../../../images';
 import { Itinerary } from '../../../types/experience';
 
 interface ActiveModalProps {
@@ -29,7 +28,7 @@ const ActiveModal = ({ itineraries, visible, onClose }: ActiveModalProps) => {
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Tất cả các hoạt động</Text>
+            <Text style={styles.title}>All Activities</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>

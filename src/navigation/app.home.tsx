@@ -48,7 +48,7 @@ export default function HomeStack() {
         component={PaymentScreen}
         options={{
           // headerRight: () => <HeaderNotificationIcon count={count} />,
-          title: 'Xác nhận và thanh toán',
+          title: 'Confirm and Payment',
         }}
       />
       <Stack.Screen

@@ -13,7 +13,7 @@ interface EditGenderProps {
 
 const EditGenderModal = (props: EditGenderProps) => {
   const {
-    title = 'Chọn giới tính',
+    title = 'Select gender',
     visible,
     onClose,
     onSave,
@@ -45,14 +45,14 @@ const EditGenderModal = (props: EditGenderProps) => {
           <Text style={styles.title}>{title}</Text>
           <RadioGroup
             options={[
-              { label: 'Nam', value: 'Male' },
-              { label: 'Nữ', value: 'Female' },
-              { label: 'Khác', value: 'Other' },
+              { label: 'Male', value: 'Male' },
+              { label: 'Female', value: 'Female' },
+              { label: 'Other', value: 'Other' },
             ]}
             selectedValue={selected}
             onValueChange={setSelected}
           />
-          <CustomButton title="Chọn" onPress={handleSave} />
+          <CustomButton title="Select" onPress={handleSave} />
         </View>
       </View>
     </Modal>

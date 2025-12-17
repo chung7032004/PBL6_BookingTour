@@ -26,23 +26,26 @@ const ForgotPasswordScreen = () => {
 
   const handleSendLink = async () => {
     if (!validateEmail(email)) {
-      setError('Email không hợp lệ');
+      setError('Invalid email address');
       return;
     }
 
     setError('');
     setLoading(true);
+
     const res = await forgotPassword(email);
+
     setLoading(false);
 
     if (!res.success) {
-      setError(res.message || '');
+      setError(res.message || 'Something went wrong');
       return;
     }
+
     setTimeout(() => {
       navigation.navigate('resetPassword', {
         email,
-        message: 'Liên kết xác nhận đã được gửi đến email của bạn',
+        message: 'A verification link has been sent to your email',
       });
     }, 1000);
   };
@@ -52,16 +55,14 @@ const ForgotPasswordScreen = () => {
       <View style={styles.contentWrapper}>
         <View style={styles.card}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Đặt lại mật khẩu</Text>
+            <Text style={styles.title}>Reset Password</Text>
           </View>
 
-          {/* Mô tả */}
           <Text style={styles.instructionText}>
-            Vui lòng nhập địa chỉ email bạn đã đăng ký. Chúng tôi sẽ gửi một
-            liên kết đến hộp thư của bạn để bạn có thể tạo mật khẩu mới.
+            Please enter the email address you registered with. We will send you
+            a link to reset your password.
           </Text>
 
-          {/* Input Email */}
           <View style={styles.inputWrapper}>
             <Icon
               name="email"
@@ -72,11 +73,12 @@ const ForgotPasswordScreen = () => {
             <TextInput
               testID="emailInput"
               style={styles.input}
-              placeholder="Email đã đăng ký"
+              placeholder="Registered email"
               placeholderTextColor="#999"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
 
@@ -95,7 +97,7 @@ const ForgotPasswordScreen = () => {
             disabled={loading}
             onPress={handleSendLink}
           >
-            <Text style={styles.confirmText}>Gửi liên kết xác nhận</Text>
+            <Text style={styles.confirmText}>Send verification link</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -109,11 +111,12 @@ const ForgotPasswordScreen = () => {
               color="#333"
               style={{ marginRight: 6 }}
             />
-            <Text style={styles.textBackToLogin}>Quay lại Đăng nhập</Text>
+            <Text style={styles.textBackToLogin}>Back to Login</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <LoadingOverlay visible={loading} message={'Đang xử lý ...'} />
+
+      <LoadingOverlay visible={loading} message="Processing..." />
     </View>
   );
 };
