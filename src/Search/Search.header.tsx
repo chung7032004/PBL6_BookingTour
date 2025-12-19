@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface Props {
@@ -14,13 +15,14 @@ interface Props {
 
 const SearchHeader = ({ onSearch }: Props) => {
   const [searchText, setSearchText] = useState('');
+  const insets = useSafeAreaInsets();
 
   const handleClear = () => {
     setSearchText('');
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
 
       <View style={styles.searchContainer}>

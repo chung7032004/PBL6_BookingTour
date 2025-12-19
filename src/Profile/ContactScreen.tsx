@@ -29,7 +29,7 @@ const ContactScreen = () => {
       </View>
 
       {/* Support center */}
-      <View style={styles.supportContainer}>
+      {/* <View style={styles.supportContainer}>
         <Text style={styles.supportTitle}>Looking for something else?</Text>
 
         <View style={styles.supportRow}>
@@ -45,7 +45,7 @@ const ContactScreen = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };

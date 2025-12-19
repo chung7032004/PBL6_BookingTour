@@ -72,11 +72,11 @@ export type RootStackParamList = {
   profileDetail: undefined;
   profileEdit: undefined;
   contact: undefined;
-
   post: {
     userProfile: userProfile | undefined;
   };
   comment: undefined;
+  changePassword: undefined;
 
   search: { categoryId?: string };
   searchTab: undefined;

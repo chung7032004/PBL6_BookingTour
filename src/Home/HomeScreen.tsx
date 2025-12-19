@@ -124,7 +124,7 @@ const HomeScreen = () => {
   const loadMoreSuggest = async () => {
     if (loadingMore) return;
     if (skipEndReachedRef.current) {
-      skipEndReachedRef.current = false; // ✅ chỉ skip 1 lần
+      skipEndReachedRef.current = false; // chỉ skip 1 lần
       return;
     }
     setLoadingMore(true);
@@ -286,7 +286,7 @@ const HomeScreen = () => {
             renderItem={({ item }) => <TourCard {...item} />}
             keyExtractor={item => item.id}
             onEndReached={loadMoreSuggest}
-            onEndReachedThreshold={0.2}
+            onEndReachedThreshold={0.4}
             contentContainerStyle={styles.cardRow}
           />
           {loadingMore && <ActivityIndicator style={{ marginLeft: 10 }} />}

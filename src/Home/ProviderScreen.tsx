@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
   Image,
   Linking,
   ScrollView,
@@ -8,10 +10,8 @@ import {
   View,
 } from 'react-native';
 import images from '../../images';
-import ReviewCard from './ReviewCard';
-import CustomButton from '../components/CustomButton';
-import ReviewModal from './modals/Review.modal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
   NavigationProp,
   RouteProp,
@@ -20,6 +20,9 @@ import {
 } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/route';
 import { formatDate } from '../components/FormatDate';
+import { getExperiencesByHostId } from '../api/experiences/host';
+import { TourCardProps } from '../../types/experience';
+import TourCard from './TourCard';
 
 const ProviderScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -28,31 +31,6 @@ const ProviderScreen = () => {
   const years = hostDetail?.hostingSince
     ? new Date().getFullYear() - new Date(hostDetail.hostingSince).getFullYear()
     : 0;
-
-  const suggestData = [
-    {
-      id: 1,
-      image: images.banner1,
-      title: 'Street Food Motorbike Tour',
-      rating: 4.98,
-      price: '₫730,000',
-      popular: true,
-    },
-    {
-      id: 2,
-      image: images.banner2,
-      title: 'Hue City Tour',
-      rating: 4.91,
-      price: '₫650,000',
-    },
-    {
-      id: 3,
-      image: images.banner3,
-      title: 'Ha Long Bay Cruise',
-      rating: 5.0,
-      price: '₫1,000,000',
-    },
-  ];
 
   // Fake 10 reviews
   const reviews = Array.from({ length: 10 }, (_, i) => ({
@@ -67,7 +45,61 @@ const ProviderScreen = () => {
 
   const [quantityReview] = useState<number>(164);
   const [showModalReview, setShowModalReview] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [experiences, setExperiences] = useState<TourCardProps[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const skipEndReachedRef = useRef(false);
+  const [pageExperiences, setPageExperiences] = useState(1);
+  const [showFullBio, setShowFullBio] = useState(false);
 
+  useEffect(() => {
+    loadExperience();
+  }, []);
+  const loadExperience = async () => {
+    try {
+      setLoading(true);
+      setPageExperiences(1);
+      skipEndReachedRef.current = true;
+      if (!hostDetail?.id) {
+        return;
+      }
+      const res = await getExperiencesByHostId(1, 10, hostDetail?.id);
+      if (res.messages) {
+        setError(res.messages);
+        return;
+      }
+      setExperiences(res.experiences);
+    } catch (error) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const loadMoreExperiences = async () => {
+    if (loadingMore) return;
+    if (skipEndReachedRef.current) {
+      skipEndReachedRef.current = false; // chỉ skip 1 lần
+      return;
+    }
+    setLoadingMore(true);
+    try {
+      if (!hostDetail?.id) {
+        return;
+      }
+      const nextPage = pageExperiences + 1;
+      const res = await getExperiencesByHostId(nextPage, 10, hostDetail.id);
+      if (!res.experiences) {
+        return;
+      }
+      setExperiences(prev => [...prev, ...res.experiences]);
+      setPageExperiences(res?.pageNumber ? res.pageNumber : 1);
+    } catch (error) {
+      console.log('Load more experiences error:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       {/* Profile Card */}
@@ -129,8 +161,25 @@ const ProviderScreen = () => {
           </View>
         </View>
       </View>
-      {/* Introduction */}
-      <Text style={styles.introText}>{hostDetail?.bio}</Text>
+      <View style={styles.bioCard}>
+        <Text style={styles.bioTitle}>About the host</Text>
+
+        <Text
+          style={styles.bioText}
+          numberOfLines={showFullBio ? undefined : 3}
+        >
+          {hostDetail?.bio || 'No description provided.'}
+        </Text>
+
+        {(hostDetail?.bio?.length ?? 0) > 120 && (
+          <Text
+            style={styles.showMoreBio}
+            onPress={() => setShowFullBio(!showFullBio)}
+          >
+            {showFullBio ? 'Show less' : 'Show more'}
+          </Text>
+        )}
+      </View>
 
       <View style={styles.aboutCard}>
         {/* Badge xác minh */}
@@ -257,7 +306,7 @@ const ProviderScreen = () => {
                 />
               )}
               {hostDetail.instagramUrl && (
-                <Icon
+                <FontAwesome
                   name="instagram"
                   size={32}
                   color="#E4405F"
@@ -266,7 +315,7 @@ const ProviderScreen = () => {
                 />
               )}
               {hostDetail.linkedInUrl && (
-                <Icon
+                <FontAwesome
                   name="linkedin"
                   size={32}
                   color="#0A66C2"
@@ -278,6 +327,20 @@ const ProviderScreen = () => {
           </View>
         )}
       </View>
+      <Text style={styles.sectionTitle}>
+        Experience of {hostDetail?.fullName}
+      </Text>
+      <FlatList
+        data={experiences}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => <TourCard {...item} />}
+        keyExtractor={item => item.id}
+        onEndReached={loadMoreExperiences}
+        onEndReachedThreshold={0.4}
+        contentContainerStyle={styles.cardRow}
+      />
+      {loadingMore && <ActivityIndicator style={{ marginLeft: 10 }} />}
 
       {/* Reviews Section */}
       {/* <Text style={styles.sectionTitle}>Đánh giá của khách</Text>
@@ -385,11 +448,12 @@ const styles = StyleSheet.create({
 
   /** Section styles **/
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 24,
+    marginBottom: 12,
+    marginLeft: 10,
+    color: '#1a1a1a',
   },
   reviewRow: {
     paddingLeft: 16,
@@ -476,6 +540,30 @@ const styles = StyleSheet.create({
   },
   socialIcon: {
     padding: 4,
+  },
+  bioCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 16,
+    padding: 16,
+    elevation: 3,
+  },
+  bioTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 8,
+    color: '#1a1a1a',
+  },
+  bioText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#444',
+  },
+  showMoreBio: {
+    marginTop: 6,
+    color: '#007AFF',
+    fontWeight: '600',
   },
 });
 

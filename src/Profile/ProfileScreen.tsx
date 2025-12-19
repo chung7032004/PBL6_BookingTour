@@ -20,10 +20,11 @@ import { userProfile } from '../../types/host';
 import { getMyProfile } from '../api/experiences/host';
 import LoadingView from '../components/LoadingView';
 import ErrorView from '../components/ErrorView';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ProfileScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-
+  const insets = useSafeAreaInsets();
   // undefined = loading, null = guest, object = logged in
   const [myProfile, setMyProfile] = useState<userProfile | null | undefined>(
     undefined,
@@ -93,7 +94,7 @@ const ProfileScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { paddingTop: insets.top + 10 }]}>
       {/* PROFILE HEADER */}
       <View style={styles.profileContainer}>
         <TouchableOpacity
@@ -154,8 +155,23 @@ const ProfileScreen = () => {
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.touch}
+          onPress={() => navigation.navigate('changePassword')}
+        >
+          {/* Thay credit-card bằng vpn-key hoặc lock */}
+          <Icon name="vpn-key" size={24} color="#000" style={styles.icon} />
 
-        <TouchableOpacity style={styles.touch}>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Change Password</Text>
+            <Text style={styles.subtitle}>
+              Update your password to keep your account secure
+            </Text>
+          </View>
+
+          <Icon name="chevron-right" size={24} color="#666" />
+        </TouchableOpacity>
+        {/* <TouchableOpacity style={styles.touch}>
           <Icon name="credit-card" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Payments</Text>
@@ -194,7 +210,7 @@ const ProfileScreen = () => {
             <Text style={styles.subtitle}>Get answers to your questions</Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={styles.touch}
@@ -208,14 +224,14 @@ const ProfileScreen = () => {
           <Icon name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.touch}>
+        {/* <TouchableOpacity style={styles.touch}>
           <Icon name="settings" size={24} color="#000" style={styles.icon} />
           <View style={styles.textContainer}>
             <Text style={styles.title}>Settings</Text>
             <Text style={styles.subtitle}>Customize your account settings</Text>
           </View>
           <Icon name="chevron-right" size={24} color="#666" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {myProfile && (
           <TouchableOpacity style={styles.touch} onPress={handleLogout}>

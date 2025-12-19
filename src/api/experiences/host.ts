@@ -1,3 +1,4 @@
+import { ExperiencesResponse, TourCardProps } from '../../../types/experience';
 import { HostDetail, HostInTour, userProfile } from '../../../types/host';
 import { apiFetch, fetchWithAuth, fetchWithTimeout } from '../auth/fetch';
 import { logout } from '../auth/login';
@@ -116,5 +117,52 @@ export async function updateMyProfile(data: {
   } catch (error) {
     console.log('Lỗi', error);
     return null;
+  }
+}
+export async function getExperiencesByHostId(
+  page: number = 1,
+  pageSize: number = 10,
+  hostId: string,
+): Promise<{
+  experiences: TourCardProps[];
+  totalCount?: number;
+  pageNumber?: number;
+  messages: string | null;
+}> {
+  const param = {
+    sortBy: 'createdAt',
+    isAscending: false,
+  };
+  try {
+    const fullUrl = `${url}/api/experiences?pageNumber=${page}&pageSize=${pageSize}&sortBy=${param.sortBy}&isAscending=${param.isAscending}&hostId=${hostId}`;
+    const res = await fetchWithTimeout(
+      fullUrl,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      7000,
+    );
+
+    if (!res.ok) {
+      throw Error('Network error');
+    }
+    const data = await res.json();
+    console.log('experience', data);
+    const apiResponse = data as ExperiencesResponse;
+    return {
+      experiences: apiResponse.data,
+      totalCount: apiResponse.totalCount,
+      pageNumber: apiResponse.pageNumber,
+      messages: null,
+    };
+  } catch (error) {
+    console.log('getExperience API Error:', error);
+    return {
+      experiences: [],
+      messages: 'Unable to connect to the server.',
+    };
   }
 }

@@ -49,7 +49,7 @@ export async function search(
     console.log('API Search error' + error);
     return {
       experiences: [],
-      message: 'Không thể kết nối đến máy chủ',
+      message: 'Unable to connect to the server.',
     };
   }
 }

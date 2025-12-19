@@ -67,7 +67,7 @@ const BookingListScreen = () => {
       <ErrorView message={errorMsg} onPress={handleLogin} textButton="Login" />
     );
   }
-  const filters = ['All', 'Pending', 'Confirmed', 'Cancelled', 'Completed'];
+  const filters = ['All', 'Confirmed', 'Cancelled', 'Completed'];
   const filteredBookings =
     filter === 'All' ? bookings : bookings.filter(b => b.status === filter);
 
@@ -107,7 +107,7 @@ const BookingListScreen = () => {
                 navigation.navigate('bookingDetail', { bookingId: b.id })
               }
             >
-              <BookingCard {...b} />
+              {b.status !== 'Pending' && <BookingCard {...b} />}
             </TouchableOpacity>
           ))
         ) : (

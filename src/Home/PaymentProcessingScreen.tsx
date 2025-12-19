@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
+import { RootStackParamList } from '../../types/route';
 
 const PaymentProcessingScreen = () => {
-  const route = useRoute<any>();
+  const route: RouteProp<RootStackParamList, 'paymentProcessingScreen'> =
+    useRoute();
   const { paymentUrl } = route.params;
 
   return (

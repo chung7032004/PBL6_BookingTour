@@ -238,7 +238,7 @@ export async function getBookingById(bookingId: string): Promise<{
       };
     }
     const bookingData = JSON.parse(text);
-    console.log(bookingData);
+    console.log('booking data', bookingData);
     return {
       bookingDetail: bookingData,
       message: 'Booking detail successfully retrieved',

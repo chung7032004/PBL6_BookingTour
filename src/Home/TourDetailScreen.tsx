@@ -85,8 +85,8 @@ const TourDetailScreen = () => {
         setError(resReview.message);
         return;
       }
-      console.log(resReview.reviewResponse.data);
       setReviews(resReview.reviewResponse.data);
+      console.log('review', reviews);
     } catch (error) {
       setError('Unknown error occurred');
     } finally {
@@ -224,7 +224,8 @@ const TourDetailScreen = () => {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Address: </Text>
             <Text style={styles.detailValue}>
-              {tour?.address}, {tour?.distance}, {tour?.city}, {tour?.country}
+              {tour?.address}, {tour?.distance}
+              {tour?.country}
             </Text>
           </View>
           <View style={styles.detailRow}>
@@ -329,10 +330,13 @@ const TourDetailScreen = () => {
                 .slice(0, 4)
                 .map(item => <ReviewCard key={item.id} {...item} />)}
           </ScrollView>
-
-          <TouchableOpacity onPress={() => setShowModalReview(true)}>
-            <Text style={styles.moreText}>Show more</Text>
-          </TouchableOpacity>
+          {reviews?.length ? (
+            <TouchableOpacity onPress={() => setShowModalReview(true)}>
+              <Text style={styles.moreText}>Show more</Text>
+            </TouchableOpacity>
+          ) : (
+            <></>
+          )}
         </View>
 
         <View style={{ height: 80 }}></View>
@@ -379,6 +383,7 @@ const TourDetailScreen = () => {
       />
       {reviews && (
         <ReviewModal
+          experienceId={tour?.id ? tour.id : ''}
           reviews={reviews}
           onClose={() => setShowModalReview(false)}
           quantityReview={tour?.totalReviews ? tour.totalReviews : 0}

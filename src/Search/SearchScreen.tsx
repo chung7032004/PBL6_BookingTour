@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -42,6 +43,8 @@ const SearchScreen = () => {
     categoryId ? [categoryId] : [],
   );
   const [currentKeyword, setCurrentKeyword] = useState<string>('');
+  const [loadingMore, setLoadingMore] = useState(false);
+  const skipEndReachedRef = useRef(false);
 
   const handleSearch = useCallback(
     async (keyword: string) => {

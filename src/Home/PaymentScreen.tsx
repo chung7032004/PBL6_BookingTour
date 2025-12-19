@@ -237,9 +237,8 @@ const PaymentScreen = () => {
                 {tourName}
               </Text>
               <View style={styles.ratingRow}>
-                <MaterialIcons name="star" size={16} color={COLORS.warning} />
                 <Text style={[styles.ratingText, TYPOGRAPHY.caption]}>
-                  5.0 (2,398 reviews)
+                  {slot.spotsAvailable} spots left
                 </Text>
               </View>
             </View>

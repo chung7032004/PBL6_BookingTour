@@ -40,7 +40,9 @@ const SelectDateCard = ({
       onPress={onPress}
     >
       <View>
-        <Text style={styles.cardQuantity}>{slot.spotsAvailable} chỗ trống</Text>
+        <Text style={styles.cardQuantity}>
+          {slot.spotsAvailable} spots left
+        </Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.cardDate}>{formatDate(slot.date)}</Text>
           <Text style={styles.cardDate}> : </Text>

@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
     width: 90,
     borderRadius: 45,
     marginBottom: 5,
+    marginTop: 15,
   },
   userName: {
     fontSize: 20,

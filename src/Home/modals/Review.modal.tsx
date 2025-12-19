@@ -1,35 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dimensions,
   Modal,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import ReviewCard from '../ReviewCard';
-import CustomButton from '../../components/CustomButton';
 import { Review } from '../../../types/booking';
+import { getReviews } from '../../api/experiences/experiences';
 
 interface ReviewModalProps {
   quantityReview: number;
   visible: boolean;
   onClose: () => void;
   reviews: Review[];
+  experienceId: string;
 }
-const { width } = Dimensions.get('window');
+
+const { width, height } = Dimensions.get('window');
 
 const ReviewModal = ({
   quantityReview,
   visible,
   onClose,
   reviews,
+  experienceId,
 }: ReviewModalProps) => {
-  const [visibleCount, setVisibleCount] = useState(4);
-  const displayedReviews = reviews.slice(0, visibleCount);
-  const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 4, reviews.length)); // tăng thêm 4, nhưng không vượt quá tổng
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [pageReview, setPageReview] = useState(1);
+  const [reviewsData, setReviewsData] = useState<Review[]>([]);
+
+  useEffect(() => {
+    if (visible) {
+      setReviewsData(reviews);
+      setPageReview(1);
+    }
+  }, [visible, reviews]);
+
+  const loadMoreReview = async () => {
+    // Nếu đang tải, hoặc số lượng hiện tại đã đủ so với tổng số thì không tải thêm
+    if (loadingMore || reviewsData.length >= quantityReview) return;
+
+    setLoadingMore(true);
+    try {
+      const nextPage = pageReview + 1;
+      const resReview = await getReviews(experienceId, nextPage, 10);
+
+      const newData = resReview?.reviewResponse?.data || [];
+
+      if (newData.length > 0) {
+        setReviewsData(prev => [...prev, ...newData]);
+        setPageReview(nextPage);
+      }
+    } catch (error) {
+      console.error('Lỗi tải thêm đánh giá:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  // Component hiển thị vòng quay loading dưới đáy danh sách
+  const renderFooter = () => {
+    if (!loadingMore) return <View style={{ height: 20 }} />;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color="#FF5A5F" />
+        <Text style={styles.footerText}>Loading...</Text>
+      </View>
+    );
   };
 
   return (
@@ -44,31 +86,37 @@ const ReviewModal = ({
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>{quantityReview} reviews</Text>
-            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={onClose}
+              activeOpacity={0.7}
+            >
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Danh sách review */}
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.reviewList}
-          >
-            {displayedReviews.map(item => (
-              <View key={item.id} style={styles.reviewItem}>
-                <ReviewCard width={width - 20} {...item} />
+          {/* Danh sách review bằng FlatList */}
+          <FlatList
+            data={reviewsData}
+            keyExtractor={(item, index) => `${item.id}-${index}`} // Đảm bảo key duy nhất
+            renderItem={({ item }) => (
+              <View style={styles.reviewItem}>
+                <ReviewCard width={width - 32} {...item} />
               </View>
-            ))}
-
-            {/* Nút "Hiển thị thêm" chỉ hiện nếu còn review chưa hiển thị */}
-            {visibleCount < reviews.length && (
-              <CustomButton
-                title="Show more reviews"
-                onPress={handleLoadMore}
-                style={styles.button}
-              />
             )}
-          </ScrollView>
+            contentContainerStyle={styles.flatListContent}
+            showsVerticalScrollIndicator={false}
+            // Logic Load More
+            onEndReached={loadMoreReview}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+            // Trường hợp danh sách rỗng
+            ListEmptyComponent={
+              !loadingMore ? (
+                <Text style={styles.emptyText}>No review</Text>
+              ) : null
+            }
+          />
         </View>
       </View>
     </Modal>
@@ -78,62 +126,70 @@ const ReviewModal = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    height: '85%',
+    height: height * 0.85,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: -2 },
-    shadowRadius: 6,
-    elevation: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    borderBottomColor: '#F0F0F0',
+    zIndex: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#222',
+    color: '#1A1A1A',
   },
   closeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeText: {
-    fontSize: 22,
-    color: '#666',
+    fontSize: 16,
+    color: '#333',
+    fontWeight: 'bold',
   },
-  reviewList: {
+  flatListContent: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingTop: 16,
+    paddingBottom: 40,
   },
   reviewItem: {
-    marginBottom: 14,
+    marginBottom: 20,
+    alignItems: 'center',
   },
-  button: {
-    marginVertical: 10,
-    borderRadius: 8,
-    backgroundColor: '#ccc',
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  footerText: {
+    marginLeft: 8,
+    color: '#666',
+    fontSize: 14,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 50,
+    color: '#999',
+    fontSize: 16,
   },
 });
 

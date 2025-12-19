@@ -351,36 +351,60 @@ const BookingDetailScreen = () => {
         <View style={styles.actionSection}>
           {/* CONFIRMED → Liên hệ hướng dẫn viên */}
           {status === 'Confirmed' && (
-            <TouchableOpacity style={styles.primaryBtnV2} activeOpacity={0.8}>
-              <MaterialIcons name="phone-enabled" size={24} color="#FFFFFF" />
-              <Text style={styles.primaryBtnTextV2}>Contact Guide</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity style={styles.primaryBtnV2} activeOpacity={0.8}>
+                <MaterialIcons name="phone-enabled" size={24} color="#FFFFFF" />
+                <Text style={styles.primaryBtnTextV2}>Contact Guide</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtnV2}
+                activeOpacity={0.8}
+                onPress={() => {
+                  navigation.navigate('cancelBooking', { bookingId });
+                }}
+              >
+                <MaterialIcons name="cancel" size={24} color="#FFFFFF" />
+                <Text style={styles.cancelBtnTextV2}>Cancel Booking</Text>
+              </TouchableOpacity>
+            </>
           )}
           {/* PENDING → Hủy booking */}
-          {(status === 'Confirmed' || status === 'Pending') && (
-            <TouchableOpacity
-              style={styles.cancelBtnV2}
-              activeOpacity={0.8}
-              onPress={() => {
-                navigation.navigate('cancelBooking', { bookingId });
-              }}
-            >
-              <MaterialIcons name="cancel" size={24} color="#FFFFFF" />
-              <Text style={styles.cancelBtnTextV2}>Cancel Booking</Text>
-            </TouchableOpacity>
+          {status === 'Pending' && (
+            <>
+              <TouchableOpacity
+                style={[styles.paymentBtn, {}]}
+                activeOpacity={0.8}
+                onPress={() => {}}
+              >
+                <MaterialIcons name="payment" size={24} color="#FFFFFF" />
+                <Text style={styles.cancelBtnTextV2}>Payment</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtnV2}
+                activeOpacity={0.8}
+                onPress={() => {
+                  navigation.navigate('cancelBooking', { bookingId });
+                }}
+              >
+                <MaterialIcons name="cancel" size={24} color="#FFFFFF" />
+                <Text style={styles.cancelBtnTextV2}>Cancel Booking</Text>
+              </TouchableOpacity>
+            </>
           )}
           {/* COMPLETED → Viết đánh giá */}
           {status === 'Completed' && (
-            <TouchableOpacity
-              style={[styles.primaryBtnV2, { backgroundColor: '#FFB300' }]}
-              activeOpacity={0.8}
-              onPress={() => {
-                handleReview();
-              }}
-            >
-              <MaterialIcons name="star-rate" size={26} color="#FFFFFF" />
-              <Text style={styles.primaryBtnTextV2}>Write a Review</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={[styles.primaryBtnV2, { backgroundColor: '#FFB300' }]}
+                activeOpacity={0.8}
+                onPress={() => {
+                  handleReview();
+                }}
+              >
+                <MaterialIcons name="star-rate" size={26} color="#FFFFFF" />
+                <Text style={styles.primaryBtnTextV2}>Write a Review</Text>
+              </TouchableOpacity>
+            </>
           )}
 
           {/* CANCELLED → Đặt lại tour */}
@@ -654,6 +678,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.32,
     shadowRadius: 12,
     elevation: 10,
+  },
+  paymentBtn: {
+    flexDirection: 'row',
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    borderRadius: 16,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
   cancelBtnTextV2: {
     color: '#FFFFFF',
